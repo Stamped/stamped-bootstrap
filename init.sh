@@ -8,7 +8,7 @@ wget -qO - http://apt.opscode.com/packages@opscode.com.gpg.key | apt-key add -
 
 apt-get update
 
-echo "\n\n\n\n\n\n\n\n" > temp
+echo "none\n\n\n\n\n\n\n\n" > temp
 apt-get -y install chef < temp
 
 echo "chef installed"
