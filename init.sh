@@ -12,3 +12,9 @@ echo "none\n\n\n\n\n\n\n\n" > temp
 apt-get -y install chef < temp
 
 echo "chef installed"
+
+cd /stamped-bootstrap/chef
+
+echo "running chef-solo..."
+chef-solo -l debug -c solo.rb
+
