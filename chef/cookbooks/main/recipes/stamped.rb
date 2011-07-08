@@ -70,10 +70,31 @@ cookbook_file "/etc/init/stamped-celery.conf" do
 end
 =end
 
+flask_config "/stamped/sites/stamped.com/bin/test.py" do
+  debug true
+  action :create
+end
+
 cookbook_file "/home/#{node[:user]}/.bash_profile" do
     source "bash_profile"
     owner node[:user]
     group node[:user]
     mode 0755
+end
+
+service "stamped-flask" do
+    provider Chef::Provider::Service::Upstart
+    enabled true
+    running true
+    supports :restart => true, :reload => true, :status => true
+    action [:enable, :start]
+end
+
+cookbook_file "/etc/init/stamped-flask.conf" do
+    source "flask.conf"
+    owner "root"
+    group "root"
+    mode 0644
+    notifies :restart, resources(:service => "stamped-flask")
 end
 

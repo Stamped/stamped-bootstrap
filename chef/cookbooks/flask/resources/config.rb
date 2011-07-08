@@ -1,9 +1,9 @@
 #
-# Author:: Seth Chisamore (<schisamo@opscode.com>)
-# Cookbook Name:: gunicorn
-# Recipe:: default
+# Author:: Travis Fischer (<travis@stamped.com>)
+# Cookbook Name:: flask
+# Resource:: config
 #
-# Copyright 2011, Opscode, Inc.
+# Copyright:: 2011, Stamped, Inc <legal@stamped.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,16 +18,14 @@
 # limitations under the License.
 #
 
-include_recipe 'python'
+actions :create, :delete
 
-unless node["gunicorn"]["virtualenv"].nil?
-  python_virtualenv node["gunicorn"]["virtualenv"] do
-    action :create
-  end
-end
+attribute :path, :kind_of => String, :name_attribute => true
+attribute :template, :kind_of => String, :default => 'flask.py.erb'
+attribute :cookbook, :kind_of => String, :default => 'flask'
 
-python_pip "gunicorn" do
-  virtualenv node["gunicorn"]["virtualenv"] unless node["gunicorn"]["virtualenv"].nil?
-  action :install
-end
+attribute :debug, :kind_of => [TrueClass, FalseClass], :default => true
+
+attribute :owner, :regex => Chef::Config[:user_valid_regex]
+attribute :group, :regex => Chef::Config[:group_valid_regex]
 

@@ -6,8 +6,10 @@
         "git", 
         "nginx", 
         "gunicorn", 
+        "flask", 
         "vim", 
-        "main"
+        "main::default", 
+        "main::stamped"
     ],
     
     "base_packages": [

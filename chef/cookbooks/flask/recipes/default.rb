@@ -1,9 +1,9 @@
 #
-# Author:: Seth Chisamore (<schisamo@opscode.com>)
-# Cookbook Name:: gunicorn
+# Cookbook Name:: flask
 # Recipe:: default
+# Author:: AJ Christensen <aj@junglist.gen.nz>
 #
-# Copyright 2011, Opscode, Inc.
+# Copyright 2008-2009, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@
 
 include_recipe 'python'
 
-unless node["gunicorn"]["virtualenv"].nil?
-  python_virtualenv node["gunicorn"]["virtualenv"] do
+unless node["flask"]["virtualenv"].nil?
+  python_virtualenv node["flask"]["virtualenv"] do
     action :create
   end
 end
 
-python_pip "gunicorn" do
-  virtualenv node["gunicorn"]["virtualenv"] unless node["gunicorn"]["virtualenv"].nil?
+python_pip "flask" do
+  virtualenv node["flask"]["virtualenv"] unless node["gunicorn"]["virtualenv"].nil?
   action :install
 end
 
