@@ -71,7 +71,6 @@ cookbook_file "/home/#{node[:user]}/.bash_profile" do
     mode 0755
 end
 
-
 git "/stamped" do
   repository "git@github.com:Stamped/Stamped.git"
   reference "master"
