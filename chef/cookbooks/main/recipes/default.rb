@@ -71,3 +71,10 @@ cookbook_file "/home/#{node[:user]}/.bash_profile" do
     mode 0755
 end
 
+
+git "/stamped" do
+  repository "git://git.stamped/stamped.git"
+  reference "master"
+  action :sync
+end
+

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 echo "script initiated as `whoami`"
 
