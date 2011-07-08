@@ -89,19 +89,19 @@ cookbook_file "/home/#{node[:user]}/.vimrc" do
     mode 0755
 end
 
-service "stamped-flask" do
-    provider Chef::Provider::Service::Upstart
-    enabled true
-    running true
-    supports :restart => true, :reload => true, :status => true
-    action [:enable, :start]
-end
-
 cookbook_file "/etc/init/stamped-flask.conf" do
     source "flask.conf"
     owner "root"
     group "root"
     mode 0644
     notifies :restart, resources(:service => "stamped-flask")
+end
+
+service "stamped-flask" do
+    provider Chef::Provider::Service::Upstart
+    enabled true
+    running true
+    supports :restart => true, :reload => true, :status => true
+    action [:enable, :start]
 end
 
