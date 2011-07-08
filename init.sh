@@ -17,3 +17,4 @@ cd /stamped-bootstrap/chef
 
 echo "running chef-solo..."
 chef-solo -l debug -c solo.rb
+
