@@ -73,7 +73,7 @@ end
 
 
 git "/stamped" do
-  repository "git://git.stamped/stamped.git"
+  repository "git@github.com:Stamped/Stamped.git"
   reference "master"
   action :sync
 end
