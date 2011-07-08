@@ -82,6 +82,13 @@ cookbook_file "/home/#{node[:user]}/.bash_profile" do
     mode 0755
 end
 
+cookbook_file "/home/#{node[:user]}/.vimrc" do
+    source "vimrc"
+    owner node[:user]
+    group node[:user]
+    mode 0755
+end
+
 service "stamped-flask" do
     provider Chef::Provider::Service::Upstart
     enabled true

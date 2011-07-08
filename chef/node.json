@@ -16,7 +16,7 @@
         "bash-completion"
     ],
     
-    "user": "devbot", 
+    "user": "ubuntu", 
     
     "users": {
         "devbot": {
