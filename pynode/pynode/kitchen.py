@@ -92,6 +92,7 @@ class Kitchen(Environment):
         for name in args:
             cookbook = None
             
+            print "%d cookbook_paths" % len(self._cookbookPaths)
             for origpath, path in reversed(self._cookbookPaths):
                 print ""
                 print origpath
