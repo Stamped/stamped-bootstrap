@@ -57,6 +57,7 @@ def main():
     node_name = params['name']
     
     path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    print "PATH = %s" % path
     params['path'] = path
     
     check_shell('easy_install virtualenv', True)
@@ -68,10 +69,10 @@ def main():
         (config_file, string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' ')))
     
     os.chdir('pynode')
-    check_shell('python setup.py build --build-base=/tmp --force', True)
-    check_shell('python setup.py install --force --record=.pynode.record', True)
+    check_shell('python setup.py build --build-base=/tmp --force')
+    check_shell('python setup.py install --force --record=.pynode.record')
     check_shell('rm -rf `cat .pynode.record`')
-    check_shell('python setup.py install --force', True)
+    check_shell('python setup.py install --force')
     os.chdir('..')
     check_shell('pynode %s' % config_file, True)
 
