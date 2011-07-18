@@ -21,13 +21,13 @@ if 'git' in env.config.node and 'repos' in env.config.node.git:
         Script(name="git.clone.%s" % repo.url, 
                code="git clone %s %s" % (repo.url, repo.path))
 
-"""
 activate = env.config.node.path + "/bin/activate"
 python = env.config.node.path + "/bin/python"
-site = env.config.node.wsgi_app
-wsgi_log = env.config.node.wsgi_log
 
-Service(name="wsgi_app", 
-        start_cmd="source %s && %s %s >& %s&" % (activate, python, site, wsgi_log))
-"""
+if 'wsgi' in env.config.node:
+    site = env.config.node.wsgi.app
+    log  = env.config.node.wsgi.log
+    
+    Service(name="wsgi_app", 
+            start_cmd="source %s && %s %s >& %s&" % (activate, python, site, log))
 
