@@ -1,5 +1,5 @@
 
-from pynode.resources import Service
+from pynode.resources import Script, Service
 
 env.includeRecipe("virtualenv")
 
