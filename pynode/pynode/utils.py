@@ -66,16 +66,12 @@ def printException():
 
 def resolvePath(path):
     if "." in path and not os.path.exists(path) and not '/' in path:
-        import copy, sys
-        import cookbooks
-        oldpath = copy.deepcopy(sys.path)
-        
-        sys.path.append('.')
-        sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+        if path.startswith('pynode.'):
+            path = path[7:]
+            print path
         
         pkg  = __import__(path, globals(), locals(), path)
         path = os.path.dirname(os.path.abspath(pkg.__file__))
-        sys.path = oldpath
     
     return os.path.abspath(path)
 
