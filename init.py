@@ -50,7 +50,7 @@ def main():
     
     # parse commandline
     (options, params) = parseCommandLine()
-    print str(params)
+    global node_name
     node_name = params['name']
     
     path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
