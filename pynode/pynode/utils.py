@@ -67,7 +67,7 @@ def printException():
 def resolvePath(path):
     if "." in path and not os.path.exists(path) and not '/' in path:
         if path.startswith('pynode.'):
-            path = path[7:]
+            path = os.path.join(os.path.dirname(__file__), path[7:])
         else:
             pkg  = __import__(path, globals(), locals(), path)
             path = os.path.dirname(os.path.abspath(pkg.__file__))
