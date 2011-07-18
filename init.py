@@ -67,10 +67,12 @@ def main():
     check_shell('python config/convert.py -t config/templates/instance.py.j2 -o %s %s' % \
         (config_file, string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' ')))
     
-    #os.chdir('pynode')
-    #check_shell('python setup.py build --build-base=/tmp --force', True)
-    #check_shell('python setup.py install --force', True)
-    #os.chdir('..')
+    os.chdir('pynode')
+    check_shell('python setup.py build --build-base=/tmp --force')
+    check_shell('python setup.py install --force --record=.pynode.record')
+    check_shell('rm -rf `cat .pynode.record`')
+    check_shell('python setup.py install --force')
+    os.chdir('..')
     check_shell('python pynode/pynode/pynode.py %s' % config_file, True)
 
 if __name__ == '__main__':

@@ -1,3 +1,0 @@
-[console_scripts]
-pynode = pynode.pynode:main
-
