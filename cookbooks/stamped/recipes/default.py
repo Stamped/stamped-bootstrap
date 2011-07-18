@@ -1,5 +1,5 @@
 
-from pynode.resources import Script, Service
+from pynode.resources import *
 from pynode.utils import AttributeDict
 import os
 
