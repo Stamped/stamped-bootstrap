@@ -18,7 +18,7 @@ for package in env.config.node.python.requirements:
 if 'git' in env.config.node and 'repos' in env.config.node.git:
     for repo in env.config.node.git.repos:
         repo = AttributeDict(repo)
-        Script(name="git.clone." % repo.url, 
+        Script(name="git.clone.%s" % repo.url, 
                code="git clone %s %s" % (repo.url, repo.path))
 
 """
