@@ -44,7 +44,7 @@ def main():
     params['path'] = path
     
     shell('python config/init.py -t config/templates/instance.py.j2 -o config/generated/instance.py %s' % \
-        string.joinfields(('%s=%s' % (param, params[param] for param in params)), ' '))
+        string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' '))
 
 if __name__ == '__main__':
     main()
