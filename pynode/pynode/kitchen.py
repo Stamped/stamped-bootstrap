@@ -101,7 +101,7 @@ class Kitchen(Environment):
                 break
             
             if not cookbook:
-                raise ImportError("Cookbook %s not found" % name)
+                raise ImportError("Cookbook '%s' not found" % name)
             
             self._registerCookbook(cookbook)
     

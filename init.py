@@ -12,16 +12,19 @@ from config import convert
 
 node_name = ""
 
-def shell(cmd):
-    pp = Popen(cmd, shell=True, stdout=PIPE)
+def shell(cmd, stdout=False):
+    if stdout:
+        pp = Popen(cmd, shell=True)
+    else:
+        pp = Popen(cmd, shell=True, stdout=PIPE)
     status = pp.wait()
     
     return status
 
-def check_shell(cmd):
+def check_shell(cmd, stdout=False):
     print '[%s] %s' % (node_name, cmd)
     
-    if 0 != shell(cmd):
+    if 0 != shell(cmd, stdout):
         print 'error running shell command: %s' % cmd
         sys.exit(1)
 
@@ -63,7 +66,7 @@ def main():
     os.chdir('pynode')
     check_shell('python setup.py build install')
     os.chdir('..')
-    check_shell('pynode %s' % config_file)
+    check_shell('pynode %s' % config_file, True)
 
 if __name__ == '__main__':
     main()
