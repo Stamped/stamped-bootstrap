@@ -18,11 +18,13 @@ if 'git' in env.config.node and 'repos' in env.config.node.git:
     for repo in env.config.node.git.repos:
         pass
 
+"""
 activate = env.config.node.path + "/bin/activate"
 python = env.config.node.path + "/bin/python"
 site = env.config.node.wsgi_app
 wsgi_log = env.config.node.wsgi_log
 
-#Service(name="wsgi_app", 
-#        start_cmd="source %s && %s %s >& %s&" % (activate, python, site, wsgi_log))
+Service(name="wsgi_app", 
+        start_cmd="source %s && %s %s >& %s&" % (activate, python, site, wsgi_log))
+"""
 
