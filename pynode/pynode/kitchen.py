@@ -68,9 +68,9 @@ class Kitchen(Environment):
                 try:
                     self._loadCookbook(cookbook)
                     cookbook = self.cookbooks[cookbook]
-                except ImportError as e:
+                except ImportError:
                     utils.log("Error: unable to find cookbook for recipe '%s'" % name)
-                    raise e
+                    raise
             
             self._included_recipes[name] = (cookbook, recipe)
             

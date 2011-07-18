@@ -168,10 +168,10 @@ class Resource(AttributeDict):
                     value = resourceArg.validate(value)
                     self[arg] = value
                     #utils.log("added '%s'='%s' to resource '%s'" % (arg, str(value), str(self)))
-                except InvalidArgument as e:
+                except InvalidArgument:
                     utils.log("Error initializing argument '%s' for resource %s" % (arg, str(self)))
                     utils.printException()
-                    raise e
+                    raise
         
         for key in schema:
             if not key in self:
