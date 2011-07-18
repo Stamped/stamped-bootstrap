@@ -51,10 +51,6 @@ def parseCommandLine():
 def main():
     os.chdir(os.path.dirname(__file__))
     
-    check_shell('easy_install virtualenv', True)
-    check_shell('virtualenv .')
-    check_shell('pip install Jinja2')
-    
     # parse commandline
     (options, params) = parseCommandLine()
     global node_name
@@ -62,6 +58,10 @@ def main():
     
     path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     params['path'] = path
+    
+    check_shell('easy_install virtualenv', True)
+    check_shell('virtualenv .')
+    check_shell('pip install Jinja2')
     
     config_file = "config/generated/instance.py"
     check_shell('python config/convert.py -t config/templates/instance.py.j2 -o %s %s' % \

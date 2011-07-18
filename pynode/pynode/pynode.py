@@ -16,7 +16,7 @@ class PyNode(object):
     
     @utils.lazyProperty
     def config(self):
-        configFilePath = utils.resolvePath(self.options.config)
+        configFilePath = self.options.config
         
         try:
             with open(configFilePath, "rb") as fp:
