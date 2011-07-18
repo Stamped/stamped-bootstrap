@@ -64,7 +64,8 @@ def main():
         (config_file, string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' ')))
     
     os.chdir('pynode')
-    check_shell('python setup.py build install')
+    check_shell('python setup.py build --build-base=/tmp --force')
+    check_shell('python setup.py install --force')
     os.chdir('..')
     check_shell('pynode %s' % config_file, True)
 
