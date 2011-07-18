@@ -49,6 +49,7 @@ def parseCommandLine():
     return (options, params)
 
 def main():
+    print __file__
     os.chdir(os.path.dirname(__file__))
     
     # parse commandline
@@ -61,7 +62,7 @@ def main():
     params['path'] = path
     
     check_shell('easy_install virtualenv', True)
-    check_shell('virtualenv . && source bin/activate')
+    check_shell('virtualenv . && . bin/activate')
     check_shell('pip install Jinja2')
     
     config_file = "config/generated/instance.py"

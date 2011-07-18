@@ -32,5 +32,5 @@ if 'wsgi' in env.config.node:
     Directory(os.path.dirname(log))
     
     Service(name="wsgi_app", 
-            start_cmd="source %s && %s %s >& %s&" % (activate, python, site, log))
+            start_cmd=". %s && %s %s >& %s&" % (activate, python, site, log))
 
