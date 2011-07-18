@@ -79,8 +79,8 @@ class Kitchen(Environment):
     
     def addCookbookPath(self, *args):
         for origPath in args:
-            print origPath
             path = utils.resolvePath(origPath)
+            print "%s vs %s" % (origPath, path)
             
             self._cookbookPaths.append((origPath, path))
     
@@ -93,12 +93,7 @@ class Kitchen(Environment):
         for name in args:
             cookbook = None
             
-            print "%d cookbook_paths" % len(self._cookbookPaths)
             for origpath, path in reversed(self._cookbookPaths):
-                print ""
-                print origpath
-                print path
-                print ""
                 fullpath = os.path.join(path, name)
                 if not os.path.exists(fullpath):
                     continue
