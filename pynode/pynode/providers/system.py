@@ -5,7 +5,7 @@ __version__ = "1.0"
 __copyright__ = "Copyright (c) 2011 Stamped.com"
 __license__ = "TODO"
 
-import grp, os, pwd, subprocess, pynode.utils
+import grp, os, pwd, subprocess, pynode.utils as utils
 
 from pynode.errors import Fail
 from pynode.provider import Provider

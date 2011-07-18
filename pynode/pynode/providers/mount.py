@@ -5,7 +5,7 @@ __version__ = "1.0"
 __copyright__ = "Copyright (c) 2011 Stamped.com"
 __license__ = "TODO"
 
-import os, re, pynode.utils
+import os, re, pynode.utils as utils
 
 from subprocess import Popen, PIPE, STDOUT, check_call
 from pynode.errors import Fail
