@@ -79,6 +79,7 @@ class Kitchen(Environment):
     
     def addCookbookPath(self, *args):
         for origPath in args:
+            print origPath
             path = utils.resolvePath(origPath)
             
             self._cookbookPaths.append((origPath, path))
