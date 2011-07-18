@@ -67,6 +67,7 @@ def printException():
 def resolvePath(path):
     if "." in path and not os.path.exists(path) and not '/' in path:
         import copy, sys
+        import cookbooks
         oldpath = copy.deepcopy(sys.path)
         
         sys.path.append('.')
