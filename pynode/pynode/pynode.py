@@ -33,9 +33,8 @@ class PyNode(object):
         
         if 'cookbook_path' in self.config:
             for path in self.config['cookbook_path']:
-                if "." not in path:
-                    path = os.path.join(os.path.dirname(utils.resolvePath(self.options.config)), path)
-                
+                #if "." not in path:
+                #    path = os.path.join(os.path.dirname(utils.resolvePath(self.options.config)), path)
                 kitchen.addCookbookPath(path)
         
         if 'recipes' in self.config:
