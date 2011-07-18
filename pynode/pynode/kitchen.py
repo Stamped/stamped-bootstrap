@@ -93,6 +93,10 @@ class Kitchen(Environment):
             cookbook = None
             
             for origpath, path in reversed(self._cookbookPaths):
+                print ""
+                print origpath
+                print path
+                print ""
                 fullpath = os.path.join(path, name)
                 if not os.path.exists(fullpath):
                     continue
