@@ -37,7 +37,7 @@ def parseCommandLine():
     return (options, params)
 
 def main():
-    os.chdir(os.dirname(__file__))
+    os.chdir(os.path.dirname(__file__))
     
     # parse commandline
     (options, params) = parseCommandLine()
