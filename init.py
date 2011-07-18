@@ -60,7 +60,7 @@ def main():
     params['path'] = path
     
     check_shell('easy_install virtualenv', True)
-    check_shell('virtualenv .')
+    check_shell('virtualenv . && bin/activate')
     check_shell('pip install Jinja2')
     
     config_file = "config/generated/instance.py"
@@ -68,10 +68,10 @@ def main():
         (config_file, string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' ')))
     
     os.chdir('pynode')
-    check_shell('python setup.py build --build-base=/tmp --force')
-    check_shell('python setup.py install --force --record=.pynode.record')
+    check_shell('python setup.py build --build-base=/tmp --force', True)
+    check_shell('python setup.py install --force --record=.pynode.record', True)
     check_shell('rm -rf `cat .pynode.record`')
-    check_shell('python setup.py install --force')
+    check_shell('python setup.py install --force', True)
     os.chdir('..')
     check_shell('python pynode/pynode/pynode.py %s' % config_file, True)
 
