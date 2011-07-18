@@ -29,7 +29,7 @@ class DebianAptProvider(PackageProvider):
             ver = line[1].strip()
             if line[0] == "Installed":
                 self.currentVersion = None if ver == '(none)' else ver
-                Utils.log("Current version of package %s is %s" % (self.resource.name, self.currentVersion))
+                utils.log("Current version of package %s is %s" % (self.resource.name, self.currentVersion))
             elif line[0] == "Candidate":
                 self.candidateVersion = ver
         

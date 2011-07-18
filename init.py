@@ -58,6 +58,9 @@ def main():
     path = os.path.dirname(os.path.abspath(__file__))
     os.chdir(path)
     
+    if os.path.exists(os.path.join(path, "bin")):
+        shell('rm -rf %s/bin %s/install %s/lib' % (path, path, path))
+    
     # parse commandline
     (options, params) = parseCommandLine()
     assert 'name' in params
@@ -68,7 +71,7 @@ def main():
     
     check_shell('easy_install virtualenv', True)
     check_shell('virtualenv . && . bin/activate')
-    check_shell('pip install Jinja2')
+    check_shell('pip install -U Jinja2')
     
     config_file = "config/generated/instance.py"
     check_shell('python config/convert.py -t config/templates/instance.py.j2 -o %s %s' % \
@@ -79,7 +82,7 @@ def main():
     check_shell('python setup.py install --force --record=.pynode.record', True)
     check_shell('rm -rf `cat .pynode.record`')
     check_shell('python setup.py install --force')
-    os.chdir('..')
+    os.chdir(path)
     check_shell('pynode %s' % config_file, True)
 
 if __name__ == '__main__':
