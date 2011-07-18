@@ -20,6 +20,7 @@ def shell(cmd):
 
 def check_shell(cmd):
     print '[%s] %s' % (node_name, cmd)
+    
     if 0 != shell(cmd):
         print 'error running shell command: %s' % cmd
         sys.exit(1)
@@ -49,6 +50,7 @@ def main():
     
     # parse commandline
     (options, params) = parseCommandLine()
+    print str(params)
     node_name = params['name']
     
     path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
