@@ -66,15 +66,15 @@ def printException():
 
 def resolvePath(path):
     if "." in path and not os.path.exists(path) and not '/' in path:
-        #import copy, sys
-        #oldpath = copy.deepcopy(sys.path)
+        import copy, sys
+        oldpath = copy.deepcopy(sys.path)
         
-        #sys.path.append('.')
-        #sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.append('.')
+        sys.path.append(os.path.dirname(os.path.abspath(__file__)))
         
         pkg  = __import__(path, globals(), locals(), path)
         path = os.path.dirname(os.path.abspath(pkg.__file__))
-        #sys.path = oldpath
+        sys.path = oldpath
     
     return os.path.abspath(path)
 
