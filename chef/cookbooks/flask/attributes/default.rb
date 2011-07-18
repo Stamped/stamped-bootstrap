@@ -1,3 +1,0 @@
-
-default["flask"]["virtualenv"] = nil
-

@@ -1,0 +1,38 @@
+{
+    "name" : "{{ name }}", 
+    "type" : "{{ type }}", 
+    "path" : "{{ path }}", 
+    "port_base" : "{{ port_base }}", 
+    "cookbook_path" : [ "pynode.cookbooks", "cookbooks", ], 
+    
+    "git" : {
+        "repos" : [ 
+            {
+                "url" : "git@github.com:Stamped/stamped-bootstrap.git", 
+                "path" : "{{ path }}", 
+            }
+        ], 
+    }, 
+    
+    "wsgi" : {
+        "app" : "{{ path }}/stamped/sites/stamped.com/bin/serve.py", 
+        "log" : "{{ path }}/stamped/logs/wsgi.log", 
+    }, 
+    
+    "python" : {
+        "requirements" : [
+            "fabric", 
+            "BeautifulSoup", 
+            "boto", 
+            "xlrd", 
+            "pymongo", 
+            "flask", 
+            "gunicorn", 
+            "gevent", 
+        ], 
+    }, 
+    
+    "recipes" : [
+        "stamped", 
+    ], 
+}
