@@ -54,7 +54,7 @@ def main():
     check_shell('python config/convert.py -t config/templates/instance.py.j2 -o %s %s' % \
         (config_file, string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' ')))
     
-    check_shell('pynode/setup.py build install')
+    check_shell('python pynode/setup.py build install')
     check_shell('pynode %s' % config_file)
 
 if __name__ == '__main__':
