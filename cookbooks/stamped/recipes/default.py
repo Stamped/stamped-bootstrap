@@ -9,12 +9,10 @@ env.includeRecipe("virtualenv")
 path = env.config.node.path
 env.cookbooks.virtualenv.VirtualEnv(path) #, site_packages=False)
 
-print "PLATFORM: " + env.system.platform
-
 if env.system.platform != "mac_os_x":
     Package("python-dev")
+    Package("gcc")
 
-Package("gcc")
 env.includeRecipe("pip")
 #env.includeRecipe("libevent")
 
