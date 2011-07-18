@@ -24,6 +24,10 @@ def shell(cmd, stdout=False):
 def check_shell(cmd, stdout=False):
     print '[%s] %s' % (node_name, cmd)
     
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin/activate")
+    if os.path.exists(path):
+        cmd = ". %s && %s" % (path, cmd)
+    
     if 0 != shell(cmd, stdout):
         print 'error running shell command: %s' % cmd
         sys.exit(1)
@@ -49,16 +53,15 @@ def parseCommandLine():
     return (options, params)
 
 def main():
-    print __file__
-    os.chdir(os.path.dirname(__file__))
+    path = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(path)
     
     # parse commandline
     (options, params) = parseCommandLine()
+    assert 'name' in params
+    
     global node_name
     node_name = params['name']
-    
-    path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    print "PATH = %s" % path
     params['path'] = path
     
     check_shell('easy_install virtualenv', True)
