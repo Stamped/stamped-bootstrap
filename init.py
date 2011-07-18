@@ -62,7 +62,7 @@ def main():
     
     os.chdir('pynode')
     check_shell('python setup.py build install')
-    os.chdir('../..')
+    os.chdir('..')
     check_shell('pynode %s' % config_file)
 
 if __name__ == '__main__':

@@ -18,14 +18,14 @@ class PyNode(object):
     def config(self):
         configFilePath = utils.resolvePath(self.options.config)
         
-        with open(configFilePath, "rb") as fp:
-            source = fp.read()
-        
-        cfg = eval(source)
-        if not 'path' in cfg:
-            cfg['path'] = "/pynode/%s" % cfg['name']
-        
-        return cfg
+        try:
+            with open(configFilePath, "rb") as fp:
+                source = fp.read()
+            
+            return eval(source)
+        except Exception:
+            utils.log("Error parsing config file '%s'" % self.options.config)
+            utils.printException()
     
     def run(self):
         kitchen = Kitchen()
