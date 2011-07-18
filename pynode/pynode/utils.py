@@ -65,7 +65,7 @@ def printException():
     traceback.print_exc()
 
 def resolvePath(path):
-    if "." in path and not os.path.exists(path):
+    if "." in path and not os.path.exists(path) and not '/' in path:
         pkg  = __import__(path, {}, {}, path)
         path = os.path.dirname(os.path.abspath(pkg.__file__))
     
