@@ -70,7 +70,7 @@ def main():
     
     os.chdir('pynode')
     check_shell('python setup.py build --build-base=/tmp --force')
-    check_shell('python setup.py install --force --record=.pynode.record')
+    check_shell('python setup.py install --force --record=.pynode.record', True)
     check_shell('rm -rf `cat .pynode.record`')
     check_shell('python setup.py install --force')
     os.chdir('..')
