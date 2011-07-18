@@ -1,6 +1,7 @@
 
 from pynode.resources import Script, Service
 from pynode.utils import AttributeDict
+import os
 
 env.includeRecipe("virtualenv")
 
@@ -27,6 +28,8 @@ python = env.config.node.path + "/bin/python"
 if 'wsgi' in env.config.node:
     site = env.config.node.wsgi.app
     log  = env.config.node.wsgi.log
+    
+    Directory(os.path.dirname(log))
     
     Service(name="wsgi_app", 
             start_cmd="source %s && %s %s >& %s&" % (activate, python, site, log))
