@@ -10,6 +10,8 @@ from subprocess import Popen, PIPE
 from optparse import OptionParser
 from config import convert
 
+node_name = ""
+
 def shell(cmd):
     pp = Popen(cmd, shell=True, stdout=PIPE)
     status = pp.wait()
@@ -17,6 +19,7 @@ def shell(cmd):
     return status
 
 def check_shell(cmd):
+    print '[%s] %s' % (node_name, cmd)
     if 0 != shell(cmd):
         print 'error running shell command: %s' % cmd
         sys.exit(1)
@@ -46,6 +49,7 @@ def main():
     
     # parse commandline
     (options, params) = parseCommandLine()
+    node_name = params['name']
     
     path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     params['path'] = path
