@@ -4,7 +4,7 @@ from pynode.resources import Service
 env.includeRecipe("virtualenv")
 
 path = env.config.node.path
-env.cookbooks.virtualenv.VirtualEnv(path, site_packages=False)
+env.cookbooks.virtualenv.VirtualEnv(path) #, site_packages=False)
 
 env.includeRecipe("pip")
 env.includeRecipe("libevent")
@@ -16,7 +16,8 @@ for package in env.config.node.python.requirements:
 # install git repos
 if 'git' in env.config.node and 'repos' in env.config.node.git:
     for repo in env.config.node.git.repos:
-        pass
+        Script(name="git.clone." % repo.url, 
+               code="git clone %s %s" % (repo.url, repo.path))
 
 """
 activate = env.config.node.path + "/bin/activate"
