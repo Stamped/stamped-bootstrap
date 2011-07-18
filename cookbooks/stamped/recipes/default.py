@@ -3,6 +3,7 @@ from pynode.resources import *
 from pynode.utils import AttributeDict
 import os
 
+# install prerequisites
 env.includeRecipe("virtualenv")
 
 path = env.config.node.path
@@ -25,6 +26,7 @@ if 'git' in env.config.node and 'repos' in env.config.node.git:
 activate = env.config.node.path + "/bin/activate"
 python = env.config.node.path + "/bin/python"
 
+# start wsgi application (flask server)
 if 'wsgi' in env.config.node:
     site = env.config.node.wsgi.app
     log  = env.config.node.wsgi.log

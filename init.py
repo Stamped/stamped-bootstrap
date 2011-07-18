@@ -30,6 +30,8 @@ def check_shell(cmd, stdout=False):
     
     if 0 != shell(cmd, stdout):
         print 'error running shell command: %s' % cmd
+        sys.stdout.flush()
+        sys.stderr.flush()
         sys.exit(1)
 
 def parseCommandLine():
@@ -62,7 +64,7 @@ def main():
     
     global node_name
     node_name = params['name']
-    params['path'] = path
+    params['path'] = os.path.dirname(path)
     
     check_shell('easy_install virtualenv', True)
     check_shell('virtualenv . && . bin/activate')
