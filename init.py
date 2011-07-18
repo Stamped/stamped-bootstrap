@@ -51,6 +51,10 @@ def parseCommandLine():
 def main():
     os.chdir(os.path.dirname(__file__))
     
+    check_shell('easy_install virtualenv', True)
+    check_shell('virtualenv .')
+    check_shell('pip install Jinja2')
+    
     # parse commandline
     (options, params) = parseCommandLine()
     global node_name
@@ -63,11 +67,11 @@ def main():
     check_shell('python config/convert.py -t config/templates/instance.py.j2 -o %s %s' % \
         (config_file, string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' ')))
     
-    os.chdir('pynode')
-    check_shell('python setup.py build --build-base=/tmp --force', True)
-    check_shell('python setup.py install --force', True)
-    os.chdir('..')
-    check_shell('pynode %s' % config_file, True)
+    #os.chdir('pynode')
+    #check_shell('python setup.py build --build-base=/tmp --force', True)
+    #check_shell('python setup.py install --force', True)
+    #os.chdir('..')
+    check_shell('python pynode/pynode/pynode.py %s' % config_file, True)
 
 if __name__ == '__main__':
     main()
