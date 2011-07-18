@@ -5,7 +5,7 @@ __version__ = "1.0"
 __copyright__ = "Copyright (c) 2011 Stamped.com"
 __license__ = "TODO"
 
-import os, sys
+import os, string, sys
 from subprocess import Popen, PIPE
 from optparse import OptionParser
 from config import convert
@@ -43,7 +43,7 @@ def main():
     path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     params['path'] = path
     
-    shell('python config/init.py -t config/templates/instance.py.j2 -o config/generated/instance.py %s' % \
+    shell('python config/convert.py -t config/templates/instance.py.j2 -o config/generated/instance.py %s' % \
         string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' '))
 
 if __name__ == '__main__':
