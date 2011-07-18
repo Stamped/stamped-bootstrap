@@ -1,5 +1,6 @@
 
 from pynode.resources import Script, Service
+from pynode.utils import AttributeDict
 
 env.includeRecipe("virtualenv")
 
@@ -16,6 +17,7 @@ for package in env.config.node.python.requirements:
 # install git repos
 if 'git' in env.config.node and 'repos' in env.config.node.git:
     for repo in env.config.node.git.repos:
+        repo = AttributeDict(repo)
         Script(name="git.clone." % repo.url, 
                code="git clone %s %s" % (repo.url, repo.path))
 

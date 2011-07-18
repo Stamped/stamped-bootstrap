@@ -99,7 +99,6 @@ class AttributeDict(object):
         self._dict[name] = self._convert_value(value)
 
     def __getitem__(self, name):
-        
         return self._convert_value(self._dict[name])
 
     def _convert_value(self, value):
