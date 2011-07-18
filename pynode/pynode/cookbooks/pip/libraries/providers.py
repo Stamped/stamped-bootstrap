@@ -57,7 +57,7 @@ class PipPackageProvider(PackageProvider):
     
     def _install_package(self, name, version):
         if self.resource.virtualenv is not None:
-            prefix     = "source %s/bin/activate && " % self.resource.virtualenv
+            prefix     = ". %s/bin/activate && " % self.resource.virtualenv
             virtualenv = "--environment %s" % self.resource.virtualenv
         else:
             prefix     = ""

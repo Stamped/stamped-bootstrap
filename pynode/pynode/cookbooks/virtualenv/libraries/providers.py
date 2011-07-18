@@ -29,7 +29,7 @@ class VirtualEnvProvider(Provider):
         log("Installed virtualenv '%s'" % self.resource.path)
     
     def action_activate(self):
-        (output, status) = shell('source %s/bin/activate' % self.resource.path)
+        (output, status) = shell('. %s/bin/activate' % self.resource.path)
         if 0 != status:
             raise Fail("unable to activate virtualenv %s" % self.resource.name)
     
