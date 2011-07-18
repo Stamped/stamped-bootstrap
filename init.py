@@ -16,6 +16,11 @@ def shell(cmd):
     
     return status
 
+def check_shell(cmd):
+    if 0 != shell(cmd):
+        print 'error running shell command: %s' % cmd
+        sys.exit(1)
+
 def parseCommandLine():
     usage   = "Usage: %prog [[param1=value] [param2=value]...]"
     version = "%prog " + __version__
@@ -45,8 +50,12 @@ def main():
     path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     params['path'] = path
     
-    shell('python config/convert.py -t config/templates/instance.py.j2 -o config/generated/instance.py %s' % \
-        string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' '))
+    config_file = "config/generated/instance.py"
+    check_shell('python config/convert.py -t config/templates/instance.py.j2 -o %s %s' % \
+        (config_file, string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' ')))
+    
+    check_shell('pynode/setup.py build install')
+    check_shell('pynode %s' % config_file)
 
 if __name__ == '__main__':
     main()
