@@ -44,6 +44,8 @@ if 'db' in env.config.node.roles:
     if 'dbpath' in mongodb.content:
         Directory(os.path.dirname(mongodb.content.dbpath))
     
+    print str(env.cookbooks.mongodb)
+    
     env.cookbooks.mongodb.MongoDBConfigFile(**mongodb)
     Service(name="mongod", 
             start_cmd="mongod -- --config %s %s >& log" % (mongodb.path, string.joinfields(options, ' ')))
