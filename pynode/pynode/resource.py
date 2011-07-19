@@ -54,7 +54,7 @@ class ResourceArgumentSchema(OrderedDict, ResourceArgument):
         ResourceArgument.__init__(self, 
                                   default=default, 
                                   required=required, 
-                                  expectedType=type(ResourceArgumentSchema))
+                                  expectedType=None)
         
         # hack to make ordering work... would be *much* nicer if python 
         # supported an option for order-preserving **kwargs ala:
@@ -63,6 +63,12 @@ class ResourceArgumentSchema(OrderedDict, ResourceArgument):
             self[d[0]] = d[1]
     
     def validate(self, value):
+        if value is None:
+            if self._required:
+                raise InvalidArgument("invalid value for arg %s" % str(value))
+            else:
+                return value
+        
         if not isinstance(value, dict):
             raise InvalidArgument("invalid value for arg %s" % str(value))
         
