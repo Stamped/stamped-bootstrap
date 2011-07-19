@@ -28,10 +28,16 @@ def check_shell(cmd, stdout=False):
     if os.path.exists(path):
         cmd = ". %s && %s" % (path, cmd)
     
-    if 0 != shell(cmd, stdout):
+    sys.stdout.flush()
+    sys.stderr.flush()
+    
+    ret = shell(cmd, stdout):
+    
+    sys.stdout.flush()
+    sys.stderr.flush()
+    
+    if 0 != ret
         print 'error running shell command: %s' % cmd
-        sys.stdout.flush()
-        sys.stderr.flush()
         sys.exit(1)
 
 def parseCommandLine():
