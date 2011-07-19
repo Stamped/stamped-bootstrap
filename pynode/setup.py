@@ -26,7 +26,7 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    package_data={'': [ '*.j2', '*.py', '*.txt', '*.md' ]}
+    package_data = {'': [ '*.j2', '*.py', '*.txt', '*.md' ]}, 
     install_requires = [
         'jinja2', 
     ],
