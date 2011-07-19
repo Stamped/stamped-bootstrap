@@ -29,6 +29,7 @@ if 'db' in env.config.node.roles:
     
     Directory(os.path.dirname(log))
     Directory(os.path.dirname(mongodb.path))
+    print "DBPATH: " + mongodb.dbpath
     Directory(os.path.dirname(mongodb.dbpath))
     
     env.cookbooks.mongodb.MongoDBConfigFile(**mongodb)
