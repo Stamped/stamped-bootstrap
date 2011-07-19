@@ -17,6 +17,7 @@ def shell(cmd, stdout=False):
         pp = Popen(cmd, shell=True)
     else:
         pp = Popen(cmd, shell=True, stdout=PIPE)
+        output = pp.stdout.read()
     status = pp.wait()
     
     return status
@@ -92,7 +93,7 @@ def main():
     
     os.chdir('pynode')
     check_shell('python setup.py build --build-base=/tmp --force')
-    check_shell('python setup.py install --force --record=.pynode.record', True)
+    check_shell('python setup.py install --force --record=.pynode.record')
     check_shell('rm -rf `cat .pynode.record`')
     check_shell('python setup.py install --force')
     os.chdir(path)
