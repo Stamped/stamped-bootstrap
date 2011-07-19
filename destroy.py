@@ -18,8 +18,8 @@ def shell(cmd, stdout=False):
     else:
         pp = Popen(cmd, shell=True, stdout=PIPE)
         output = pp.stdout.read()
-    status = pp.wait()
     
+    status = pp.wait()
     return status
 
 def check_shell(cmd, stdout=False, show_cmd=True):
@@ -74,7 +74,7 @@ def main():
     check_shell('python config/convert.py -t config/templates/destroy.py.j2 -o %s "%s"' % \
         (config_file, pickle.dumps(params)), show_cmd=False)
     
-    check_shell('pynode %s' % config_file, True)
+    check_shell('pynode %s' % config_file, stdout=True)
 
 if __name__ == '__main__':
     main()

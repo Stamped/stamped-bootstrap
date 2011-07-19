@@ -9,7 +9,7 @@ def shell(cmd):
     
     return status
 
-def check_shell(cmd, show_cmd):
+def check_shell(cmd, show_cmd=True):
     if show_cmd:
         print cmd
      
