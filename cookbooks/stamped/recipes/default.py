@@ -59,15 +59,28 @@ if 'web_server' in env.config.node.roles:
 if 'replSetInit' in env.config.node.roles:
     assert 'replSet' in env.config.node
     from pymongo import Connection
+    from pymongo.errors import *
     from pprint import pprint
+    from time import sleep
     
     config = env.config.node.replSet
     primary = config.members[0]['host']
     print "Initializing replica set '%s' with primary '%s'" % (config._id, primary)
     
     conn = Connection(primary, slave_okay=True)
-    conn.admin.command({'replSetInitiate' : dict(config)})
+    try:
+        conn.admin.command({'replSetInitiate' : dict(config)})
+    except AutoReconnect:
+        sleep(1)
+        pass
     
-    status = conn.admin.command({'replSetGetStatus' : 1})
-    pprint(status)
+    initializing = True
+    while initializing:
+        try:
+            status = conn.admin.command({'replSetGetStatus' : 1})
+            pprint(status)
+            initializing = False
+        except (AutoReconnect, pymongo.errors.OperationFailure):
+            sleep(1)
+            pass
 
