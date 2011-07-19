@@ -17,9 +17,9 @@
 # administration & monitoring
 {% if mongodb.nohttpinterface is not none %}nohttpinterface = {% if mongodb.nohttpinterface %}true{% else %}false{% endif %}{% endif %}
 {% if mongodb.rest is not none %}rest = {% if mongodb.rest %}true{% else %}false{% endif %}{% endif %}
-{% if mongodb.noscripting is not none %}noscripting = {% if mongodb.scripting %}false{% else %}true{% endif %}{% endif %}
-{% if mongodb.notablescan is not none %}notablescan = {% if mongodb.tablescan %}false{% else %}true{% endif %}{% endif %}
-{% if mongodb.noprealloc is not none %}noprealloc = {% if mongodb.prealloc %}false{% else %}true{% endif %}{% endif %}
+{% if mongodb.scripting is not none %}noscripting = {% if mongodb.scripting %}false{% else %}true{% endif %}{% endif %}
+{% if mongodb.tablescan is not none %}notablescan = {% if mongodb.tablescan %}false{% else %}true{% endif %}{% endif %}
+{% if mongodb.prealloc is not none %}noprealloc = {% if mongodb.prealloc %}false{% else %}true{% endif %}{% endif %}
 {% if mongodb.nssize is not none %}nssize = {{ mongodb.nssize }}{% endif %}
 {% if mongodb.mms_token is not none %}mms-token = {{ mongodb.mms_token }}{% endif %}
 {% if mongodb.mms_name is not none %}mms-name = {{ mongodb.mms_name }}{% endif %}
@@ -35,7 +35,7 @@
 
 # master-slave replication
 {% if mongodb.master is not none %}master = {% if mongodb.master %}true{% else %}false{% endif %}{% endif %}
-slave  = {% if mongodb.slave  %}true{% else %}false{% endif %}
+{% if mongodb.slave is not none %}slave  = {% if mongodb.slave  %}true{% else %}false{% endif %}{% endif %}
 {% if mongodb.source is not none %}source = {{ mongodb.source }}{% endif %}
 {% if mongodb.only is not none %}only = {{ mongodb.only }}{% endif %}
 
