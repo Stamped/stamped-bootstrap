@@ -62,7 +62,7 @@ class ResourceArgumentSchema(OrderedDict, ResourceArgument):
         for d in items:
             self[d[0]] = d[1]
     
-    def validate(self, args):
+    def validate(self, value):
         if not isinstance(value, dict):
             raise InvalidArgument("invalid value for arg %s" % str(value))
         
@@ -78,10 +78,10 @@ class ResourceArgumentSchema(OrderedDict, ResourceArgument):
                 try:
                     resourceArg = self[arg]
                     
-                    value = value[arg]
-                    value = resourceArg.validate(value)
-                    output[arg] = value
-                    #utils.log("added '%s'='%s' to resource '%s'" % (arg, str(value), str(self)))
+                    sub_value = value[arg]
+                    sub_value = resourceArg.validate(sub_value)
+                    output[arg] = sub_value
+                    #utils.log("added '%s'='%s' to resource '%s'" % (arg, str(sub_value), str(self)))
                 except InvalidArgument:
                     utils.log("Error initializing argument '%s'" % (arg, ))
                     utils.printException()
