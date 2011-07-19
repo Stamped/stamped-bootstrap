@@ -5,8 +5,8 @@
 {% if mongodb.dbpath is not none %}dbpath = {{ mongodb.dbpath }}{% endif %}
 {% if mongodb.port is not none %}port = {{ mongodb.port }}{% endif %}
 {% if mongodb.bind_ip is not none %}bind_ip = {{ mongodb.bind_ip }}{% endif %}
-{% if mongodb.logpath is not none %}logpath={{ mongodb.logpath }}{% endif %}
-{% if mongodb.logappend is not none %}logappend={{ mongodb.logappend }}{% endif %}
+{% if mongodb.logpath is not none %}logpath = {{ mongodb.logpath }}{% endif %}
+{% if mongodb.logappend is not none %}logappend = {{ mongodb.logappend }}{% endif %}
 
 # logging
 {% if mongodb.cpu is not none %}cpu = {% if mongodb.cpu %}true{% else %}false{% endif %}{% endif %}
