@@ -70,10 +70,6 @@ def main():
     node_name = params['name']
     params['path'] = os.path.dirname(path)
     
-    check_shell('easy_install virtualenv', True)
-    check_shell('virtualenv . && . bin/activate')
-    check_shell('pip install -U Jinja2')
-    
     config_file = "config/generated/destroy.py"
     check_shell('python config/convert.py -t config/templates/destroy.py.j2 -o %s "%s"' % \
         (config_file, pickle.dumps(params)), show_cmd=False)
