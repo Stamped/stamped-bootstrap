@@ -57,7 +57,7 @@ if 'replSetInit' in env.config.node.roles:
     conf = {
         'mongodb' : {
             'host' : primary_host, 
-            'port' : primary_port, 
+            'port' : int(primary_port), 
         }
     }
     
