@@ -16,14 +16,14 @@ class MongoDBConfigFileProvider(FileProvider):
     def _getContent(self):
         print "MongoDBConfigFileProvider"
         content = self.resource.content
-        print content
+        print self.resource
         
         if content is None:
             return None
         elif isinstance(content, basestring):
             return content
         elif isinstance(content, dict):
-            template = Template("mongodb/mongodb.conf.j2", variables=dict(mongodb=content))
+            template = Template("mongodb/mongodb.conf.j2", variables=dict(mongodb=self.resource))
             return template()
         elif hasattr(content, "__call__"):
             return content()
