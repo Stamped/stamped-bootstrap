@@ -60,17 +60,14 @@ class MongoDBConfigFile(File):
         
         # journaling
         ("journal",             ResourceArgumentBoolean()), 
-        
-        # PyNode-specific
-        ("name",                ResourceArgument(default=lambda r: r['path'], 
-                                                 expectedType=basestring)), 
-        ("provider",            ResourceArgument(default="*mongodb.MongoDBConfigFileProvider", 
-                                                 expectedType=basestring)), 
     ])
     
     def __init__(self):
         self._schema = copy.deepcopy(File._schema)
-        self._schema.content = self._contentSchema
+        
+        self._schema.content  = self._contentSchema
+        self._schema.provider = ResourceArgument(default="*mongodb.MongoDBConfigFileProvider", 
+                                                 expectedType=basestring)
         
         Resource.__init__(self)
 
