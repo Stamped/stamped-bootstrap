@@ -38,6 +38,7 @@
     
     {% if 'replSetInit' in roles %}
     "replSet" : {{ replSet }}, 
+    "populateDB" : "{{ path }}/stamped/sites/stamped.com/bin/api/SampleData.py", 
     {% endif %}
     
     {% if 'db' in roles %}
