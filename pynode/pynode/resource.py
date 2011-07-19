@@ -199,8 +199,8 @@ class Resource(AttributeDict):
         
         # validate resource arguments
         output = schema.validate(resolvedArgs)
-        for k, v in output.iteritems():
-            self[k] = v
+        for key in output:
+            self[key] = output[key]
         
         self.subscriptions = {
             'immediate' : set(), 
