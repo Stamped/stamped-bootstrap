@@ -20,16 +20,6 @@ env.includeRecipe("pip")
 for package in env.config.node.python.requirements:
     env.cookbooks.pip.PipPackage(package, virtualenv=path)
 
-# install git repos
-if 'git' in env.config.node and 'repos' in env.config.node.git:
-    for repo in env.config.node.git.repos:
-        repo = AttributeDict(repo)
-        Script(name="git.clone.%s" % repo.url, 
-               code="git clone %s %s" % (repo.url, repo.path))
-
-activate = env.config.node.path + "/bin/activate"
-python = env.config.node.path + "/bin/python"
-
 if 'db' in env.config.node.roles:
     env.includeRecipe('mongodb')
     
@@ -45,6 +35,16 @@ if 'db' in env.config.node.roles:
     env.cookbooks.mongodb.MongoDBConfigFile(**mongodb)
     Service(name="mongod", 
             start_cmd="mongod -- --config %s %s >& log" % (mongodb.path, string.joinfields(options, ' ')))
+
+# install git repos
+if 'git' in env.config.node and 'repos' in env.config.node.git:
+    for repo in env.config.node.git.repos:
+        repo = AttributeDict(repo)
+        Script(name="git.clone.%s" % repo.url, 
+               code="git clone %s %s" % (repo.url, repo.path))
+
+activate = env.config.node.path + "/bin/activate"
+python = env.config.node.path + "/bin/python"
 
 if 'web_server' in env.config.node.roles:
     # start wsgi application (flask server)
