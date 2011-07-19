@@ -24,7 +24,7 @@ def shell(cmd, stdout=False):
 
 def check_shell(cmd, stdout=False, show_cmd=True):
     if show_cmd:
-        print '[%s] %s' % (node_name, cmd_str)
+        print '[%s] %s' % (node_name, cmd)
     
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin/activate")
     if os.path.exists(path):
