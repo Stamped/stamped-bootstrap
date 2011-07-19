@@ -14,23 +14,13 @@ __all__ = [
     "Template", 
 ]
 
-import utils
+import copy, utils
 from utils import AttributeDict, OrderedDict
 from environment import Environment
 from errors import *
 
 # TODO: cleanup the code duplication between ResourceArgument.validate, 
 # ResourceArgumentList.validate, and ResourceArgumentBoolean.validate.
-
-class ResourceArgumentSchema(OrderedDict):
-    def __init__(self, items=[]):
-        OrderedDict.__init__(self)
-        
-        # hack to make ordering work... would be *much* nicer if python 
-        # supported an option for order-preserving **kwargs ala:
-        # http://groups.google.com/group/python-ideas/browse_thread/thread/f3663e5b1f4fe7d4
-        for d in items:
-            self[d[0]] = d[1]
 
 class ResourceArgument(object):
     def __init__(self, default=None, required=False, expectedType=None):
@@ -57,6 +47,54 @@ class ResourceArgument(object):
             raise InvalidArgument("invalid value for arg %s" % str(value))
         else:
             return value
+
+class ResourceArgumentSchema(OrderedDict, ResourceArgument):
+    def __init__(self, items=[], default=None, required=False):
+        OrderedDict.__init__(self)
+        ResourceArgument.__init__(self, 
+                                  default=default, 
+                                  required=required, 
+                                  expectedtype=type(ResourceArgumentSchema))
+        
+        # hack to make ordering work... would be *much* nicer if python 
+        # supported an option for order-preserving **kwargs ala:
+        # http://groups.google.com/group/python-ideas/browse_thread/thread/f3663e5b1f4fe7d4
+        for d in items:
+            self[d[0]] = d[1]
+    
+    def validate(self, args):
+        if not isinstance(value, dict):
+            raise InvalidArgument("invalid value for arg %s" % str(value))
+        
+        output = AttributeDict()
+        
+        # validate resource arguments
+        for arg in value:
+            if arg not in self
+                raise InvalidArgument("Unexpected argument %s" % (arg, ))
+            elif arg in output:
+                raise InvalidArgument("Duplicate argument %s" % (arg, ))
+            else:
+                try:
+                    resourceArg = self[arg]
+                    
+                    value = value[arg]
+                    value = resourceArg.validate(value)
+                    output[arg] = value
+                    #utils.log("added '%s'='%s' to resource '%s'" % (arg, str(value), str(self)))
+                except InvalidArgument:
+                    utils.log("Error initializing argument '%s'" % (arg, ))
+                    utils.printException()
+                    raise
+        
+        for key in self:
+            if not key in output:
+                if self[key].required:
+                    raise Fail("Required argument '%s' to API function '%s' not found" % (key, name))
+                
+                output[key] = self[key].default
+        
+        return output
 
 class ResourceArgumentList(ResourceArgument):
     def __init__(self, default=None, required=False, expectedType=None, options=None):
@@ -122,7 +160,11 @@ class Resource(AttributeDict):
         if not hasattr(self, '_schema'):
             raise Fail("Resource failed to define a valid _schema")
         
-        schema = self._schema
+        # union global schema with local schema
+        schema = copy.deepcopy(self._schema)
+        for key in self.s_globalSchema:
+            if not key in schema:
+                schema[key] = self.s_globalSchema[key]
         
         resolvedArgs = { }
         keys = schema.keys()
@@ -151,34 +193,9 @@ class Resource(AttributeDict):
         utils.log("Initializing resource '%s' with args: %s" % (self.resourceType, resolvedArgs))
         
         # validate resource arguments
-        for arg in resolvedArgs:
-            if arg not in schema and arg not in self.s_globalSchema:
-                raise InvalidArgument("Unexpected argument %s provided to resource %s" % (arg, str(self)))
-            elif arg in seen:
-                raise InvalidArgument("Duplicate argument %s provided to resource %s" % (arg, str(self)))
-            else:
-                try:
-                    if arg in schema:
-                        resourceArg = schema[arg]
-                    else:
-                        resourceArg = self.s_globalSchema[arg]
-                    
-                    value = resolvedArgs[arg]
-                    value = resourceArg.validate(value)
-                    self[arg] = value
-                    #utils.log("added '%s'='%s' to resource '%s'" % (arg, str(value), str(self)))
-                except InvalidArgument:
-                    utils.log("Error initializing argument '%s' for resource %s" % (arg, str(self)))
-                    utils.printException()
-                    raise
-        
-        for key in schema:
-            if not key in self:
-                self[key] = schema[key].default
-        
-        for key in self.s_globalSchema:
-            if not key in self:
-                self[key] = self.s_globalSchema[key].default
+        output = schema.validate(resolvedArgs)
+        for k, v in output.iteritems():
+            self[k] = v
         
         self.subscriptions = {
             'immediate' : set(), 
