@@ -1,6 +1,6 @@
 {
     "name" : "{{ name }}", 
-    "type" : "{{ type }}", 
+    "roles" : [ "{{ roles }}" ], 
     "path" : "{{ path }}", 
     "port_base" : "{{ port_base }}", 
     "cookbook_path" : [ "pynode.cookbooks", "cookbooks", ], 
@@ -16,7 +16,7 @@
     
     "wsgi" : {
         "app" : "{{ path }}/stamped/sites/stamped.com/bin/serve.py", 
-        "log" : "{{ path }}/stamped/logs/wsgi.log", 
+        "log" : "{{ path }}/logs/wsgi.log", 
     }, 
     
     "python" : {
@@ -35,4 +35,15 @@
     "recipes" : [
         "stamped", 
     ], 
+    
+    "mongodb" : {
+        "options" : [ {% if mongodb.options %} mongodb.options {% endif %} ], 
+        "log" : "{{ path }}/logs/mongodb.log", 
+        "config" : {
+            "path" : "{{ path }}/conf/mongod.conf", 
+            "content" : {
+                "dbpath" : "{{ path }}/db", 
+            }, 
+        }, 
+    }, 
 }

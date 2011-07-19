@@ -30,13 +30,30 @@ if 'git' in env.config.node and 'repos' in env.config.node.git:
 activate = env.config.node.path + "/bin/activate"
 python = env.config.node.path + "/bin/python"
 
-# start wsgi application (flask server)
-if 'wsgi' in env.config.node:
-    site = env.config.node.wsgi.app
-    log  = env.config.node.wsgi.log
+if 'db' in env.config.node.roles:
+    env.includeRecipe('monbodb')
     
-    Directory(os.path.dirname(log))
+    options = env.config.node.mongodb.options
+    log     = env.config.node.mongodb.log
+    mongodb = env.config.node.mongodb.config
     
-    Service(name="wsgi_app", 
-            start_cmd=". %s && %s %s >& %s&" % (activate, python, site, log))
+    Directory(os.path.dirname(mongodb.path))
+    
+    if 'dbpath' in mongodb.content:
+        Directory(os.path.dirname(mongodb.content.dbpath))
+    
+    env.cookbooks.mongodb.MongoDBConfigFile(**mongodb)
+    Service(name="mongod", 
+            start_cmd="mongod -- --config %s %s >& log" % (mongodb.path, string.joinfields(options, ' ')))
+
+if 'web_server' in env.config.node.roles:
+    # start wsgi application (flask server)
+    if 'wsgi' in env.config.node:
+        site = env.config.node.wsgi.app
+        log  = env.config.node.wsgi.log
+        
+        Directory(os.path.dirname(log))
+        
+        Service(name="wsgi_app", 
+                start_cmd=". %s && %s %s >& %s&" % (activate, python, site, log))
 

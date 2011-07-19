@@ -10,6 +10,7 @@ __all__ = [ "MongoDBConfigFileProvider" ]
 import pynode.utils as utils
 from pynode.errors import Fail
 from pynode.providers import *
+from pynode.source import Template
 
 class MongoDBConfigFileProvider(FileProvider):
     def _getContent(self):
