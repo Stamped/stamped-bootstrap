@@ -9,6 +9,7 @@ __all__ = [ "MongoDBConfigFile" ]
 
 import copy
 from pynode.resource import *
+from pynode.resources import File
 
 class MongoDBConfigFile(File):
     _contentSchema = ResourceArgumentSchema([
