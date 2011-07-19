@@ -85,6 +85,7 @@ class ResourceArgumentSchema(OrderedDict, ResourceArgument):
                     resourceArg = self[arg]
                     
                     sub_value = value[arg]
+                    print "%s) %s" % (type(resourceArg), sub_value)
                     sub_value = resourceArg.validate(sub_value)
                     output[arg] = sub_value
                     #utils.log("added '%s'='%s' to resource '%s'" % (arg, str(sub_value), str(self)))
