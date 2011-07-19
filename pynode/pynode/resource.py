@@ -169,7 +169,8 @@ class Resource(AttributeDict):
         if 'content' in self._schema:
             print "%s %s" % (type(self._schema.content), self._schema.content)
         # union global schema with local schema
-        schema = copy.deepcopy(self._schema)
+        #schema = copy.deepcopy(self._schema)
+        schema = self._schema
         for key in self.s_globalSchema:
             if not key in schema:
                 schema[key] = self.s_globalSchema[key]
