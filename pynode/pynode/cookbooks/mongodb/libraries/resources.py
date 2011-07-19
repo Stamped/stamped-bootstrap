@@ -63,12 +63,12 @@ class MongoDBConfigFile(File):
         ("journal",             ResourceArgumentBoolean()), 
     ])
     
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self._schema = copy.deepcopy(File._schema)
         
         self._schema.content  = self._contentSchema
         self._schema.provider = ResourceArgument(default="*mongodb.MongoDBConfigFileProvider", 
                                                  expectedType=basestring)
         
-        Resource.__init__(self)
+        File.__init__(self, *args, **kwargs)
 
