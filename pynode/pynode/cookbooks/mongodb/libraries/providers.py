@@ -10,7 +10,6 @@ __all__ = [ "MongoDBConfigFileProvider" ]
 import pynode.utils as utils
 from pynode.errors import Fail
 from pynode.providers import FileProvider
-from pynode.source import Template
 
 class MongoDBConfigFileProvider(FileProvider):
     def _getContent(self):
@@ -18,7 +17,8 @@ class MongoDBConfigFileProvider(FileProvider):
         
         if content is None:
             try:
-                template = Template("mongodb/mongodb.conf.j2", dict(mongodb=self.resource))
+                from pynode.source import Template as _template
+                template = _template("mongodb/mongodb.conf.j2", dict(mongodb=self.resource))
             except:
                 utils.log("Template is fucked")
                 raise
