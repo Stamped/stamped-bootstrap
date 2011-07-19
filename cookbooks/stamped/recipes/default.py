@@ -46,7 +46,7 @@ if 'db' in env.config.node.roles:
     
     print str(mongodb)
     
-    env.cookbooks.mongodb.MongoDBConfigFile(**mongodb)
+    env.cookbooks.mongodb.MongoDBConfigFile(kwargs=mongodb)
     Service(name="mongod", 
             start_cmd="mongod -- --config %s %s >& log" % (mongodb.path, string.joinfields(options, ' ')))
 
