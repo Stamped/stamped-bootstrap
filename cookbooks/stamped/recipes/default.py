@@ -35,17 +35,17 @@ if 'db' in env.config.node.roles:
             start_cmd="mongod --config %s %s&" % \
             (config.path, string.joinfields(options, ' ')))
 
-# install git repos
-if 'git' in env.config.node and 'repos' in env.config.node.git:
-    for repo in env.config.node.git.repos:
-        repo = AttributeDict(repo)
-        Script(name="git.clone.%s" % repo.url, 
-               code="git clone %s %s" % (repo.url, repo.path))
-
-activate = env.config.node.path + "/bin/activate"
-python = env.config.node.path + "/bin/python"
-
 if 'web_server' in env.config.node.roles:
+    # install git repos
+    if 'git' in env.config.node and 'repos' in env.config.node.git:
+        for repo in env.config.node.git.repos:
+            repo = AttributeDict(repo)
+            Script(name="git.clone.%s" % repo.url, 
+                   code="git clone %s %s" % (repo.url, repo.path))
+    
+    activate = env.config.node.path + "/bin/activate"
+    python = env.config.node.path + "/bin/python"
+    
     # start wsgi application (flask server)
     if 'wsgi' in env.config.node:
         site = env.config.node.wsgi.app
