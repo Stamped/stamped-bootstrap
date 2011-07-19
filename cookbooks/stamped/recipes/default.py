@@ -30,6 +30,8 @@ if 'git' in env.config.node and 'repos' in env.config.node.git:
 activate = env.config.node.path + "/bin/activate"
 python = env.config.node.path + "/bin/python"
 
+print env.config.node.roles
+
 if 'db' in env.config.node.roles:
     env.includeRecipe('monbodb')
     
