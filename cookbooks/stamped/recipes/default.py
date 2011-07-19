@@ -1,7 +1,7 @@
 
 from pynode.resources import *
 from pynode.utils import AttributeDict
-import os
+import os, string
 
 # install prerequisites
 env.includeRecipe("virtualenv")
