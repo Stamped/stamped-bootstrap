@@ -80,7 +80,7 @@ if 'replSetInit' in env.config.node.roles:
             status = conn.admin.command({'replSetGetStatus' : 1})
             pprint(status)
             initializing = False
-        except (AutoReconnect, pymongo.errors.OperationFailure):
+        except (AutoReconnect, OperationFailure):
             sleep(1)
             pass
 
