@@ -35,7 +35,7 @@ if 'db' in env.config.node.roles:
     
     env.cookbooks.mongodb.MongoDBConfigFile(**mongodb)
     Service(name="mongod", 
-            start_cmd="mongod -- --config %s %s >& %s" % \
+            start_cmd="mongod --config %s %s >& %s" % \
             (mongodb.path, string.joinfields(options, ' '), log))
 
 # install git repos
