@@ -28,6 +28,7 @@ if 'db' in env.config.node.roles:
     mongodb = env.config.node.mongodb.config
     
     Directory(os.path.dirname(mongodb.path))
+    Directory(os.path.dirname(log))
     
     if 'dbpath' in mongodb:
         Directory(os.path.dirname(mongodb.dbpath))
