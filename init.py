@@ -23,7 +23,8 @@ def shell(cmd, stdout=False):
     return status
 
 def check_shell(cmd, stdout=False):
-    print '[%s] %s' % (node_name, cmd)
+    cmd_str = cmd.replace('\n', '').replace('\r', '')
+    print '[%s] %s' % (node_name, cmd_str)
     
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin/activate")
     if os.path.exists(path):
@@ -38,7 +39,8 @@ def check_shell(cmd, stdout=False):
     sys.stderr.flush()
     
     if 0 != ret:
-        print 'error running shell command: %s' % cmd
+        cmd_str = cmd.replace('\n', '').replace('\r', '')
+        print 'error running shell command: %s' % cmd_str
         sys.exit(1)
 
 def parseCommandLine():
