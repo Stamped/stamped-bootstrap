@@ -14,9 +14,7 @@ from pynode.source import Template
 
 class MongoDBConfigFileProvider(FileProvider):
     def _getContent(self):
-        print "MongoDBConfigFileProvider"
         content = self.resource.content
-        print self.resource
         
         if content is None:
             template = Template("mongodb/mongodb.conf.j2", variables=dict(mongodb=self.resource))
