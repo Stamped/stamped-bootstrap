@@ -18,11 +18,9 @@ class MongoDBConfigFileProvider(FileProvider):
         
         if content is None:
             try:
-                template = Template(name="mongodb/mongodb.conf.j2", variables=dict(mongodb=self.resource))
+                template = Template("mongodb/mongodb.conf.j2", dict(mongodb=self.resource))
             except:
                 utils.log("Template is fucked")
-                utils.log(dir(Template))
-                utils.log(dir(Template.__init__))
                 raise
             return template()
         elif isinstance(content, basestring):
