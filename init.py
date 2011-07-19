@@ -31,12 +31,12 @@ def check_shell(cmd, stdout=False):
     sys.stdout.flush()
     sys.stderr.flush()
     
-    ret = shell(cmd, stdout):
+    ret = shell(cmd, stdout)
     
     sys.stdout.flush()
     sys.stderr.flush()
     
-    if 0 != ret
+    if 0 != ret:
         print 'error running shell command: %s' % cmd
         sys.exit(1)
 
