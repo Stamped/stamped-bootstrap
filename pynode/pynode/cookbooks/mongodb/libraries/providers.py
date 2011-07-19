@@ -19,12 +19,10 @@ class MongoDBConfigFileProvider(FileProvider):
         print self.resource
         
         if content is None:
-            return None
-        elif isinstance(content, basestring):
-            return content
-        elif isinstance(content, dict):
             template = Template("mongodb/mongodb.conf.j2", variables=dict(mongodb=self.resource))
             return template()
+        elif isinstance(content, basestring):
+            return content
         elif hasattr(content, "__call__"):
             return content()
         
