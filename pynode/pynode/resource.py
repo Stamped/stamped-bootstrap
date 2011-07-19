@@ -70,7 +70,7 @@ class ResourceArgumentSchema(OrderedDict, ResourceArgument):
         
         # validate resource arguments
         for arg in value:
-            if arg not in self
+            if arg not in self:
                 raise InvalidArgument("Unexpected argument %s" % (arg, ))
             elif arg in output:
                 raise InvalidArgument("Duplicate argument %s" % (arg, ))
