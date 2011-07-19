@@ -18,7 +18,7 @@ class MongoDBConfigFileProvider(FileProvider):
         
         if content is None:
             try:
-                template = pynode.source.Template(name="mongodb/mongodb.conf.j2", variables=dict(mongodb=self.resource))
+                template = Template(name="mongodb/mongodb.conf.j2", variables=dict(mongodb=self.resource))
             except:
                 utils.log("Template is fucked")
                 raise
