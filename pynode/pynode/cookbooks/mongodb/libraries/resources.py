@@ -45,9 +45,9 @@ class MongoDBConfigFile(Resource):
         ("tablescan",           ResourceArgumentBoolean()), 
         ("prealloc",            ResourceArgumentBoolean()), 
         ("nssize",              ResourceArgument(expectedType=int)), 
-        ("mms-token",           ResourceArgument(expectedType=basestring)), 
-        ("mms-name",            ResourceArgument(expectedType=basestring)), 
-        ("mms-interval",        ResourceArgument(expectedType=int)), 
+        ("mms_token",           ResourceArgument(expectedType=basestring)), 
+        ("mms_name",            ResourceArgument(expectedType=basestring)), 
+        ("mms_interval",        ResourceArgument(expectedType=int)), 
         ("quota",               ResourceArgumentBoolean()), 
         ("quotaFiles",          ResourceArgument(expectedType=int)), 
         
