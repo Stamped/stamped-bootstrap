@@ -23,8 +23,6 @@ class EasyInstallProvider(PackageProvider):
             self.currentVersion = output
         else:
             self.currentVersion = None
-        
-        log(self.currentVersion)
     
     @lazyProperty
     def candidateVersion(self):
