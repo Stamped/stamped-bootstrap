@@ -5,7 +5,7 @@ __version__ = "1.0"
 __copyright__ = "Copyright (c) 2011 Stamped.com"
 __license__ = "TODO"
 
-import os, string, sys
+import os, pickle, string, sys
 from subprocess import Popen, PIPE
 from optparse import OptionParser
 from config import convert
