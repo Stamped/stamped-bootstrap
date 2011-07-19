@@ -22,9 +22,9 @@ def shell(cmd, stdout=False):
     
     return status
 
-def check_shell(cmd, stdout=False):
-    cmd_str = cmd.replace('\n', '').replace('\r', '')
-    print '[%s] %s' % (node_name, cmd_str)
+def check_shell(cmd, stdout=False, show_cmd=True):
+    if show_cmd:
+        print '[%s] %s' % (node_name, cmd_str)
     
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin/activate")
     if os.path.exists(path):
@@ -39,8 +39,7 @@ def check_shell(cmd, stdout=False):
     sys.stderr.flush()
     
     if 0 != ret:
-        cmd_str = cmd.replace('\n', '').replace('\r', '')
-        print 'error running shell command: %s' % cmd_str
+        print 'error running shell command: %s' % cmd
         sys.exit(1)
 
 def parseCommandLine():
@@ -93,7 +92,7 @@ def main():
     
     config_file = "config/generated/instance.py"
     check_shell('python config/convert.py -t config/templates/instance.py.j2 -o %s "%s"' % \
-        (config_file, pickle.dumps(params)))
+        (config_file, pickle.dumps(params)), show_cmd=False)
     #string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' ')))
     
     os.chdir('pynode')
