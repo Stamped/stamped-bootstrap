@@ -41,14 +41,19 @@ def check_shell(cmd, stdout=False):
         sys.exit(1)
 
 def parseCommandLine():
-    usage   = "Usage: %prog [[param1=value] [param2=value]...]"
+    usage   = "Usage: %prog pickled-params"
     version = "%prog " + __version__
     parser  = OptionParser(usage=usage, version=version)
     
     (options, args) = parser.parse_args()
     
-    params = { }
+    if len(args) != 1:
+        parser.print_help()
+        sys.exit(1)
     
+    params = pickle.loads(args[0])
+    
+    """
     for arg in args:
         if not '=' in arg:
             print "error: invalid param=value arg '%s'" % arg
@@ -57,6 +62,7 @@ def parseCommandLine():
         
         (name, value) = arg.split('=')
         params[name] = value
+    """
     
     return (options, params)
 
@@ -81,7 +87,8 @@ def main():
     
     config_file = "config/generated/instance.py"
     check_shell('python config/convert.py -t config/templates/instance.py.j2 -o %s %s' % \
-        (config_file, string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' ')))
+        (config_file, sys.argv[1]))
+    #string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' ')))
     
     os.chdir('pynode')
     check_shell('python setup.py build --build-base=/tmp --force')

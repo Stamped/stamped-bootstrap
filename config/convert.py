@@ -5,7 +5,7 @@ __version__ = "1.0"
 __copyright__ = "Copyright (c) 2011 Stamped.com"
 __license__ = "TODO"
 
-import os, sys
+import os, pickle, sys
 from subprocess import Popen, PIPE
 from optparse import OptionParser
 
@@ -39,6 +39,13 @@ def parseCommandLine():
     
     (options, args) = parser.parse_args()
     
+    if len(args) != 1:
+        parser.print_help()
+        sys.exit(1)
+    
+    params = pickle.loads(args[0])
+    
+    """
     params = { }
     
     for arg in args:
@@ -49,6 +56,7 @@ def parseCommandLine():
         
         (name, value) = arg.split('=')
         params[name] = value
+    """
     
     if options.input is None:
         options.input = sys.stdin
