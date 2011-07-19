@@ -87,7 +87,7 @@ def main():
     
     config_file = "config/generated/instance.py"
     check_shell('python config/convert.py -t config/templates/instance.py.j2 -o %s "%s"' % \
-        (config_file, sys.argv[1]))
+        (config_file, pickle.dumps(params)))
     #string.joinfields(('%s=%s' % (k, v) for k, v in params.iteritems()), ' ')))
     
     os.chdir('pynode')
