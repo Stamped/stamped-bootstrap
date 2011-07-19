@@ -52,13 +52,17 @@ else:
                 cookbook, name = template.split('/', 1)
             except ValueError:
                 raise Fail("[Template(%s)] Path must include cookbook name (e.g. 'nginx/nginx.conf.j2')" % template)
+            
             cb = self.env.cookbooks[cookbook]
             path = os.path.join(cb.path, "templates", name)
+            
             if not os.path.exists(path):
                 raise TemplateNotFound("%s at %s" % (template, path))
+            
             mtime = os.path.getmtime(path)
             with open(path, "rb") as fp:
                 source = fp.read().decode('utf-8')
+            
             return source, path, lambda:mtime == os.path.getmtime(path)
     
     class Template(Source):
