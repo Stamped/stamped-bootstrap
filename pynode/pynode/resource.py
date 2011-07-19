@@ -54,7 +54,7 @@ class ResourceArgumentSchema(OrderedDict, ResourceArgument):
         ResourceArgument.__init__(self, 
                                   default=default, 
                                   required=required, 
-                                  expectedtype=type(ResourceArgumentSchema))
+                                  expectedType=type(ResourceArgumentSchema))
         
         # hack to make ordering work... would be *much* nicer if python 
         # supported an option for order-preserving **kwargs ala:
