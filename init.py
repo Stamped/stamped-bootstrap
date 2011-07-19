@@ -82,7 +82,7 @@ def main():
     node_name = params['name']
     params['path'] = os.path.dirname(path)
     
-    import pprint
+    from pprint import pprint
     pprint(params)
     
     check_shell('easy_install virtualenv', True)
