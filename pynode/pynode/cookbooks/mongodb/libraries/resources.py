@@ -11,8 +11,19 @@ import copy
 from pynode.resource import *
 from pynode.resources import File
 
-class MongoDBConfigFile(File):
-    _contentSchema = ResourceArgumentSchema([
+class MongoDBConfigFile(Resource):
+    _schema = ResourceArgumentSchema([
+        # file 
+        ("path",        ResourceArgument(required=True, 
+                                         expectedType=basestring)), 
+        ("action",      ResourceArgumentList(default="create", 
+                                             options=[ "create", "delete", "touch" ])), 
+        ("backup",      ResourceArgument(expectedType=basestring)), 
+        ("mode",        ResourceArgument(expectedType=int)), 
+        ("owner",       ResourceArgument(expectedType=basestring)), 
+        ("group",       ResourceArgument(expectedType=basestring)), 
+        ("content",     ResourceArgument(expectedType=basestring)), 
+        
         # basic database configuration
         ("dbpath",              ResourceArgument(expectedType=basestring)), 
         ("port",                ResourceArgument(expectedType=basestring)), 
@@ -61,11 +72,11 @@ class MongoDBConfigFile(File):
         
         # journaling
         ("journal",             ResourceArgumentBoolean()), 
+        
+        # pynode
+        ("name",        ResourceArgument(default=lambda r: r.path, 
+                                         expectedType=basestring)), 
+        ("provider",            ResourceArgument(default="*mongodb.MongoDBConfigFileProvider", 
+                                                 expectedType=basestring)), 
     ])
-    
-    _schema = copy.depcopy(File._schema)
-
-MongoDBConfigFile._schema.content  = MongoDBConfigFile._contentSchema
-MongoDBConfigFile._schema.provider = ResourceArgument(default="*mongodb.MongoDBConfigFileProvider", 
-                                                      expectedType=basestring)
 
