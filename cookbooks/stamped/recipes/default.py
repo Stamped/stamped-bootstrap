@@ -1,13 +1,16 @@
 
 from pynode.resources import *
 from pynode.utils import AttributeDict
-import os, string
+import os, pickle, string
 
 # install prerequisites
 env.includeRecipe("virtualenv")
 
 path = env.config.node.path
 env.cookbooks.virtualenv.VirtualEnv(path) #, site_packages=False)
+
+conf = os.path.join(pat, "conf")
+Directory(conf)
 
 if env.system.platform != "mac_os_x":
     Package("python-dev")
@@ -51,8 +54,20 @@ if 'replSetInit' in env.config.node.roles:
     else:
         primary_host, primary_port = (primary, 27017)
     
-    os.putenv('STAMPED_MONGODB_HOST', primary_host)
-    os.putenv('STAMPED_MONGODB_PORT', primary_port)
+    conf = {
+        'mongodb' : {
+            'host' : primary_host, 
+            'port' : primary_port, 
+        }
+    }
+    
+    conf_str = pickle.dumps(conf)
+    conf_path = os.getenv('STAMPED_CONF_PATH')
+    if conf_path is None:
+        raise Fail("must define a valid STAMPED_CONF_PATH")
+    
+    File(conf_path
+         content=conf_str)
     
     conn = Connection(primary, slave_okay=True)
     try:

@@ -73,6 +73,8 @@ def main():
     os.chdir(path)
     
     if os.path.exists(os.path.join(path, "bin")):
+        # remove virtualenv if it previously exists for some reason
+        # otherwise, the virtualenv creation step will fail
         shell('rm -rf %s/bin %s/install %s/lib' % (path, path, path))
     
     # parse commandline
@@ -82,6 +84,9 @@ def main():
     global node_name
     node_name = params['name']
     params['path'] = os.path.dirname(path)
+    
+    os.putenv('STAMPED_ROOT', params['path'])
+    os.putenv('STAMPED_CONF_PATH', os.path.join(params['path'], 'conf/stamped.conf'))
     
     from pprint import pprint
     pprint(params)
