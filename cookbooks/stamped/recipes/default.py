@@ -66,7 +66,7 @@ if 'replSetInit' in env.config.node.roles:
     if conf_path is None:
         raise Fail("must define a valid STAMPED_CONF_PATH")
     
-    File(conf_path
+    File(conf_path, 
          content=conf_str)
     
     conn = Connection(primary, slave_okay=True)
