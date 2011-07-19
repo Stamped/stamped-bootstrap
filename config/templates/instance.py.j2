@@ -36,6 +36,7 @@
         "stamped", 
     ], 
     
+    {% if mongodb %}
     "mongodb" : {
         "options" : [ {% if mongodb.options %} mongodb.options {% endif %} ], 
         "log" : "{{ path }}/logs/mongodb.log", 
@@ -46,4 +47,5 @@
             }, 
         }, 
     }, 
+    {% endif %}
 }
