@@ -36,7 +36,11 @@
         "stamped", 
     ], 
     
-    {% if 'db' in roles and mongodb %}
+    {% if 'replSetInit' in roles %}
+    "replSet" : {{ replSet }}, 
+    {% endif %}
+    
+    {% if 'db' in roles %}
     "mongodb" : {
         "options" : [ {% if mongodb.options %} mongodb.options {% endif %} ], 
         "config" : {

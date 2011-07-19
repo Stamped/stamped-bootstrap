@@ -56,3 +56,18 @@ if 'web_server' in env.config.node.roles:
         Service(name="wsgi_app", 
                 start_cmd=". %s && %s %s >& %s&" % (activate, python, site, log))
 
+if 'replSetInit' in env.config.node.roles:
+    assert 'replSet' in env.config.node
+    from pymongo import Connection
+    from pprint import pprint
+    
+    config = env.config.node.replSet
+    primary = config.members[0]['host']
+    print "Initializing replica set '%s' with primary '%s'" % (config._id, primary)
+    
+    conn = Connection(primary, slave_okay=True)
+    conn.admin.command({'replSetInitiate'  : config})
+    
+    status = conn.admin.command({'replSetGetStatus' : 1})
+    pprint(status)
+
