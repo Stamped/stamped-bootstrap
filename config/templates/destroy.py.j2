@@ -1,0 +1,54 @@
+{
+    "name" : "{{ name }}", 
+    "roles" : {{ roles }}, 
+    "path" : "{{ path }}", 
+    "port_base" : "{{ port_base }}", 
+    "cookbook_path" : [ "pynode.cookbooks", "cookbooks", ], 
+    
+    "git" : {
+        "repos" : [ 
+            {
+                "url" : "git@github.com:Stamped/Stamped.git", 
+                "path" : "{{ path }}/stamped", 
+            }
+        ], 
+    }, 
+    
+    "wsgi" : {
+        "app" : "{{ path }}/stamped/sites/stamped.com/bin/serve.py", 
+        "log" : "{{ path }}/logs/wsgi.log", 
+    }, 
+    
+    "python" : {
+        "requirements" : [
+            "fabric", 
+            "BeautifulSoup", 
+            "boto", 
+            "xlrd", 
+            "pymongo", 
+            "flask", 
+            "gunicorn", 
+            #"gevent", 
+        ], 
+    }, 
+    
+    "recipes" : [
+        "stamped.destroy", 
+    ], 
+    
+    {% if 'db' in roles and mongodb %}
+    "mongodb" : {
+        "options" : [ {% if mongodb.options %} mongodb.options {% endif %} ], 
+        "config" : {
+            "path" : "{{ path }}/conf/mongod.conf", 
+            "dbpath" : "{{ path }}/db", 
+            {% if mongodb.port %}"port" : "{{ mongodb.port }}", {% endif %}
+            "logpath" : "{{ path }}/logs/mongod.log", 
+            "replSet" : "{{ mongodb.replSet }}", 
+            "nohttpinterface" : True, 
+            "journal" : True, 
+            #"shardsvr" : True, 
+        }, 
+    }, 
+    {% endif %}
+}
