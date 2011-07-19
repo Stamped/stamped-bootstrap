@@ -24,16 +24,15 @@ if 'db' in env.config.node.roles:
     env.includeRecipe('mongodb')
     
     options = env.config.node.mongodb.options
-    log     = env.config.node.mongodb.log
     config  = env.config.node.mongodb.config
     
-    Directory(os.path.dirname(log))
+    Directory(os.path.dirname(config.log))
     Directory(os.path.dirname(config.path))
     Directory(config.dbpath)
     
     env.cookbooks.mongodb.MongoDBConfigFile(**config)
     Service(name="mongod", 
-            start_cmd="mongod --config %s %s >& %s&" % \
+            start_cmd="mongod --config %s %s&" % \
             (config.path, string.joinfields(options, ' '), log))
 
 # install git repos
