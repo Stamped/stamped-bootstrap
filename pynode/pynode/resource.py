@@ -150,8 +150,7 @@ class Resource(AttributeDict):
         ("subscribes",      ResourceArgumentList(default=[])), 
         ("not_if",          ResourceArgument(expectedType=basestring)), 
         ("only_if",         ResourceArgument(expectedType=basestring)), 
-        ("provider",        ResourceArgument(required=True, 
-                                             expectedType=basestring)), 
+        ("provider",        ResourceArgument(expectedType=basestring)), 
     ])
     
     def __init__(self, *args, **kwargs):
