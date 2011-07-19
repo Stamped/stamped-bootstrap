@@ -244,6 +244,9 @@ class Resource(AttributeDict):
         # briefly check for conflicting duplicate resources
         for resource in self.env.resources:
             if resource.name == self.name and resource.provider != self.provider:
+                if self.provider == None:
+                    self.provider = resource.provider
+                
                 raise Fail("Duplicate resource %r with different providers: %r != %r" % \
                            (resource, self.provider, resource.provider))
         
