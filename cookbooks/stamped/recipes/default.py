@@ -39,8 +39,8 @@ if 'db' in env.config.node.roles:
     
     Directory(os.path.dirname(mongodb.path))
     
-    if 'dbpath' in mongodb.content:
-        Directory(os.path.dirname(mongodb.content.dbpath))
+    if 'dbpath' in mongodb:
+        Directory(os.path.dirname(mongodb.dbpath))
     
     env.cookbooks.mongodb.MongoDBConfigFile(**mongodb)
     Service(name="mongod", 
