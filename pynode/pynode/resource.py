@@ -96,7 +96,7 @@ class ResourceArgumentSchema(OrderedDict, ResourceArgument):
         for key in self:
             if not key in output:
                 if self[key].required:
-                    raise Fail("Required argument '%s' to API function '%s' not found" % (key, name))
+                    raise Fail("Required argument '%s' not found" % (key, ))
                 
                 output[key] = self[key].default
         
