@@ -35,6 +35,42 @@ if 'db' in env.config.node.roles:
             start_cmd="mongod --config %s %s&" % \
             (config.path, string.joinfields(options, ' ')))
 
+if 'replSetInit' in env.config.node.roles:
+    assert 'replSet' in env.config.node
+    from pymongo import Connection
+    from pymongo.errors import *
+    from pprint import pprint
+    from time import sleep
+    
+    config = env.config.node.replSet
+    primary = config.members[0]['host']
+    print "Initializing replica set '%s' with primary '%s'" % (config._id, primary)
+    
+    if ':' in primary:
+        primary_host, primary_port = primary.split(':')
+    else:
+        primary_host, primary_port = (primary, 27017)
+    
+    os.putenv('STAMPED_MONGODB_HOST', primary_host)
+    os.putenv('STAMPED_MONGODB_POST', primary_post)
+    
+    conn = Connection(primary, slave_okay=True)
+    try:
+        conn.admin.command({'replSetInitiate' : dict(config)})
+    except AutoReconnect:
+        sleep(1)
+        pass
+    
+    initializing = True
+    while initializing:
+        try:
+            status = conn.admin.command({'replSetGetStatus' : 1})
+            pprint(status)
+            initializing = False
+        except (AutoReconnect, OperationFailure):
+            sleep(1)
+            pass
+
 if 'web_server' in env.config.node.roles:
     # install git repos
     if 'git' in env.config.node and 'repos' in env.config.node.git:
@@ -55,32 +91,4 @@ if 'web_server' in env.config.node.roles:
         
         Service(name="wsgi_app", 
                 start_cmd=". %s && %s %s >& %s&" % (activate, python, site, log))
-
-if 'replSetInit' in env.config.node.roles:
-    assert 'replSet' in env.config.node
-    from pymongo import Connection
-    from pymongo.errors import *
-    from pprint import pprint
-    from time import sleep
-    
-    config = env.config.node.replSet
-    primary = config.members[0]['host']
-    print "Initializing replica set '%s' with primary '%s'" % (config._id, primary)
-    
-    conn = Connection(primary, slave_okay=True)
-    try:
-        conn.admin.command({'replSetInitiate' : dict(config)})
-    except AutoReconnect:
-        sleep(1)
-        pass
-    
-    initializing = True
-    while initializing:
-        try:
-            status = conn.admin.command({'replSetGetStatus' : 1})
-            pprint(status)
-            initializing = False
-        except (AutoReconnect, OperationFailure):
-            sleep(1)
-            pass
 
