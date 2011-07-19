@@ -71,5 +71,6 @@ class MongoDBConfigFile(File):
     def __init__(self):
         self._schema = copy.deepcopy(File._schema)
         self._schema.content = self._contentSchema
+        
         Resource.__init__(self)
 

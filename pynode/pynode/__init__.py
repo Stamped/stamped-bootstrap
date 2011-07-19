@@ -9,6 +9,7 @@ from cookbook  import *
 from kitchen   import *
 from provider  import *
 from resource  import *
+from source    import *
 import utils
 
 from resources import *

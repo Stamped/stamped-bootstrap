@@ -9,21 +9,21 @@ __all__ = [ "MongoDBConfigFileProvider" ]
 
 import pynode.utils as utils
 from pynode.errors import Fail
-from pynode.provider import Provider
+from pynode.providers import *
 
-class MongoDBConfigFileProvider(Provider):
-    def action_create(self):
-        virtualenv.create_environment(home_dir=self.resource.path, 
-                                      site_packages=self.resource.site_packages, 
-                                      clear=self.resource.clear, 
-                                      unzip_setuptools=self.resource.unzip_setuptools, 
-                                      use_distribute=self.resource.use_distribute, 
-                                      never_download=self.resource.never_download)
+class MongoDBConfigFileProvider(FileProvider):
+    def _getContent(self):
+        content = self.resource.content
         
-        log("Installed virtualenv '%s'" % self.resource.path)
-    
-    def action_delete(self):
-        (output, status) = shell('rm -rf %s' % self.resource.path)
-        if 0 != status:
-            raise Fail("unable to delete virtualenv %s" % self.resource.name)
+        if content is None:
+            return None
+        elif isinstance(content, basestring):
+            return content
+        elif isinstance(content, dict):
+            template = Template("mongodb/mongodb.conf.j2", variables=dict(mongodb=content))
+            return template()
+        elif hasattr(content, "__call__"):
+            return content()
+        
+        raise Fail("Unknown source type for %s: %r" % (self, content))
 
