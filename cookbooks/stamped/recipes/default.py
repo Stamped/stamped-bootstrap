@@ -52,7 +52,7 @@ if 'replSetInit' in env.config.node.roles:
         primary_host, primary_port = (primary, 27017)
     
     os.putenv('STAMPED_MONGODB_HOST', primary_host)
-    os.putenv('STAMPED_MONGODB_POST', primary_post)
+    os.putenv('STAMPED_MONGODB_PORT', primary_port)
     
     conn = Connection(primary, slave_okay=True)
     try:
