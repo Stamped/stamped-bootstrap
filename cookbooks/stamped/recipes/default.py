@@ -66,7 +66,7 @@ if 'replSetInit' in env.config.node.roles:
     print "Initializing replica set '%s' with primary '%s'" % (config._id, primary)
     
     conn = Connection(primary, slave_okay=True)
-    conn.admin.command({'replSetInitiate'  : config})
+    conn.admin.command({'replSetInitiate' : dict(config)})
     
     status = conn.admin.command({'replSetGetStatus' : 1})
     pprint(status)
