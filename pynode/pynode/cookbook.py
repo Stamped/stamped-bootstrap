@@ -53,7 +53,6 @@ class Cookbook(object):
             libpath = os.path.join(self.path, "libraries")
             globs = {}
             
-            print "LIBPATH: " + libpath
             if os.path.exists(libpath):
                 for f in sorted(os.listdir(libpath)):
                     if not f.endswith('.py'):
