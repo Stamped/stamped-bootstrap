@@ -26,7 +26,7 @@ if 'db' in env.config.node.roles:
     options = env.config.node.mongodb.options
     config  = env.config.node.mongodb.config
     
-    Directory(os.path.dirname(config.log))
+    Directory(os.path.dirname(config.logpath))
     Directory(os.path.dirname(config.path))
     Directory(config.dbpath)
     
