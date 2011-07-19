@@ -24,26 +24,26 @@ from errors import *
 
 class ResourceArgument(object):
     def __init__(self, default=None, required=False, expectedType=None):
-        self._required = False
-        self._expectedType = expectedType
+        self.required = False
+        self.expectedType = expectedType
         
         if hasattr(default, '__call__'):
             self.default = default
         else:
             self.default = self.validate(default)
         
-        self._required = required
+        self.required = required
     
     def validate(self, value):
         if hasattr(value, '__call__'):
             return value
         
         if value is None:
-            if self._required:
+            if self.required:
                 raise InvalidArgument("invalid value for arg %s" % str(value))
             else:
                 return value
-        elif self._expectedType is not None and not isinstance(value, self._expectedType):
+        elif self.expectedType is not None and not isinstance(value, self.expectedType):
             raise InvalidArgument("invalid value for arg %s" % str(value))
         else:
             return value
@@ -64,7 +64,7 @@ class ResourceArgumentSchema(OrderedDict, ResourceArgument):
     
     def validate(self, value):
         if value is None:
-            if self._required:
+            if self.required:
                 raise InvalidArgument("invalid value for arg %s" % str(value))
             else:
                 return value
@@ -112,7 +112,7 @@ class ResourceArgumentList(ResourceArgument):
             return value
         
         if value is None:
-            if self._required:
+            if self.required:
                 raise InvalidArgument("invalid value for arg %s" % str(value))
             else:
                 return value
@@ -124,7 +124,7 @@ class ResourceArgumentList(ResourceArgument):
         for v in value:
             if hasattr(v, '__call__'):
                 continue
-            elif (self._expectedType is not None and not isinstance(v, self._expectedType)) or \
+            elif (self.expectedType is not None and not isinstance(v, self.expectedType)) or \
                 (self._options is not None and not v in self._options):
                 raise InvalidArgument("invalid value '%s'" % str(v))
         
