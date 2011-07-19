@@ -38,14 +38,14 @@
     
     {% if 'db' in roles and mongodb %}
     "mongodb" : {
-        "options" : [ {% if mongodb and mongodb.options %} mongodb.options {% endif %} ], 
+        "options" : [ {% if mongodb.options %} mongodb.options {% endif %} ], 
         "log" : "{{ path }}/logs/mongodb.log", 
         "config" : {
             "path" : "{{ path }}/conf/mongod.conf", 
             "dbpath" : "{{ path }}/db", 
-            "port  " : "{{ mongod_port }}", 
+            {% if mongodb.port %}"port" : "{{ mongodb.port }}", {% endif %}
             "logpath" : "{{ path }}/logs/mongod.log", 
-            "replSet" : "{{ replSet }}", 
+            "replSet" : "{{ mongodb.replSet }}", 
             "nohttpinterface" : True, 
             "journal" : True, 
             #"shardsvr" : True, 
