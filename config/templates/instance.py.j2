@@ -36,12 +36,20 @@
         "stamped", 
     ], 
     
+    {% if 'db' in roles and mongodb %}
     "mongodb" : {
         "options" : [ {% if mongodb and mongodb.options %} mongodb.options {% endif %} ], 
         "log" : "{{ path }}/logs/mongodb.log", 
         "config" : {
             "path" : "{{ path }}/conf/mongod.conf", 
             "dbpath" : "{{ path }}/db", 
+            "port  " : "{{ mongod_port }}", 
+            "logpath" : "{{ path }}/logs/mongod.log", 
+            "replSet" : "{{ replSet }}", 
+            "nohttpinterface" : True, 
+            "journal" : True, 
+            #"shardsvr" : True, 
         }, 
     }, 
+    {% endif %}
 }
