@@ -11,6 +11,11 @@ from optparse import OptionParser
 from config import convert
 
 node_name = ""
+virtualenv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin/activate")
+
+def get_virtualenv_bin_path():
+    global virtualenv_path
+    return os.path.join(virtualenv_path, "bin/activate")
 
 def shell(cmd, stdout=False):
     if stdout:
@@ -26,7 +31,7 @@ def check_shell(cmd, stdout=False, show_cmd=True):
     if show_cmd:
         print '[%s] %s' % (node_name, cmd)
     
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin/activate")
+    path = get_virtualenv_bin_path()
     if os.path.exists(path):
         cmd = ". %s && %s" % (path, cmd)
     
@@ -56,27 +61,18 @@ def parseCommandLine():
     import json
     params = json.loads(args[0].replace("'", '"'))
     
-    """
-    for arg in args:
-        if not '=' in arg:
-            print "error: invalid param=value arg '%s'" % arg
-            parser.print_help()
-            sys.exit(1)
-        
-        (name, value) = arg.split('=')
-        params[name] = value
-    """
-    
     return (options, params)
 
 def main():
+    global virtualenv_path
     path = os.path.dirname(os.path.abspath(__file__))
+    virtualenv_path = os.path.dirname(path)
     os.chdir(path)
     
-    if os.path.exists(os.path.join(path, "bin")):
+    if os.path.exists(os.path.join(virtualenv_path, "bin")):
         # remove virtualenv if it previously exists for some reason
         # otherwise, the virtualenv creation step will fail
-        shell('rm -rf %s/bin %s/install %s/lib' % (path, path, path))
+        shell('rm -rf %s/bin %s/install %s/lib' % (virtualenv_path, virtualenv_path, virtualenv_path))
     
     # parse commandline
     (options, params) = parseCommandLine()
@@ -84,16 +80,16 @@ def main():
     
     global node_name
     node_name = params['name']
-    params['path'] = os.path.dirname(path)
+    params['path'] = virtualenv_path
     
     os.putenv('STAMPED_ROOT', params['path'])
-    os.putenv('STAMPED_CONF_PATH', os.path.join(params['path'], 'conf/stamped.conf'))
+    os.putenv('STAMPED_CONF_PATH', os.path.join(virtualenv_path, 'conf/stamped.conf'))
     
     from pprint import pprint
     pprint(params)
     
     check_shell('easy_install virtualenv', True)
-    check_shell('virtualenv . && . bin/activate')
+    check_shell('virtualenv %s && . %s/bin/activate' % (virtualenv_path, virtualenv_path))
     check_shell('pip install -U Jinja2')
     
     config_file = "config/generated/instance.py"

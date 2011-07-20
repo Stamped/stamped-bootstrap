@@ -8,7 +8,6 @@ import os, pickle, string
 env.includeRecipe("virtualenv")
 
 path = env.config.node.path
-bootstrap = os.path.join(path, "bootstrap")
 env.cookbooks.virtualenv.VirtualEnv(path) #, site_packages=False)
 
 conf = os.path.join(path, "conf")
@@ -24,7 +23,6 @@ env.includeRecipe("pip")
 # install python packages
 for package in env.config.node.python.requirements:
     env.cookbooks.pip.PipPackage(package, virtualenv=path)
-    env.cookbooks.pip.PipPackage(package, virtualenv=bootstrap)
 
 if 'db' in env.config.node.roles:
     env.includeRecipe('mongodb')
@@ -42,7 +40,6 @@ if 'db' in env.config.node.roles:
             (config.path, string.joinfields(options, ' ')))
 
 if 'replSetInit' in env.config.node.roles:
-    assert 'replSet' in env.config.node
     from pymongo import Connection
     from pymongo.errors import *
     from pprint import pprint
@@ -71,6 +68,7 @@ if 'replSetInit' in env.config.node.roles:
             for instance in reservation.instances:
                 from pprint import pprint
                 pprint(instance.__dict__)
+                continue
                 
                 if stackNameKey in instance.tags and instance.tags[stackNameKey].lower() == stackName:
                     if instance.tags[stackFamilyKey].lower() == 'database':
