@@ -53,7 +53,8 @@ def parseCommandLine():
         parser.print_help()
         sys.exit(1)
     
-    params = pickle.loads(args[0])
+    import json
+    params = json.loads(args[0])
     
     """
     for arg in args:
