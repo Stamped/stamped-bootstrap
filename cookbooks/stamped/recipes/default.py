@@ -64,6 +64,9 @@ if 'replSetInit' in env.config.node.roles:
         stackNameKey = 'aws:cloudformation:stack-name'
         stackFamilyKey = 'stamped:family'
         
+        print "PUBLIC: " + aws_access_key_id
+        print "SECRET: " + aws_access_key_secret
+        
         for reservation in reservations:
             for instance in reservation.instances:
                 from pprint import pprint
