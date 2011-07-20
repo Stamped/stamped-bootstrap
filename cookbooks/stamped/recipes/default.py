@@ -76,7 +76,8 @@ if 'replSetInit' in env.config.node.roles:
                 replSetMembers.append({"_id": i, "host": dbInstances[i]})
             
             config = {"_id": replSet._id, "memebers": replSetMembers}
-        raise Fail
+        else:
+            raise Fail("invalid number of db instances")
     else:
         config = env.config.node.replSet
         
