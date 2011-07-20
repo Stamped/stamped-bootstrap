@@ -75,9 +75,8 @@ if 'replSetInit' in env.config.node.roles:
             for i in range(len(dbInstances)):
                 replSetMembers.append({"_id": i, "host": dbInstances[i]})
             
-            replSetInitiate = {"_id": replSet._id, "memebers": replSetMembers}
+            config = {"_id": replSet._id, "memebers": replSetMembers}
         raise Fail
-            
     else:
         config = env.config.node.replSet
         
