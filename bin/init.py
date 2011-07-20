@@ -9,7 +9,7 @@ from pymongo import Connection
 from pymongo.errors import *
 from pprint import pprint
 from time import sleep
-import utils
+import .utils
 
 def replSetInit(config):
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
