@@ -187,7 +187,8 @@ class ExecuteProvider(Provider):
                 return
         
         utils.log("Executing %s" % self.resource)
-        ret = subprocess.call(self.resource.path, shell=True, cwd=self.resource.cwd, env=self.resource.env, preexec_fn=_preexec_fn(self.resource))
+        ret = subprocess.call(self.resource.path, shell=True, cwd=self.resource.cwd, env=self.resource.env)
+        #, preexec_fn=_preexec_fn(self.resource))
         
         if self.resource.returns and ret not in self.resource.returns:
             raise Fail("%s failed, returned %d instead of %s" % (self, ret, self.resource.returns))
@@ -207,8 +208,8 @@ class ScriptProvider(Provider):
             _ensureMetadata(tf.name, self.resource.user, self.resource.group)
             subprocess.call([self.resource.interpreter, tf.name], 
                             cwd=self.resource.cwd, 
-                            env=self.resource.environment, 
-                            preexec_fn=_preexec_fn(self.resource))
+                            env=self.resource.environment)
+            #preexec_fn=_preexec_fn(self.resource))
         
         self.resource.updated()
 
