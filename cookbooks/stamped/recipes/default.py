@@ -80,46 +80,47 @@ if 'replSetInit' in env.config.node.roles:
             raise Fail("invalid number of db instances")
     else:
         config = env.config.node.replSet
+    
+    if len(config.members) > 0:
+        primary = config.members[0]['host']
+        print "Initializing replica set '%s' with primary '%s'" % (config._id, primary)
         
-    primary = config.members[0]['host']
-    print "Initializing replica set '%s' with primary '%s'" % (config._id, primary)
-    
-    if ':' in primary:
-        primary_host, primary_port = primary.split(':')
-    else:
-        primary_host, primary_port = (primary, 27017)
-    
-    conf = {
-        'mongodb' : {
-            'host' : primary_host, 
-            'port' : int(primary_port), 
+        if ':' in primary:
+            primary_host, primary_port = primary.split(':')
+        else:
+            primary_host, primary_port = (primary, 27017)
+        
+        conf = {
+            'mongodb' : {
+                'host' : primary_host, 
+                'port' : int(primary_port), 
+            }
         }
-    }
-    
-    conf_str = pickle.dumps(conf)
-    conf_path = os.getenv('STAMPED_CONF_PATH')
-    if conf_path is None:
-        raise Fail("must define a valid STAMPED_CONF_PATH")
-    
-    File(conf_path, 
-         content=conf_str)
-    
-    conn = Connection(primary, slave_okay=True)
-    try:
-        conn.admin.command({'replSetInitiate' : dict(config)})
-    except AutoReconnect:
-        sleep(1)
-        pass
-    
-    initializing = True
-    while initializing:
+        
+        conf_str = pickle.dumps(conf)
+        conf_path = os.getenv('STAMPED_CONF_PATH')
+        if conf_path is None:
+            raise Fail("must define a valid STAMPED_CONF_PATH")
+        
+        File(conf_path, 
+             content=conf_str)
+        
+        conn = Connection(primary, slave_okay=True)
         try:
-            status = conn.admin.command({'replSetGetStatus' : 1})
-            pprint(status)
-            initializing = False
-        except (AutoReconnect, OperationFailure):
+            conn.admin.command({'replSetInitiate' : dict(config)})
+        except AutoReconnect:
             sleep(1)
             pass
+        
+        initializing = True
+        while initializing:
+            try:
+                status = conn.admin.command({'replSetGetStatus' : 1})
+                pprint(status)
+                initializing = False
+            except (AutoReconnect, OperationFailure):
+                sleep(1)
+                pass
 
 if 'web_server' in env.config.node.roles:
     # install git repos
