@@ -141,9 +141,9 @@ if 'web_server' in env.config.node.roles:
         
         Service(name="wsgi_app", 
                 start_cmd=". %s && %s %s >& %s&" % (activate, python, site, log))
-
-# populate the replica set with some initial, sample data
-if 'replSetInit' in env.config.node.roles:
-    Execute("python %s" % env.config.node.populateDB, 
-            delayed=True)
+    
+    # populate the replica set with some initial, sample data
+    if 'replSetInit' in env.config.node.roles:
+        Execute("python %s" % env.config.node.populateDB, 
+                delayed=True)
 

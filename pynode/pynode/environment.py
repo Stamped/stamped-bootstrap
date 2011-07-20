@@ -39,7 +39,8 @@ class Environment(object):
         with self:
             # Run resource actions
             for resource in self.resources:
-                self.runResource(resource)
+                if resource.delayed:
+                    self.runResource(resource)
             
             # Run delayed actions
             while self.delayedActions:
