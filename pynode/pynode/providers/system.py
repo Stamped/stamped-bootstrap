@@ -187,7 +187,9 @@ class ExecuteProvider(Provider):
                 return
         
         utils.log("Executing %s" % self.resource)
-        ret = subprocess.call(self.resource.path, shell=True, cwd=self.resource.cwd, env=self.resource.env)
+        ret = utils.shell3(self.resource.path)[1]
+        # TODO: use cwd and env
+        # subprocess.call(self.resource.path, shell=True, cwd=self.resource.cwd, env=self.resource.env)
         #, preexec_fn=_preexec_fn(self.resource))
         
         if self.resource.returns and ret not in self.resource.returns:
