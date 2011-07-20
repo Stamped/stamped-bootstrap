@@ -223,6 +223,8 @@ class Resource(AttributeDict):
         self._validate()
         self._register()
         utils.log("Added new resource '%s'" % (str(self), ))
+        
+        self.env.runResource(self)
     
     def updated(self):
         self.isUpdated = True

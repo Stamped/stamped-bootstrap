@@ -39,23 +39,26 @@ class Environment(object):
         with self:
             # Run resource actions
             for resource in self.resources:
-                utils.log("Running resource %r" % resource)
-                
-                if resource.not_if is not None and self._checkCondition(resource.not_if):
-                    utils.log("Skipping %s due to not_if" % resource)
-                    continue
-                
-                if resource.only_if is not None and not self._checkCondition(resource.only_if):
-                    utils.log("Skipping %s due to only_if" % resource)
-                    continue
-                
-                for action in resource.action:
-                    self._runAction(resource, action)
+                self.runResource(resource)
             
             # Run delayed actions
             while self.delayedActions:
                 (action, resource) = self.delayedActions.pop()
                 self._runAction(resource, action)
+    
+    def runResource(self, resource):
+        utils.log("Running resource %r" % resource)
+        
+        if resource.not_if is not None and self._checkCondition(resource.not_if):
+            utils.log("Skipping %s due to not_if" % resource)
+            continue
+        
+        if resource.only_if is not None and not self._checkCondition(resource.only_if):
+            utils.log("Skipping %s due to only_if" % resource)
+            continue
+        
+        for action in resource.action:
+            self._runAction(resource, action)
     
     def updateConfig(self, attributes, overwrite=True):
         for key, value in attributes.items():
