@@ -120,7 +120,7 @@ if 'replSetInit' in env.config.node.roles:
                 sleep(1)
                 pass
 
-if 'web_server' in env.config.node.roles:
+if 'webServer' in env.config.node.roles:
     # install git repos
     if 'git' in env.config.node and 'repos' in env.config.node.git:
         for repo in env.config.node.git.repos:
@@ -140,9 +140,8 @@ if 'web_server' in env.config.node.roles:
         
         Service(name="wsgi_app", 
                 start_cmd=". %s && %s %s >& %s&" % (activate, python, site, log))
-    
-    # populate the replica set with some initial, sample data
-    if 'replSetInit' in env.config.node.roles:
-        Execute("python %s" % env.config.node.populateDB, 
-                delayed=True)
+
+# populate the replica set with some initial, sample data
+if 'replSetInit' in env.config.node.roles:
+    Execute("python %s" % env.config.node.populateDB)
 
