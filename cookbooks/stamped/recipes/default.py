@@ -8,7 +8,7 @@ import os, pickle, string
 env.includeRecipe("virtualenv")
 
 path = env.config.node.path
-env.cookbooks.virtualenv.VirtualEnv(path) #, site_packages=False)
+#env.cookbooks.virtualenv.VirtualEnv(path) #, site_packages=False)
 
 conf = os.path.join(path, "conf")
 Directory(conf)
