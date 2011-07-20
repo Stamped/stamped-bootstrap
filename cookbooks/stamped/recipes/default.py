@@ -106,11 +106,7 @@ if 'replSetInit' in env.config.node.roles:
              content=conf_str)
         
         conn = Connection(primary, slave_okay=True)
-        try:
-            conn.admin.command({'replSetInitiate' : dict(config)})
-        except AutoReconnect:
-            sleep(1)
-            pass
+        conn.admin.command({'replSetInitiate' : dict(config)})
         
         initializing = True
         while initializing:
