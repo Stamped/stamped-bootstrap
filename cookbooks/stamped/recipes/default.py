@@ -8,7 +8,8 @@ import os, pickle, string
 env.includeRecipe("virtualenv")
 
 path = env.config.node.path
-env.cookbooks.virtualenv.VirtualEnv(path, site_packages=False)
+bootstrap = os.path.join(path, "bootstrap")
+env.cookbooks.virtualenv.VirtualEnv(path) #, site_packages=False)
 
 conf = os.path.join(path, "conf")
 Directory(conf)
@@ -22,7 +23,8 @@ env.includeRecipe("pip")
 
 # install python packages
 for package in env.config.node.python.requirements:
-    env.cookbooks.pip.PipPackage(package, virtualenv=path)
+    env.cookbooks.pip.PipPackage(package)
+    #env.cookbooks.pip.PipPackage(package, virtualenv=path)
 
 if 'db' in env.config.node.roles:
     env.includeRecipe('mongodb')
