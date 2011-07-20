@@ -38,8 +38,8 @@
     ], 
     
     {% if 'replSetInit' in roles %}
-    {% if aws_access_key_id %}"aws_access_key_id" : {{ aws_access_key_id }}, {% endif %}
-    {% if aws_access_key_secret %} "aws_access_key_secret" : {{ aws_access_key_secret }}, {% endif %}
+    {% if aws_access_key_id %}"aws_access_key_id" : "{{ aws_access_key_id }}", {% endif %}
+    {% if aws_access_key_secret %} "aws_access_key_secret" : "{{ aws_access_key_secret }}", {% endif %}
     "replSet" : {{ replSet }}, 
     "populateDB" : "{{ path }}/stamped/sites/stamped.com/bin/api/SampleData.py", 
     {% endif %}
