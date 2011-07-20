@@ -54,7 +54,7 @@ def parseCommandLine():
         sys.exit(1)
     
     import json
-    params = json.loads(args[0])
+    params = json.loads(args[0].replace(r'\"', '"'))
     
     """
     for arg in args:
