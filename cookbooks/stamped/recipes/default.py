@@ -144,5 +144,6 @@ if 'web_server' in env.config.node.roles:
 
 # populate the replica set with some initial, sample data
 if 'replSetInit' in env.config.node.roles:
-    Execute("python %s" % env.config.node.populateDB)
+    Execute("python %s" % env.config.node.populateDB, 
+            delayed=True)
 
