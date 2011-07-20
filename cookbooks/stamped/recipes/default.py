@@ -23,8 +23,8 @@ env.includeRecipe("pip")
 
 # install python packages
 for package in env.config.node.python.requirements:
-    env.cookbooks.pip.PipPackage(package)
-    #env.cookbooks.pip.PipPackage(package, virtualenv=path)
+    env.cookbooks.pip.PipPackage(package, virtualenv=path)
+    env.cookbooks.pip.PipPackage(package, virtualenv=bootstrap)
 
 if 'db' in env.config.node.roles:
     env.includeRecipe('mongodb')
@@ -66,10 +66,10 @@ if 'replSetInit' in env.config.node.roles:
         
         for reservation in reservations:
             for instance in reservation.instances:
-                if stackNameKey in instance.tags and instance.tags[stackNameKey].lower() == stackName:
-                    if instance.tags[stackFamilyKey].lower() == 'Database':
+                if 'tags' in instance and stackNameKey in instance.tags and instance.tags[stackNameKey].lower() == stackName:
+                    if instance.tags[stackFamilyKey].lower() == 'database':
                         dbInstances.append(instance.private_dns_name)
-                    if instance.tags[stackFamilyKey].lower() == 'WebServer':
+                    if instance.tags[stackFamilyKey].lower() == 'webserver':
                         webInstances.append(instance.private_dns_name)
         
         if len(dbInstances) > 1: # Only run if multiple instances exist
