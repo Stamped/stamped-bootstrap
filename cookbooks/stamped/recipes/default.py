@@ -66,7 +66,10 @@ if 'replSetInit' in env.config.node.roles:
         
         for reservation in reservations:
             for instance in reservation.instances:
-                if 'tags' in instance and stackNameKey in instance.tags and instance.tags[stackNameKey].lower() == stackName:
+                from pprint import pprint
+                pprint(instance.__dict__)
+                
+                if stackNameKey in instance.tags and instance.tags[stackNameKey].lower() == stackName:
                     if instance.tags[stackFamilyKey].lower() == 'database':
                         dbInstances.append(instance.private_dns_name)
                     if instance.tags[stackFamilyKey].lower() == 'webserver':
@@ -79,7 +82,7 @@ if 'replSetInit' in env.config.node.roles:
             
             config = {"_id": replSet._id, "memebers": replSetMembers}
         else:
-            raise Fail("invalid number of db instances")
+            raise Fail("Error: invalid number of db instances -- must have at least two instances to form a replica set")
     else:
         config = env.config.node.replSet
     
