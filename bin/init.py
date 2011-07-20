@@ -9,7 +9,7 @@ from pymongo import Connection
 from pymongo.errors import *
 from pprint import pprint
 from time import sleep
-import .utils
+import utils
 
 def replSetInit(config):
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -32,7 +32,7 @@ def replSetInit(config):
         }
         
         conf_str = pickle.dumps(conf)
-        conf_path = os.path.join(root, "/conf/stamped.conf")
+        conf_path = os.path.join(root, "conf/stamped.conf")
         
         utils.write(conf_path, conf_str)
         

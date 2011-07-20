@@ -9,7 +9,7 @@ import os, pickle, string, sys
 from subprocess import Popen, PIPE
 from optparse import OptionParser
 from config import convert
-import shell
+import utils
 
 node_name = ""
 virtualenv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin/activate")
