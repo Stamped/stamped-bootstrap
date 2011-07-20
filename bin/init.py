@@ -10,13 +10,11 @@ from pymongo.errors import *
 from pprint import pprint
 from optparse import OptionParser
 from time import sleep
-import os, sys, utils
+import json, os, sys, utils
 
 def replSetInit(config):
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     activate = os.path.join(root, "bin/activate")
-    
-    pprint(config)
     
     if len(config.members) > 0:
         primary = config.members[0]['host']
@@ -68,9 +66,7 @@ def parseCommandLine():
         parser.print_help()
         sys.exit(1)
     
-    import json
-    params = json.loads(args[0].replace("'", '"'))
-    
+    params = utils.AttributeDict(json.loads(args[0].replace("'", '"')))
     return (options, params)
 
 def main():
