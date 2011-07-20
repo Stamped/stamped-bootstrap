@@ -120,8 +120,6 @@ if 'replSetInit' in env.config.node.roles:
         except (AutoReconnect, OperationFailure):
             sleep(1)
             pass
-    
-    Execute("python %s" % env.config.node.populateDB)
 
 if 'web_server' in env.config.node.roles:
     # install git repos
@@ -143,4 +141,8 @@ if 'web_server' in env.config.node.roles:
         
         Service(name="wsgi_app", 
                 start_cmd=". %s && %s %s >& %s&" % (activate, python, site, log))
+
+# populate the replica set with some initial, sample data
+if 'replSetInit' in env.config.node.roles:
+    Execute("python %s" % env.config.node.populateDB)
 
