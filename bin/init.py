@@ -10,7 +10,7 @@ from pymongo.errors import *
 from pprint import pprint
 from optparse import OptionParser
 from time import sleep
-import json, os, sys, utils
+import json, os, pickle, sys, utils
 
 def replSetInit(config):
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
