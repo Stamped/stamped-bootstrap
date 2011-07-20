@@ -39,91 +39,6 @@ if 'db' in env.config.node.roles:
             start_cmd="mongod --config %s %s&" % \
             (config.path, string.joinfields(options, ' ')))
 
-if 'replSetInit' in env.config.node.roles:
-    from pymongo import Connection
-    from pymongo.errors import *
-    from pprint import pprint
-    from time import sleep
-    
-    replSet = env.config.node.replSet
-    
-    if env.system.platform != "mac_os_x":
-        from boto.ec2.connection import EC2Connection
-        stackName = env.config.node.stack_name
-        aws_access_key_id = env.config.node.aws_access_key_id
-        aws_access_key_secret = env.config.node.aws_access_key_secret
-        
-        dbInstances = []
-        webInstances = []
-        
-        conn = EC2Connection(aws_access_key_id, aws_access_key_secret)
-        reservations = conn.get_all_instances()
-        stackNameKey = 'aws:cloudformation:stack-name'
-        stackFamilyKey = 'stamped:family'
-        
-        print "PUBLIC: " + aws_access_key_id
-        print "SECRET: " + aws_access_key_secret
-        
-        for reservation in reservations:
-            for instance in reservation.instances:
-                from pprint import pprint
-                pprint(instance.__dict__)
-                continue
-                
-                if stackNameKey in instance.tags and instance.tags[stackNameKey].lower() == stackName:
-                    if instance.tags[stackFamilyKey].lower() == 'database':
-                        dbInstances.append(instance.private_dns_name)
-                    if instance.tags[stackFamilyKey].lower() == 'webserver':
-                        webInstances.append(instance.private_dns_name)
-        
-        if len(dbInstances) > 1: # Only run if multiple instances exist
-            replSetMembers = []
-            for i in range(len(dbInstances)):
-                replSetMembers.append({"_id": i, "host": dbInstances[i]})
-            
-            config = {"_id": replSet._id, "memebers": replSetMembers}
-        else:
-            raise Fail("Error: invalid number of db instances -- must have at least two instances to form a replica set")
-    else:
-        config = env.config.node.replSet
-    
-    if len(config.members) > 0:
-        primary = config.members[0]['host']
-        print "Initializing replica set '%s' with primary '%s'" % (config._id, primary)
-        
-        if ':' in primary:
-            primary_host, primary_port = primary.split(':')
-        else:
-            primary_host, primary_port = (primary, 27017)
-        
-        conf = {
-            'mongodb' : {
-                'host' : primary_host, 
-                'port' : int(primary_port), 
-            }
-        }
-        
-        conf_str = pickle.dumps(conf)
-        conf_path = os.getenv('STAMPED_CONF_PATH')
-        if conf_path is None:
-            raise Fail("must define a valid STAMPED_CONF_PATH")
-        
-        File(conf_path, 
-             content=conf_str)
-        
-        conn = Connection(primary, slave_okay=True)
-        conn.admin.command({'replSetInitiate' : dict(config)})
-        
-        initializing = True
-        while initializing:
-            try:
-                status = conn.admin.command({'replSetGetStatus' : 1})
-                pprint(status)
-                initializing = False
-            except (AutoReconnect, OperationFailure):
-                sleep(1)
-                pass
-
 if 'webServer' in env.config.node.roles:
     # install git repos
     if 'git' in env.config.node and 'repos' in env.config.node.git:
@@ -144,8 +59,4 @@ if 'webServer' in env.config.node.roles:
         
         Service(name="wsgi_app", 
                 start_cmd=". %s && %s %s >& %s&" % (activate, python, site, log))
-
-# populate the replica set with some initial, sample data
-if 'replSetInit' in env.config.node.roles:
-    Execute("python %s" % env.config.node.populateDB)
 

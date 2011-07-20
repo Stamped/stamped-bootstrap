@@ -9,6 +9,7 @@ import os, pickle, string, sys
 from subprocess import Popen, PIPE
 from optparse import OptionParser
 from config import convert
+import shell
 
 node_name = ""
 virtualenv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin/activate")
@@ -16,16 +17,6 @@ virtualenv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin/
 def get_virtualenv_bin_path():
     global virtualenv_path
     return os.path.join(virtualenv_path, "bin/activate")
-
-def shell(cmd, stdout=False):
-    if stdout:
-        pp = Popen(cmd, shell=True)
-    else:
-        pp = Popen(cmd, shell=True, stdout=PIPE)
-        output = pp.stdout.read()
-    status = pp.wait()
-    
-    return status
 
 def check_shell(cmd, stdout=False, show_cmd=True):
     if show_cmd:
@@ -38,7 +29,7 @@ def check_shell(cmd, stdout=False, show_cmd=True):
     sys.stdout.flush()
     sys.stderr.flush()
     
-    ret = shell(cmd, stdout)
+    ret = utils.shell(cmd, stdout)
     
     sys.stdout.flush()
     sys.stderr.flush()
@@ -72,7 +63,7 @@ def main():
     if os.path.exists(os.path.join(virtualenv_path, "bin")):
         # remove virtualenv if it previously exists for some reason
         # otherwise, the virtualenv creation step will fail
-        shell('rm -rf %s/bin %s/install %s/lib' % (virtualenv_path, virtualenv_path, virtualenv_path))
+        utils.shell('rm -rf %s/bin %s/install %s/lib' % (virtualenv_path, virtualenv_path, virtualenv_path))
     
     # parse commandline
     (options, params) = parseCommandLine()
