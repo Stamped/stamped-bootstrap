@@ -51,11 +51,11 @@ class Environment(object):
         
         if resource.not_if is not None and self._checkCondition(resource.not_if):
             utils.log("Skipping %s due to not_if" % resource)
-            continue
+            return
         
         if resource.only_if is not None and not self._checkCondition(resource.only_if):
             utils.log("Skipping %s due to only_if" % resource)
-            continue
+            return
         
         for action in resource.action:
             self._runAction(resource, action)
