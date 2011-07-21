@@ -272,7 +272,7 @@ class OrderedDict(dict, MutableMapping):
             return all(p==q for p, q in  _zip_longest(self.items(), other.items()))
         return dict.__eq__(self, other)
 
-def getFile(url):
+def getFile(url, retry=True):
     """
         Wrapper around urllib2.urlopen(url).read(), which attempts to increase 
         the success rate by sidestepping server-side issues and usage limits by
@@ -300,14 +300,14 @@ def getFile(url):
             
             # if delay is already too large, request will likely not complete successfully, 
             # so propagate the error and return.
-            if delay > maxDelay:
+            if delay > maxDelay or not retry:
                 raise
         except IOError, e:
             log("Warning '%s' fetching url '%s'" % (str(e), url))
             
             # if delay is already too large, request will likely not complete successfully, 
             # so propagate the error and return.
-            if delay > maxDelay:
+            if delay > maxDelay or not retry:
                 raise
         except Exception, e:
             log("Unexpected Error '%s' fetching url '%s'" % (str(e), url))
