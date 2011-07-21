@@ -5,7 +5,7 @@ __version__ = "1.0"
 __copyright__ = "Copyright (c) 2011 Stamped.com"
 __license__ = "TODO"
 
-import os, utils
+import os
 
 def main():
     bootstrap = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -19,7 +19,8 @@ def main():
     
     for repo in repos:
         if os.path.exists(repo):
-            utils.shell("cd %s && git pull" % repo)
+            cmd = "cd %s && git pull" % repo
+            Popen(cmd, shell=True).wait()
 
 if __name__ == '__main__':
     main()
