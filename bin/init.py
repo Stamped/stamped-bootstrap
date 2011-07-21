@@ -81,9 +81,7 @@ def replSetInit(config):
     print "Populating database with initial data..."
     app = os.path.join(root, "stamped/sites/stamped.com/bin/api/SampleData.py")
     cmd = ". %s && %s %s" % (activate, python, app)
-    pp  = Popen(cmd, shell=True)
-    pp.stdout.read()
-    pp.wait()
+    pp  = Popen(cmd, shell=True).wait()
     
     print "Running WSGI application server"
     out = open(os.path.join(root, "logs/wsgi.log"), "w")
