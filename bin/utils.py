@@ -20,8 +20,8 @@ def shell(cmd, stdout=False, out=PIPE, err=None):
     
     return status
 
-def shell2(cmd, *args, **kwargs):
-    pp = Popen(cmd, args, kwargs)
+def shell2(*args, **kwargs):
+    pp = Popen(args, kwargs)
     output = pp.stdout.read().strip()
     status = pp.wait()
     
