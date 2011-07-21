@@ -45,7 +45,7 @@ if 'db' in env.config.node.roles:
     env.cookbooks.mongodb.MongoDBConfigFile(**config)
     
     # TODO: where is this rogue mongod process coming from?!
-    if system.env.platform != 'mac_os_x':
+    if env.system.platform != 'mac_os_x':
         Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9")
     
     Service(name="mongod", 
