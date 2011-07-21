@@ -123,7 +123,7 @@ def replSetInit(config):
     try:
         pp  = Popen(cmd, shell=True, stdout=out, stderr=out)
         pp.wait()
-    except Exception e:
+    except Exception as e:
         utils.log("Error populating the database (likely already populated)")
         utils.printException()
         pass
