@@ -1,5 +1,15 @@
-import os, pickle, sys
+#!/usr/bin/python
+
+__author__ = "Stamped (dev@stamped.com)"
+__version__ = "1.0"
+__copyright__ = "Copyright (c) 2011 Stamped.com"
+__license__ = "TODO"
+
+import json, os, sys, pickle, threading, time, traceback, urllib2
+from errors import *
 from subprocess import Popen, PIPE
+from functools import wraps
+from BeautifulSoup import BeautifulSoup
 
 def shell(cmd, stdout=False, out=PIPE, err=None):
     if stdout:
@@ -10,11 +20,6 @@ def shell(cmd, stdout=False, out=PIPE, err=None):
     status = pp.wait()
     
     return status
-
-def write(filename, content):
-    f = open(filename, "w")
-    f.write(content)
-    f.close()
 
 def getFuncName(offset=0):
     import inspect
@@ -31,6 +36,94 @@ def getPythonConfigFile(path, pickled=False):
             return eval(source)
     else:
         return { }
+
+def shell2(cmd, *args, **kwargs):
+    pp = Popen(cmd, args, kwargs)
+    output = pp.stdout.read().strip()
+    status = pp.wait()
+    
+    return (output, status)
+
+def shell3(cmd, customEnv=None):
+    pp = Popen(cmd, shell=True)
+    status = pp.wait()
+    
+    return status
+
+def lazyProperty(undecorated):
+    name = '_' + undecorated.__name__
+    @property
+    @wraps(undecorated)
+    def decorated(self):
+        try:
+            return getattr(self, name)
+        except AttributeError:
+            v = undecorated(self)
+            setattr(self, name, v)
+            return v
+    return decorated
+
+def log(s):
+    print _formatLog(s)
+
+def logRaw(s, includeFormat=False):
+    if includeFormat:
+        s = _formatLog(s)
+    
+    sys.stdout.write(s)
+
+def _formatLog(s):
+    try:
+        return "[%s] %s" % (threading.currentThread().getName(), normalize(s))
+    except:
+        return "[%s] __error__ printout" % (threading.currentThread().getName(), )
+
+def write(filename, content):
+    f = open(filename, "w")
+    f.write(content)
+    f.close()
+
+def printException():
+    """
+        Simple debug utility to print a stack trace.
+    """
+    traceback.print_exc()
+
+def resolvePath(path):
+    if "." in path and not os.path.exists(path):
+        pkg  = __import__(path, {}, {}, path)
+        path = os.path.dirname(os.path.abspath(pkg.__file__))
+    
+    return os.path.abspath(path)
+
+def getFuncName(offset=0):
+    import inspect
+    return inspect.stack()[1 + offset][3]
+
+def getPythonConfigFile(path, pickled=False, jsonPickled=False):
+    if os.path.exists(path):
+        with open(path, "rb") as fp:
+            source = fp.read()
+        
+        if pickled:
+            return AttributeDict(pickle.loads(source))
+        elif jsonPickled:
+            return AttributeDict(json.loads(source))
+        else:
+            return AttributeDict(eval(source))
+    else:
+        return AttributeDict()
+
+def getenv(var, default=None):
+    value = os.getenv(var)
+    
+    if value is None or value == "":
+        if default:
+            return default
+        else:
+            raise Fail("error: environment variable '%s' not set!" % var)
+    
+    return value
 
 class AttributeDict(object):
     def __init__(self, *args, **kwargs):
@@ -195,4 +288,88 @@ class OrderedDict(dict, MutableMapping):
         if isinstance(other, OrderedDict):
             return all(p==q for p, q in  _zip_longest(self.items(), other.items()))
         return dict.__eq__(self, other)
+
+def getFile(url):
+    """
+        Wrapper around urllib2.urlopen(url).read(), which attempts to increase 
+        the success rate by sidestepping server-side issues and usage limits by
+        retrying unsuccessful attempts with increasing delays between retries, 
+        capped at a maximum possibly delay, after which the request will simply
+        fail and propagate any exceptions normally.
+    """
+    
+    maxDelay = 64
+    delay = 0.5
+    html = None
+    
+    while True:
+        try:
+            html = urllib2.urlopen(url).read()
+            break
+        except urllib2.HTTPError, e:
+            log("'%s' fetching url '%s'" % (str(e), url))
+            
+            # reraise the exception if the request resulted in an HTTP client 4xx error code, 
+            # since it was a problem with the url / headers and retrying most likely won't 
+            # solve the problem.
+            if e.code >= 400 and e.code < 500:
+                raise
+            
+            # if delay is already too large, request will likely not complete successfully, 
+            # so propagate the error and return.
+            if delay > maxDelay:
+                raise
+        except IOError, e:
+            log("Error '%s' fetching url '%s'" % (str(e), url))
+            
+            # if delay is already too large, request will likely not complete successfully, 
+            # so propagate the error and return.
+            if delay > maxDelay:
+                raise
+        except Exception, e:
+            log("Unexpected Error '%s' fetching url '%s'" % (str(e), url))
+            printException()
+            raise
+        
+        # encountered error GETing document. delay for a bit and try again
+        log("Attempting to recover with delay of %d" % delay)
+        
+        # put the current thread to sleep for a bit, increase the delay, 
+        # and retry the request
+        time.sleep(delay)
+        delay *= 2
+    
+    # return the successfully parsed html
+    return html
+
+def getSoup(url):
+    return BeautifulSoup(getFile(url))
+
+def createEnum(*sequential, **named):
+    return dict(zip(sequential, range(len(sequential))), **named)
+
+def count(container):
+    try:
+        return len(container)
+    except:
+        # count the number of elements in a generator expression
+        return sum(1 for item in container)
+
+def removeNonAscii(s):
+    return "".join(ch for ch in s if ord(ch) < 128)
+
+def normalize(s):
+    if isinstance(s, unicode):
+        return removeNonAscii(s.encode("utf-8"))
+    else:
+        return s
+
+def numEntitiesToStr(numEntities):
+    if numEntities == 1:
+        return 'entity'
+    else:
+        return 'entities'
+
+def getStatusStr(count, maxCount):
+    return "%d%% (%d / %d)" % (round((100.0 * count) / maxCount), count, maxCount)
 

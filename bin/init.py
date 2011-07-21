@@ -11,10 +11,11 @@ try:
     from pprint import pprint
     from optparse import OptionParser
     from time import sleep
-    import json, os, pickle, sys, utils
     from subprocess import Popen, PIPE
-except ImportError as e:
-    print "warning: cannot initialize instance; bootstrap/init hasn't installed all dependencies"
+    import json, os, pickle, sys, urllib2, utils
+except ImportError:
+     utils.log("error: cannot initialize instance; bootstrap/init hasn't installed all dependencies")
+     raise
 
 def replSetInit(config):
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -39,7 +40,7 @@ def replSetInit(config):
         }
     }
     
-    print "Initializing replica set '%s' with primary '%s'" % (config._id, primary)
+    utils.log("Initializing replica set '%s' with primary '%s'" % (config._id, primary))
     connecting = True
     initializing = True
     
@@ -48,7 +49,7 @@ def replSetInit(config):
             conn = Connection(primary, slave_okay=True)
             try:
                 status = conn.admin.command({'replSetGetStatus' : 1})
-                print "Replica set '%s' already online" % config._id
+                utils.log("Replica set '%s' already online" % config._id)
                 connecting   = False
                 initializing = False
                 break
@@ -62,7 +63,7 @@ def replSetInit(config):
             pass
     
     if initializing:
-        print "Waiting for replica set '%s' to come online..." % config._id
+        utils.log("Waiting for replica set '%s' to come online..." % config._id)
         while initializing:
             try:
                 status = conn.admin.command({'replSetGetStatus' : 1})
@@ -78,13 +79,28 @@ def replSetInit(config):
     
     utils.write(conf_path, conf_str)
     
-    print "Running WSGI application server"
+    utils.log("Running WSGI application server")
     out = open(os.path.join(root, "logs/wsgi.log"), "w")
     app = os.path.join(root, "stamped/sites/stamped.com/bin/serve.py")
-    cmd = ". %s && %s %s &" % (activate, python, app)
-    pp  = Popen(cmd, shell=True, stdout=out, stderr=out).wait()
+    cmd = ". %s && %s %s" % (activate, python, app)
+    pp  = Popen(cmd, shell=True, stdout=out, stderr=out)
     
-    print "Populating database with initial data..."
+    utils.log("Waiting for WSGI server to come online...")
+    while True:
+        status = pp.poll()
+        if status != None:
+            # process was terminated, probably abnormally
+            utils.log("WSGI server process '%d' terminated with returncode '%d'" % (pp.pid, status))
+            sys.exit(1)
+        else:
+            try:
+                utils.getFile("0.0.0.0:5000")
+                break
+            except:
+                sleep(1)
+                pass
+    
+    utils.log("Populating database with initial data...")
     app = os.path.join(root, "stamped/sites/stamped.com/bin/api/SampleData.py")
     cmd = ". %s && %s %s" % (activate, python, app)
     pp  = Popen(cmd, shell=True).wait()
