@@ -73,8 +73,15 @@ def replSetInit(config):
     
     utils.write(conf_path, conf_str)
     
-    populateDB = os.path.join(root, "stamped/sites/stamped.com/bin/api/SampleData.py")
-    utils.shell(". %s && python %s" % (activate, populateDB))
+    out = os.path.join(root, "logs/initDB.log")
+    app = os.path.join(root, "stamped/sites/stamped.com/bin/api/SampleData.py")
+    cmd = ". %s && python %s" % (activate, app)
+    Popen(cmd, shell=True, stdout=out, stderr=out)
+    
+    out = os.path.join(root, "logs/wsgi.log")
+    app = os.path.join(root, "stamped/sites/stamped.com/bin/serve.py")
+    cmd = ". %s && python %s" % (activate, app)
+    Popen(cmd, shell=True, stdout=out, stderr=out)
 
 def parseCommandLine():
     usage   = "Usage: %prog json-pickled-params"

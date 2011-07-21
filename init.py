@@ -73,19 +73,23 @@ def main():
     node_name = params['name']
     params['path'] = virtualenv_path
     
-    os.putenv('STAMPED_ROOT', params['path'])
-    os.putenv('STAMPED_CONF_PATH', os.path.join(virtualenv_path, 'conf/stamped.conf'))
-    
     from pprint import pprint
     pprint(params)
     
     check_shell('easy_install virtualenv', True)
     check_shell('virtualenv %s && . %s/bin/activate' % (virtualenv_path, virtualenv_path))
-    check_shell('pip install -U Jinja2')
+    check_shell('pip install Jinja2')
     
-    config_file = "config/generated/instance.py"
-    check_shell('python config/convert.py -t config/templates/instance.py.j2 -o %s "%s"' % \
-        (config_file, pickle.dumps(params)), show_cmd=False)
+    template_dir = os.path.join(path, "config/templates")
+    
+    for template in sorted(os.listdir(template_dir)):
+        if not template.endswith(".j2"):
+            continue
+        
+        input_file  = os.path.join(template_dir, template)
+        output_file = os.path.join(os.path.join(path, "config/generated"), template[0:-3])
+        check_shell('python config/convert.py -t %s -o %s "%s"' % \
+            (input_file, output_file, pickle.dumps(params)), show_cmd=False)
     
     os.chdir('pynode')
     check_shell('python setup.py build --build-base=/tmp --force')
@@ -93,7 +97,7 @@ def main():
     check_shell('rm -rf `cat .pynode.record`')
     check_shell('python setup.py install --force')
     os.chdir(path)
-    check_shell('pynode %s' % config_file, True)
+    check_shell('pynode %s' % "config/generated/default.py", True)
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,7 @@
 import os, pickle, sys
 from subprocess import Popen, PIPE
 
-def shell(cmd, stdout=False):
+def shell(cmd, stdout=False, out=PIPE, err=None):
     if stdout:
         pp = Popen(cmd, shell=True)
     else:
