@@ -68,5 +68,6 @@ if 'webServer' in env.config.node.roles:
         Directory(os.path.dirname(log))
         
         Service(name="wsgi_app", 
-                start_cmd="source %s && python %s >& %s&" % (activate, site, log))
+                start_cmd=". %s" % activate)
+                #&& python %s >& %s&" % (activate, site, log))
 
