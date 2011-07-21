@@ -3,6 +3,7 @@ from pynode.resources import *
 from pynode.utils import AttributeDict
 from pynode.errors import Fail
 import os, pickle, string
+from subprocess import Popen, PIPE
 
 # install prerequisites
 env.includeRecipe("virtualenv")
@@ -24,6 +25,13 @@ env.includeRecipe("pip")
 for package in env.config.node.python.requirements:
     env.cookbooks.pip.PipPackage(package, virtualenv=path)
 
+def shell(cmd):
+    pp = Popen(cmd, shell=True, stdout=PIPE)
+    output = pp.stdout.read().strip()
+    status = pp.wait()
+    
+    return status
+
 if 'db' in env.config.node.roles:
     env.includeRecipe('mongodb')
     
@@ -35,9 +43,10 @@ if 'db' in env.config.node.roles:
     Directory(config.dbpath)
     
     env.cookbooks.mongodb.MongoDBConfigFile(**config)
-    #Service(name="mongod", 
-    #        start_cmd="mongod --fork --replSet %s --config %s %s" % \
-    #        (config.replSet, config.path, string.joinfields(options, ' ')))
+    shell(r"ps -e | grep mongod | grep -v grep | sed 's/^\([0-9]*\).*/\1/g' | xargs kill -9")
+    Service(name="mongod", 
+            start_cmd="mongod --fork --replSet %s --config %s %s" % \
+            (config.replSet, config.path, string.joinfields(options, ' ')))
 
 if 'webServer' in env.config.node.roles:
     # install git repos

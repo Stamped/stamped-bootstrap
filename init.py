@@ -93,7 +93,7 @@ def main():
     check_shell('rm -rf `cat .pynode.record`')
     check_shell('python setup.py install --force')
     os.chdir(path)
-    #check_shell('pynode %s' % config_file, True)
+    check_shell('pynode %s' % config_file, True)
 
 if __name__ == '__main__':
     main()
