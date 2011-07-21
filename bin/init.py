@@ -18,8 +18,9 @@ except ImportError as e:
 
 def replSetInit(config):
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    print root
+    
     activate = os.path.join(root, "bin/activate")
+    python   = os.path.join(root, "bin/python")
     
     if len(config.members) <= 1:
         raise Exception("Error: must define at least 2 replica set members")
@@ -77,12 +78,14 @@ def replSetInit(config):
     
     utils.write(conf_path, conf_str)
     
-    python = os.path.join(root, "bin/python")
-    out = open(os.path.join(root, "logs/initDB.log"), "w")
+    print "Populating database with initial data..."
     app = os.path.join(root, "stamped/sites/stamped.com/bin/api/SampleData.py")
     cmd = ". %s && %s %s" % (activate, python, app)
-    Popen(cmd, shell=True, stdout=out, stderr=out)
+    pp  = Popen(cmd, shell=True)
+    pp.stdout.read()
+    pp.wait()
     
+    print "Running WSGI application server"
     out = open(os.path.join(root, "logs/wsgi.log"), "w")
     app = os.path.join(root, "stamped/sites/stamped.com/bin/serve.py")
     cmd = ". %s && %s %s" % (activate, python, app)
