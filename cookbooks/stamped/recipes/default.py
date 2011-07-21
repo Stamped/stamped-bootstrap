@@ -73,6 +73,10 @@ if 'webServer' in env.config.node.roles:
         # TODO: use /bin/bash as default interpreter? this bourne shell redirection 
         # syntax blows and is incompatible with the default redirection syntax on bash
         # under mac os x
-        Service(name="wsgi_app", 
-                start_cmd=". %s && python %s > %s 2>&1 &" % (activate, site, log))
+        if env.system.platform == "mac_os_x":
+            Service(name="wsgi_app", 
+                    start_cmd=". %s && python %s >& %s &" % (activate, site, log))
+        else:
+            Service(name="wsgi_app", 
+                    start_cmd=". %s && python %s > %s 2>&1 &" % (activate, site, log))
 
