@@ -152,7 +152,7 @@ class Resource(AttributeDict):
         ("not_if",          ResourceArgument(expectedType=basestring)), 
         ("only_if",         ResourceArgument(expectedType=basestring)), 
         ("provider",        ResourceArgument(expectedType=basestring)), 
-        ("delayed",         ResourceArgumentBoolean(default=False)), 
+        #("delayed",         ResourceArgumentBoolean(default=False)), 
     ])
     
     def __init__(self, *args, **kwargs):
@@ -225,8 +225,8 @@ class Resource(AttributeDict):
         self._register()
         utils.log("Added new resource '%s'" % (str(self), ))
         
-        if not self.delayed:
-            self.env.runResource(self)
+        #if not self.delayed:
+        #    self.env.runResource(self)
     
     def updated(self):
         self.isUpdated = True
