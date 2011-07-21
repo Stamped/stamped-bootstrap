@@ -20,22 +20,6 @@ def shell(cmd, stdout=False, out=PIPE, err=None):
     
     return status
 
-def getFuncName(offset=0):
-    import inspect
-    return inspect.stack()[1 + offset][3]
-
-def getPythonConfigFile(path, pickled=False):
-    if os.path.exists(path):
-        with open(path, "rb") as fp:
-            source = fp.read()
-        
-        if pickled:
-            return pickle.loads(source)
-        else:
-            return eval(source)
-    else:
-        return { }
-
 def shell2(cmd, *args, **kwargs):
     pp = Popen(cmd, args, kwargs)
     output = pp.stdout.read().strip()
@@ -319,7 +303,7 @@ def getFile(url):
             if delay > maxDelay:
                 raise
         except IOError, e:
-            log("Error '%s' fetching url '%s'" % (str(e), url))
+            log("Warning '%s' fetching url '%s'" % (str(e), url))
             
             # if delay is already too large, request will likely not complete successfully, 
             # so propagate the error and return.

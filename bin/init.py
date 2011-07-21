@@ -91,6 +91,10 @@ def replSetInit(config):
     
     utils.write(conf_path, conf_str)
     
+    find_wsgi_server = r"ps -e | grep python | grep 'serve\.py' | grep -v grep"
+    if 0 == utils.shell3(find_wsgi_server):
+        utils.shell(r"%s | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9" % find_wsgi_server)
+    
     utils.log("Running WSGI application server")
     out = open(os.path.join(root, "logs/wsgi.log"), "w")
     app = os.path.join(root, "stamped/sites/stamped.com/bin/serve.py")
