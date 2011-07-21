@@ -6,6 +6,7 @@ __copyright__ = "Copyright (c) 2011 Stamped.com"
 __license__ = "TODO"
 
 import os
+from subprocess import Popen, PIPE
 
 def main():
     bootstrap = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
