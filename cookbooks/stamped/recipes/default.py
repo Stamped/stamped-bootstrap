@@ -43,9 +43,8 @@ if 'db' in env.config.node.roles:
     Directory(config.dbpath)
     
     env.cookbooks.mongodb.MongoDBConfigFile(**config)
-    shell(r"ps -e | grep mongod | grep -v grep | sed 's/^\([0-9]*\).*/\1/g' | xargs kill -9")
     Service(name="mongod", 
-            start_cmd="mongod --fork --replSet %s --config %s %s" % \
+            start_cmd=r"ps -e | grep mongod | grep -v grep | sed 's/^\([0-9]*\).*/\1/g' | xargs kill -9; mongod --fork --replSet %s --config %s %s" % \
             (config.replSet, config.path, string.joinfields(options, ' ')))
 
 if 'webServer' in env.config.node.roles:
