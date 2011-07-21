@@ -20,7 +20,7 @@ def shell(cmd, stdout=False, out=PIPE, err=None):
     
     return status
 
-def shell2(cmd)
+def shell2(cmd):
     pp = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
     output = pp.stdout.read().strip()
     status = pp.wait()
