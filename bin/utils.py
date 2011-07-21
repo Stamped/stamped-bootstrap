@@ -20,12 +20,12 @@ def shell(cmd, stdout=False, out=PIPE, err=None):
     
     return status
 
-def shell2(*args, **kwargs):
-    pp = Popen(args, kwargs)
+def shell2(cmd)
+    pp = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
     output = pp.stdout.read().strip()
     status = pp.wait()
     
-    return (output, status)
+    return status
 
 def shell3(cmd, customEnv=None):
     pp = Popen(cmd, shell=True)
