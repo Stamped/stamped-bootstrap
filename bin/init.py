@@ -78,16 +78,16 @@ def replSetInit(config):
     
     utils.write(conf_path, conf_str)
     
-    print "Populating database with initial data..."
-    app = os.path.join(root, "stamped/sites/stamped.com/bin/api/SampleData.py")
-    cmd = ". %s && %s %s" % (activate, python, app)
-    pp  = Popen(cmd, shell=True).wait()
-    
     print "Running WSGI application server"
     out = open(os.path.join(root, "logs/wsgi.log"), "w")
     app = os.path.join(root, "stamped/sites/stamped.com/bin/serve.py")
     cmd = ". %s && %s %s" % (activate, python, app)
     Popen(cmd, shell=True, stdout=out, stderr=out)
+    
+    print "Populating database with initial data..."
+    app = os.path.join(root, "stamped/sites/stamped.com/bin/api/SampleData.py")
+    cmd = ". %s && %s %s" % (activate, python, app)
+    pp  = Popen(cmd, shell=True).wait()
 
 def parseCommandLine():
     usage   = "Usage: %prog json-pickled-params"
