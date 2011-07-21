@@ -36,8 +36,8 @@ if 'db' in env.config.node.roles:
     
     env.cookbooks.mongodb.MongoDBConfigFile(**config)
     Service(name="mongod", 
-            start_cmd="mongod --config %s %s&" % \
-            (config.path, string.joinfields(options, ' ')))
+            start_cmd="mongod --replSet %s --config %s %s&" % \
+            (config.replSet, config.path, string.joinfields(options, ' ')))
 
 if 'webServer' in env.config.node.roles:
     # install git repos
