@@ -38,28 +38,37 @@ def replSetInit(config):
     
     print "Initializing replica set '%s' with primary '%s'" % (config._id, primary)
     connecting = True
+    initializing = True
+    
     while connecting:
         try:
             conn = Connection(primary, slave_okay=True)
+            try:
+                status = conn.admin.command({'replSetGetStatus' : 1})
+                print "Replica set '%s' already online" % config._id
+                initializing = False
+            except:
+                pass
+            
             conn.admin.command({'replSetInitiate' : dict(config)})
             connecting = False
         except AutoReconnect:
             sleep(5)
             pass
     
-    print "Waiting for replica set '%s' to come online..." % config._id
-    initializing = True
-    while initializing:
-        try:
-            status = conn.admin.command({'replSetGetStatus' : 1})
-            pprint(status)
-            initializing = False
-        except (AutoReconnect, OperationFailure):
-            sleep(1)
-            pass
+    if initializing:
+        print "Waiting for replica set '%s' to come online..." % config._id
+        while initializing:
+            try:
+                status = conn.admin.command({'replSetGetStatus' : 1})
+                pprint(status)
+                initializing = False
+            except (AutoReconnect, OperationFailure):
+                sleep(1)
+                pass
     
     # write replica set configuration now that replica set is online
-    conf_str = pickle.dumps(conf)
+    conf_str = json.dumps(conf, sort_keys=True, indent=2)
     conf_path = os.path.join(root, "conf/stamped.conf")
     
     utils.write(conf_path, conf_str)

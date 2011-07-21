@@ -23,6 +23,5 @@ if 'db' in env.config.node.roles:
 
 if 'webServer' in env.config.node.roles:
     if 'wsgi' in env.config.node:
-        # TODO
         check_shell(r"ps -e | grep python | grep 'serve\.py' | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9")
 
