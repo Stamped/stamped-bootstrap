@@ -30,6 +30,7 @@ def replSetInit(config):
     
     if ':' in primary:
         primary_host, primary_port = primary.split(':')
+        primary_port = int(primary_port)
     else:
         primary_host, primary_port = (primary, 27017)
     
