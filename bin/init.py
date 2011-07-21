@@ -18,6 +18,7 @@ except ImportError as e:
 
 def replSetInit(config):
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    print root
     activate = os.path.join(root, "bin/activate")
     
     if len(config.members) <= 1:
