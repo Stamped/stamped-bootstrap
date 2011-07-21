@@ -12,6 +12,7 @@ try:
     from optparse import OptionParser
     from time import sleep
     import json, os, pickle, sys, utils
+    from subprocess import Popen, PIPE
 except ImportError as e:
     print "warning: cannot initialize instance; bootstrap/init hasn't installed all dependencies"
 
@@ -46,7 +47,9 @@ def replSetInit(config):
             try:
                 status = conn.admin.command({'replSetGetStatus' : 1})
                 print "Replica set '%s' already online" % config._id
+                connecting   = False
                 initializing = False
+                break
             except:
                 pass
             
