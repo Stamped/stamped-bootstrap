@@ -76,14 +76,15 @@ def replSetInit(config):
     
     utils.write(conf_path, conf_str)
     
+    python = os.path.join(root, "bin/python")
     out = open(os.path.join(root, "logs/initDB.log"), "w")
     app = os.path.join(root, "stamped/sites/stamped.com/bin/api/SampleData.py")
-    cmd = ". %s && python %s" % (activate, app)
+    cmd = ". %s && %s %s" % (activate, python, app)
     Popen(cmd, shell=True, stdout=out, stderr=out)
     
     out = open(os.path.join(root, "logs/wsgi.log"), "w")
     app = os.path.join(root, "stamped/sites/stamped.com/bin/serve.py")
-    cmd = ". %s && /stamped/test/dev0/bin/python %s" % (activate, app)
+    cmd = ". %s && %s %s" % (activate, python, app)
     Popen(cmd, shell=True, stdout=out, stderr=out)
 
 def parseCommandLine():
