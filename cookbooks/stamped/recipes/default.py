@@ -9,7 +9,9 @@ from subprocess import Popen, PIPE
 env.includeRecipe("virtualenv")
 
 path = env.config.node.path
-conf = env.config.node.conf
+Directory(path)
+
+conf = os.path.join(path, "conf")
 Directory(conf)
 
 if env.system.platform != "mac_os_x":
