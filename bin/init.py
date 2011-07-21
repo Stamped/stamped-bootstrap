@@ -41,37 +41,48 @@ def replSetInit(config):
     }
     
     utils.log("Initializing replica set '%s' with primary '%s'" % (config._id, primary))
-    connecting = True
-    initializing = True
+    replSetInitialized = False
     
-    while connecting:
+    while True:
         try:
-            conn = Connection(primary, slave_okay=True)
+            conn = Connection(primary_host, primary_port, slave_okay=True)
+            
             try:
                 status = conn.admin.command({'replSetGetStatus' : 1})
                 utils.log("Replica set '%s' already online" % config._id)
-                connecting   = False
-                initializing = False
+                replSetInitialized = True
                 break
             except:
                 pass
             
             conn.admin.command({'replSetInitiate' : dict(config)})
-            connecting = False
+            break
         except AutoReconnect:
             sleep(5)
             pass
     
-    if initializing:
+    if not replSetInitialized:
         utils.log("Waiting for replica set '%s' to come online..." % config._id)
-        while initializing:
+        while True:
             try:
                 status = conn.admin.command({'replSetGetStatus' : 1})
                 pprint(status)
-                initializing = False
+                break
             except (AutoReconnect, OperationFailure):
                 sleep(1)
                 pass
+    
+    conn.disconnect()
+    
+    utils.log("Testing connection to replica set '%s'..." % config._id)
+    while True:
+        try:
+            conn = Connection(primary_host, primary_port, slave_okay=True)
+            conn.disconnect()
+            break
+        except (AutoReconnect):
+            sleep(2)
+            pass
     
     # write replica set configuration now that replica set is online
     conf_str = json.dumps(conf, sort_keys=True, indent=2)
