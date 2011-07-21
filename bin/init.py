@@ -83,7 +83,7 @@ def replSetInit(config):
     
     out = open(os.path.join(root, "logs/wsgi.log"), "w")
     app = os.path.join(root, "stamped/sites/stamped.com/bin/serve.py")
-    cmd = ". %s && python %s" % (activate, app)
+    cmd = ". %s && /stamped/test/bin/python %s" % (activate, app)
     Popen(cmd, shell=True, stdout=out, stderr=out)
 
 def parseCommandLine():
