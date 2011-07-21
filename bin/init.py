@@ -94,7 +94,7 @@ def replSetInit(config):
             sys.exit(1)
         else:
             try:
-                utils.getFile("0.0.0.0:5000")
+                utils.getFile("http://0.0.0.0:5000")
                 break
             except:
                 sleep(1)
