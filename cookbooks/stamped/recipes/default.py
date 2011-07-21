@@ -43,6 +43,8 @@ if 'db' in env.config.node.roles:
     Directory(config.dbpath)
     
     env.cookbooks.mongodb.MongoDBConfigFile(**config)
+    
+    # TODO: where is this rogue mongod process coming from?!
     Service(name="mongod", 
             start_cmd=r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9; mongod --fork --replSet %s --config %s %s" % \
             (config.replSet, config.path, string.joinfields(options, ' ')))
@@ -56,7 +58,7 @@ if 'webServer' in env.config.node.roles:
                    code="git clone %s %s" % (repo.url, repo.path))
     
     activate = env.config.node.path + "/bin/activate"
-    python = env.config.node.path + "/bin/python"
+    #python = env.config.node.path + "/bin/python"
     
     # start wsgi application (flask server)
     if 'wsgi' in env.config.node:
@@ -66,5 +68,5 @@ if 'webServer' in env.config.node.roles:
         Directory(os.path.dirname(log))
         
         Service(name="wsgi_app", 
-                start_cmd=". %s && %s %s >& %s&" % (activate, python, site, log))
+                start_cmd=". %s && python %s >& %s&" % (activate, site, log))
 

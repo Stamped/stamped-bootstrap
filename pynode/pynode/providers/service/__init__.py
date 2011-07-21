@@ -64,7 +64,8 @@ class ServiceProvider(Provider):
                 else:
                     ret = 1
             else:
-                ret = subprocess.call(custom_cmd, shell=True)#, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                ret = utils.shell3(custom_cmd)[1]
+                #subprocess.call(custom_cmd, shell=True)#, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         else:
             ret = self._init_cmd(cmd)
         
