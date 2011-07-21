@@ -14,7 +14,7 @@ try:
     from subprocess import Popen, PIPE
     import json, os, pickle, sys, urllib2, utils
 except ImportError:
-     utils.log("error: cannot initialize instance; bootstrap/init hasn't installed all dependencies")
+     print "error: cannot initialize instance; bootstrap/init hasn't installed all dependencies"
      raise
 
 def replSetInit(config):
