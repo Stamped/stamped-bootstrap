@@ -100,7 +100,7 @@ def replSetInit(config):
     app = os.path.join(root, "stamped/sites/stamped.com/bin/serve.py")
     cmd = ". %s && %s %s" % (activate, python, app)
     pp  = Popen(cmd, shell=True)#, stdout=out, stderr=out)
-    pp.wait()
+    server = pp
     
     utils.log("Waiting for WSGI server to come online...")
     while True:
@@ -123,11 +123,13 @@ def replSetInit(config):
     cmd = ". %s && %s %s" % (activate, python, app)
     
     try:
-        pp  = Popen(cmd, shell=True, stdout=out, stderr=out)
+        pp = Popen(cmd, shell=True, stdout=out, stderr=out)
         pp.wait()
     except Exception as e:
         utils.log("Error populating the database (likely already populated)")
         utils.printException()
+    
+    server.wait()
 
 def parseCommandLine():
     usage   = "Usage: %prog json-pickled-params"
