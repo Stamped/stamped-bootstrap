@@ -98,8 +98,8 @@ def replSetInit(config):
     utils.log("Running WSGI application server")
     out = open(os.path.join(root, "logs/wsgi.log"), "w")
     app = os.path.join(root, "stamped/sites/stamped.com/bin/serve.py")
-    cmd = ". %s && %s %s &" % (activate, python, app)
-    pp  = Popen(cmd, shell=True, stdout=out, stderr=out)
+    cmd = ". %s && %s %s" % (activate, python, app)
+    pp  = Popen(cmd, shell=True)#, stdout=out, stderr=out)
     
     utils.log("Waiting for WSGI server to come online...")
     while True:
@@ -122,7 +122,7 @@ def replSetInit(config):
     cmd = ". %s && %s %s" % (activate, python, app)
     
     try:
-        pp  = Popen(cmd, shell=True, stdout=out, stderr=out)
+        pp  = Popen(cmd, shell=True)#, stdout=out, stderr=out)
         pp.wait()
     except Exception as e:
         utils.log("Error populating the database (likely already populated)")
