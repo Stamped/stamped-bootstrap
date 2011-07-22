@@ -21,7 +21,7 @@ if env.system.platform != "mac_os_x":
     Package("lvm2")
 
 env.includeRecipe("pip")
-#env.includeRecipe("libevent")
+env.includeRecipe("libevent")
 
 # install python packages
 for package in env.config.node.python.requirements:

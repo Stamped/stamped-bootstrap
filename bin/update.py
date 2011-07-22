@@ -21,6 +21,7 @@ def main():
     for repo in repos:
         if os.path.exists(repo):
             cmd = "cd %s && git pull" % repo
+            print cmd
             Popen(cmd, shell=True).wait()
 
 if __name__ == '__main__':

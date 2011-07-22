@@ -12,8 +12,6 @@ version = "libevent-2.0.12-stable"
 Package("gcc")
 Script(name="libevent", 
        code="""
-wget http://monkey.org/~provos/%s.tar.gz && tar -xvf %s.tar.gz && cd %s && ./configure && make && make install
+sudo wget http://monkey.org/~provos/%s.tar.gz && tar -xvf %s.tar.gz && cd %s && ./configure && make && make install
 """ % (version, version, version))
-
-#Package("libevent")
 
