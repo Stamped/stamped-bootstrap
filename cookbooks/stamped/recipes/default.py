@@ -48,12 +48,14 @@ if 'db' in env.config.node.roles:
         (config.replSet, config.path, string.joinfields(options, ' ')))
 
 if 'webServer' in env.config.node.roles or 'crawler' in env.config.node.roles:
-    if env.system.platform == "mac_os_x":
-        Script(name="hack" % repo.url, 
-               code="ln -s %s %s" % ("/Users/fisch0920/dev/stamped", repo.path))
-    else:
-        # install git repos
-        if 'git' in env.config.node and 'repos' in env.config.node.git:
+    if 'git' in env.config.node and 'repos' in env.config.node.git:
+        if env.system.platform == "mac_os_x":
+            for repo in env.config.node.git.repos:
+                repo = AttributeDict(repo)
+                Script(name="hack", 
+                       code="ln -s %s %s" % ("/Users/fisch0920/dev/stamped", repo.path))
+        else:
+            # install git repos
             for repo in env.config.node.git.repos:
                 repo = AttributeDict(repo)
                 Script(name="git.clone.%s" % repo.url, 
