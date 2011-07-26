@@ -48,12 +48,16 @@ if 'db' in env.config.node.roles:
         (config.replSet, config.path, string.joinfields(options, ' ')))
 
 if 'webServer' in env.config.node.roles or 'crawler' in env.config.node.roles:
-    # install git repos
-    if 'git' in env.config.node and 'repos' in env.config.node.git:
-        for repo in env.config.node.git.repos:
-            repo = AttributeDict(repo)
-            Script(name="git.clone.%s" % repo.url, 
-                   code="git clone %s %s" % (repo.url, repo.path))
+    if env.system.platform == "mac_os_x":
+        Script(name="hack" % repo.url, 
+               code="ln -s %s %s" % ("/Users/fisch0920/dev/stamped", repo.path))
+    else:
+        # install git repos
+        if 'git' in env.config.node and 'repos' in env.config.node.git:
+            for repo in env.config.node.git.repos:
+                repo = AttributeDict(repo)
+                Script(name="git.clone.%s" % repo.url, 
+                       code="git clone %s %s" % (repo.url, repo.path))
     
 if 'webServer' in env.config.node.roles:
     activate = env.config.node.path + "/bin/activate"
