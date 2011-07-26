@@ -47,7 +47,7 @@ if 'db' in env.config.node.roles:
         start_cmd="mongod --fork --replSet %s --config %s %s" % \
         (config.replSet, config.path, string.joinfields(options, ' ')))
 
-if 'webServer' in env.config.node.roles:
+if 'webServer' in env.config.node.roles or 'crawler' in env.config.node.roles:
     # install git repos
     if 'git' in env.config.node and 'repos' in env.config.node.git:
         for repo in env.config.node.git.repos:
@@ -55,6 +55,7 @@ if 'webServer' in env.config.node.roles:
             Script(name="git.clone.%s" % repo.url, 
                    code="git clone %s %s" % (repo.url, repo.path))
     
+if 'webServer' in env.config.node.roles:
     activate = env.config.node.path + "/bin/activate"
     
     # start wsgi application (flask server)
