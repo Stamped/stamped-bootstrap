@@ -23,20 +23,20 @@ def backupEBS():
 	cmd = "mongo localhost:27017/admin --eval 'printjson(db.runCommand({fsync:1,lock:1}));'"
 	status = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
 	if not re.search(r'"ok" : 1', status[0]):
-	   raise Exception('Lock failed')
+		raise Exception('Lock failed')
 
 	# Log EBS Volumes
 	uuid = 'N/A'
 	cmd = 'sudo mdadm --detail /dev/md0'
 	try:
-    	p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
-    	
-    	regex = re.compile(r'UUID : ([a-zA-Z0-9:]+)', re.IGNORECASE)
-    	
-    	match = regex.search(str(p))
-    	if match:
-    		uuid = match.group().replace('UUID : ', '')
-    except:
+		p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
+		
+		regex = re.compile(r'UUID : ([a-zA-Z0-9:]+)', re.IGNORECASE)
+		
+		match = regex.search(str(p))
+		if match:
+			uuid = match.group().replace('UUID : ', '')
+	except:
 		uuid = 'N/A'
 	
 	# Create EBS Snapshots
@@ -56,16 +56,16 @@ def backupEBS():
 	cmd = "mongo localhost:27017/admin --eval 'printjson(db.$cmd.sys.unlock.findOne());'"
 	status = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
 	if not re.search(r'"ok" : 1', status[0]):
-	   raise Exception('Unlock failed')
-    
+		raise Exception('Unlock failed')
+	
 
 def main():
 
-    # Only run if secondary node in replica set
-    cmd = "mongo localhost:27017/admin --eval 'printjson(db.isMaster());'"
+	# Only run if secondary node in replica set
+	cmd = "mongo localhost:27017/admin --eval 'printjson(db.isMaster());'"
 	status = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
 	if re.search(r'"ismaster" : false', status[0]) and re.search(r'"secondary" : true', status[0]):
-        self.backupEBS()
+		self.backupEBS()
 	
 if __name__ == '__main__':
 	main()
