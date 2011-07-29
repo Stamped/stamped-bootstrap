@@ -13,7 +13,7 @@ from boto import utils
 AWS_ACCESS_KEY_ID = 'AKIAIXLZZZT4DMTKZBDQ'
 AWS_SECRET_KEY = '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'
 
-def main():
+def backupEBS():
 
 	ec2 = EC2Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
 	
@@ -57,6 +57,15 @@ def main():
 	status = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
 	if not re.search(r'"ok" : 1', status[0]):
 	   raise Exception('Unlock failed')
+    
+
+def main():
+
+    # Only run if secondary node in replica set
+    cmd = "mongo localhost:27017/admin --eval 'printjson(db.isMaster());'"
+	status = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
+	if re.search(r'"ismaster" : false', status[0]) and re.search(r'"secondary" : true', status[0]):
+        self.backupEBS()
 	
 if __name__ == '__main__':
 	main()
