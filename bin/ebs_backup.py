@@ -65,7 +65,7 @@ def main():
 	cmd = "mongo localhost:27017/admin --eval 'printjson(db.isMaster());'"
 	status = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
 	if re.search(r'"ismaster" : false', status[0]) and re.search(r'"secondary" : true', status[0]):
-		self.backupEBS()
+		backupEBS()
 	
 if __name__ == '__main__':
 	main()
