@@ -33,6 +33,11 @@ if 'db' in env.config.node.roles:
     options = env.config.node.mongodb.options
     config  = env.config.node.mongodb.config
     
+    if env.system.platform != "mac_os_x":
+        # Setup EBS instances for data
+        config.dbpath = "/data/db"
+        Script(name="setup EBS", code=StaticFile("ebs_config.py"))
+    
     Directory(os.path.dirname(config.logpath))
     Directory(os.path.dirname(config.path))
     Directory(config.dbpath)
