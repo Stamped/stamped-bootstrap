@@ -37,7 +37,7 @@ if 'db' in env.config.node.roles:
     if env.system.platform != "mac_os_x":
         # Setup EBS instances for data
         config.dbpath = "/data/db"
-        Script(name="setup EBS", code=StaticFile("ebs_config.py"))
+        Script(name="setup EBS", code=StaticFile("files/ebs_config.py"))
     
     Directory(os.path.dirname(config.logpath))
     Directory(os.path.dirname(config.path))
