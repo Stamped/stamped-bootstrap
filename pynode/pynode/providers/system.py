@@ -201,7 +201,7 @@ class ScriptProvider(Provider):
     def action_run(self):
         from tempfile import NamedTemporaryFile
         utils.log("Running script '%s'" % self.resource)
-        utils.log("%s" % self.resource.code)
+        #utils.log("%s" % self.resource.code)
         
         with NamedTemporaryFile(prefix="pynode-script", bufsize=0) as tf:
             tf.write(self.resource.code)
