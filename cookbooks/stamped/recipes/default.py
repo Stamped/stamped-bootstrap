@@ -38,7 +38,8 @@ if 'db' in env.config.node.roles:
         # Setup EBS instances for data
         config.dbpath = "/data/db"
         #Script(name="setup EBS", code=StaticFile("files/ebs_config.py"))
-        f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_config.py'
+        #f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_config.py'
+        f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_restore.py'
         Execute('chmod +x %s  && %s' % (f, f))
     
     Directory(os.path.dirname(config.logpath))
