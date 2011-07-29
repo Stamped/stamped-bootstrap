@@ -47,7 +47,7 @@ def backupEBS():
 			description = "Instance: %s | Drive: %s | Time: %s | UUID: %s" % (
 				metadata['instance-id'], 
 				volume.attach_data.device, 
-				str(datetime.utcnow()),
+				timestamp,
 				uuid)
 		
 			ec2.create_snapshot(volume.id, description)

@@ -20,8 +20,8 @@ from boto import utils
 AWS_ACCESS_KEY_ID = 'AKIAIXLZZZT4DMTKZBDQ'
 AWS_SECRET_KEY = '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'
 
-def createEBS(conn, size, region):
-	return conn.create_volume(size, region)
+def createEBS(conn, size, region, snapshot=None):
+	return conn.create_volume(size, region, snapshot)
 
 def main():
 
