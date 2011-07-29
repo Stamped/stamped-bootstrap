@@ -1,5 +1,6 @@
 
 from pynode.resources import *
+from pynode.source import *
 from pynode.utils import AttributeDict
 from pynode.errors import Fail
 import os, pickle, string
