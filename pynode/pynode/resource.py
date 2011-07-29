@@ -273,7 +273,7 @@ class Resource(AttributeDict):
         item = super(Resource, self).__getitem__(name)
         
         if hasattr(item, '__call__'):
-            return item(self)
+            return item()
         else:
             return item
 
