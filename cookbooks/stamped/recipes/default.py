@@ -33,13 +33,17 @@ if 'db' in env.config.node.roles:
     
     options = env.config.node.mongodb.options
     config  = env.config.node.mongodb.config
+    restore = env.config.node.raid.restore
+    ebs     = env.config.node.raid.config
     
     if env.system.platform != "mac_os_x":
         # Setup EBS instances for data
         config.dbpath = "/data/db"
-        #Script(name="setup EBS", code=StaticFile("files/ebs_config.py"))
-        #f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_config.py'
-        f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_restore.py'
+        if restore:
+            f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_restore.py'
+        else:
+            f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_config.py'
+            
         Execute('chmod +x %s  && %s' % (f, f))
     
     Directory(os.path.dirname(config.logpath))

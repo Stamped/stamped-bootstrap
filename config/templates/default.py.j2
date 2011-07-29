@@ -39,6 +39,14 @@
     ], 
     
     {% if 'db' in roles %}
+    "raid" : {
+        "restore" : {% if raid.restore %} raid.restore {% else %} False {% endif %},
+        "config" : {
+            "diskSize": {{ raid.diskSize }},
+            "numDisks": {{ raid.numDisks }},
+        }
+    }, 
+    
     "mongodb" : {
         "options" : [ {% if mongodb.options %} mongodb.options {% endif %} ], 
         "config" : {
