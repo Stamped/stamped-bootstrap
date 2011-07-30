@@ -39,12 +39,12 @@ if 'db' in env.config.node.roles:
     if env.system.platform != "mac_os_x":
         # Setup EBS instances for data
         config.dbpath = "/data/db"
+        f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_config.py'
         if restore:
-            f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_restore.py'
+            Execute('chmod +x %s  && %s -r %s' % (f, f, restore))
         else:
-            f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_config.py'
+            Execute('chmod +x %s  && %s' % (f, f))
             
-        Execute('chmod +x %s  && %s' % (f, f))
     
     Directory(os.path.dirname(config.logpath))
     Directory(os.path.dirname(config.path))
