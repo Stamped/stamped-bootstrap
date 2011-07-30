@@ -76,6 +76,8 @@ def main():
 		echo "/dev/mongodb_vg/mongodb_lv /data ext4 defaults,noatime 0 0" | sudo -E tee -a /etc/fstab
 		sudo mkdir /data
 		sudo mount /data
+		sudo chown root /data/db
+		sudo rm /data/db/mongod.lock
 	""" % (uuid)
 	
 	os.system(bash)
