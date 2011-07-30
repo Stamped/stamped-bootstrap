@@ -14,6 +14,7 @@ __license__ = "TODO"
 
 import time, os, subprocess
 from datetime import datetime
+from optparse import OptionParser
 from boto.ec2.connection import EC2Connection
 from boto import utils
 
