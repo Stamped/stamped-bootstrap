@@ -60,9 +60,6 @@ def main():
     path = os.path.dirname(os.path.abspath(__file__))
     os.chdir(path)
     
-    if os.path.exists(os.path.join(path, "bin")):
-        shell('rm -rf %s/bin %s/install %s/lib' % (path, path, path))
-    
     # parse commandline
     (options, params) = parseCommandLine()
     
