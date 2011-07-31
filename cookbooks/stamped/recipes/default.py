@@ -18,8 +18,10 @@ Directory(conf)
 if env.system.platform != "mac_os_x":
     Package("python-dev")
     Package("gcc")
-    Package("mdadm")
-    Package("lvm2")
+    
+    if 'db' in env.config.node.roles:
+        Package("mdadm")
+        Package("lvm2")
 
 env.includeRecipe("pip")
 env.includeRecipe("libevent")
