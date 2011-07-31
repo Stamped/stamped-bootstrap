@@ -106,5 +106,5 @@ if 'crawler' in env.config.node.roles:
     activate = env.config.node.path + "/bin/activate"
     ready = '/stamped/bootstrap/bin/ready.py'
     
-    Execute(r'. %s && python %s&' % ready)
+    Execute(r'. %s && python %s&' % (activate, ready))
 
