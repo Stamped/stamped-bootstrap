@@ -1,5 +1,6 @@
 
 from pynode.resources import *
+from pynode.source import *
 from pynode.utils import AttributeDict
 from pynode.errors import Fail
 import os, pickle, string
@@ -32,6 +33,18 @@ if 'db' in env.config.node.roles:
     
     options = env.config.node.mongodb.options
     config  = env.config.node.mongodb.config
+    restore = env.config.node.raid.restore
+    ebs     = env.config.node.raid.config
+    
+    if env.system.platform != "mac_os_x":
+        # Setup EBS instances for data
+        config.dbpath = "/data/db"
+        f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_config.py'
+        if restore:
+            Execute('chmod +x %s  && %s -r %s' % (f, f, restore))
+        else:
+            Execute('chmod +x %s  && %s' % (f, f))
+            
     
     Directory(os.path.dirname(config.logpath))
     Directory(os.path.dirname(config.path))

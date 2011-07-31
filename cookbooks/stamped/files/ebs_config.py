@@ -14,19 +14,17 @@ __license__ = "TODO"
 
 import time, os, subprocess
 from datetime import datetime
+from optparse import OptionParser
 from boto.ec2.connection import EC2Connection
 from boto import utils
-from pymongo import Connection
 
 AWS_ACCESS_KEY_ID = 'AKIAIXLZZZT4DMTKZBDQ'
 AWS_SECRET_KEY = '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'
-MONGO_LOCATION = 'localhost'
-MONGO_PORT = 27017
 
-def createEBS(conn, size, region):
-	return conn.create_volume(size, region)
+def createEBS(conn, size, region, snapshot=None):
+	return conn.create_volume(size, region, snapshot)
 
-def main():
+def config():
 
 	metadata = utils.get_instance_metadata()
 	
@@ -54,7 +52,7 @@ def main():
 				break
 			else:
 				time.sleep(5)
-		
+
 	# Build bash command to run			 
 	bash = ''
 	for drive in drives:
@@ -79,44 +77,95 @@ def main():
 	
 	os.system(bash)
 	
+	
+def restore(instance):
 
-def backupEBS():
-	mongo = Connection(MONGO_LOCATION, MONGO_PORT)
-	ec2 = EC2Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
+	conn = EC2Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
 	
 	metadata = utils.get_instance_metadata()
 	
-	# Lock Mongo
-	mongo.admin.command("fsync", lock=True)
-
-	# Log EBS Volumes
-	bash = 'sudo mdadm --detail /dev/md0'
-	p = subprocess.Popen(bash, shell=True, stdout=subprocess.PIPE)
+	region = metadata['placement']['availability-zone']
+	instance_id = metadata['instance-id']
 	
-    regex = re.compile(r'UUID : ([a-zA-Z0-9:]+)', re.IGNORECASE)
-    
-    match = regex.search(p.communicate())
-    if match:
-        uuid = match.group().replace('UUID : ', '')
-    else:
-        uuid = 'N/A'
+	snapshots = []
+	drives = []
+	maxTimestamp = 0
+	for snapshot in conn.get_all_snapshots(owner='self'):
+		if snapshot.description != 'N/A' and snapshot.description[10:20] == instance:
+			data = {}
+			data['id'] = snapshot.id
+			data['size'] = snapshot.volume_size
+			data['drive'] = snapshot.description[30:38]
+			data['timestamp'] = snapshot.description[47:73]
+			data['uuid'] = snapshot.description[82:117]
+			if data['timestamp'] > maxTimestamp:
+				maxTimestamp = data['timestamp']
+			snapshots.append(data)
+			
+	for snapshot in snapshots:
+		if snapshot['timestamp'] == maxTimestamp:
+			drives.append(snapshot)
+			uuid = snapshot['uuid']
+			
+	print drives
 	
-	# Create EBS Snapshots
-	timestamp = str(datetime.utcnow())
-	volumes = [v for v in ec2.get_all_volumes() if v.attach_data.instance_id == metadata['instance-id']]
-	for volume in volumes:
-		if len(volume.attach_data.device) == 8:
-			description = "Instance: %s | Drive: %s | Time: %s | UUID: %s" % (
-				metadata['instance-id'], 
-				volume.attach_data.device, 
-				str(datetime.utcnow()),
-				uuid)
+	for drive in drives:
+		# Verify all drives are in the same configuration
+		if drive['uuid'] != uuid:
+			raise Exception
 		
-			ec2.create_snapshot(volume.id, description)
-
-	# Unlock Mongo
-	mongo.admin['$cmd'].sys.unlock.find_one() 
+		target = drive['drive']
+		vol = createEBS(conn, drive['size'], region, drive['id'])
+		time.sleep(5)
+		
+		while True:
+			try:
+				vol.attach(instance_id, target)
+				break
+			except:
+				time.sleep(5)
+		
+		while True:
+			if os.path.exists(target):
+				break
+			else:
+				time.sleep(5)
 	
+	bash = """
+		sudo /sbin/mdadm --assemble --auto-update-homehost -u %s --no-degraded /dev/md0
+		echo "/dev/mongodb_vg/mongodb_lv /data ext4 defaults,noatime 0 0" | sudo -E tee -a /etc/fstab
+		sudo mkdir /data
+		sudo mount /data
+		sudo chown root /data/db
+		sudo rm /data/db/mongod.lock
+	""" % (uuid)
+	
+	os.system(bash)
+	
+
+def parseCommandLine():
+    usage   = "Usage: %prog [options] command [args]"
+    version = "%prog " + __version__
+    parser  = OptionParser(usage=usage, version=version)
+    
+    parser.add_option("-r", "--restore", action="store", dest="restore", 
+        default=None, type="string", help="Instance ID to restore snapshot from")
+    
+    (options, args) = parser.parse_args()
+    args = map(lambda arg: arg.lower(), args)
+    
+    return (options, args)
+    
+
+def main():
+    # parse commandline
+    (options, args) = parseCommandLine()
+    
+    if options.restore != None:
+        restore(options.restore)
+    else:
+        config()
+    	
 if __name__ == '__main__':
 	main()
 	
