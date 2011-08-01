@@ -106,7 +106,7 @@ if 'webServer' in env.config.node.roles:
 
 #if 'crawler' in env.config.node.roles:
 activate = env.config.node.path + "/bin/activate"
-ready = '/stamped/bootstrap/bin/ready.py'
+ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
 
 Execute(r'. %s && python %s&' % (activate, ready))
 
