@@ -23,6 +23,7 @@ class MongoDBConfigFile(Resource):
         ("owner",       ResourceArgument(expectedType=basestring)), 
         ("group",       ResourceArgument(expectedType=basestring)), 
         ("content",     ResourceArgument(expectedType=basestring)), 
+        ("maxConns",    ResourceArgument(expectedType=int)),
         
         # basic database configuration
         ("dbpath",              ResourceArgument(expectedType=basestring)), 

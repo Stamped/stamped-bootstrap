@@ -51,6 +51,7 @@
         "options" : [ {% if mongodb.options %} mongodb.options {% endif %} ], 
         "config" : {
             "path" : "{{ path }}/conf/mongod.conf", 
+            "maxConns" : 16384,
             "dbpath" : "{{ path }}/db", 
             {% if mongodb.port %}"port" : "{{ mongodb.port }}", {% endif %}
             "logpath" : "{{ path }}/logs/mongod.log", 

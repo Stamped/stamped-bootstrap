@@ -45,6 +45,9 @@ if 'db' in env.config.node.roles:
         else:
             Execute('chmod +x %s  && %s' % (f, f))
             
+        # Up ulimit to 16384
+        Execute('ulimit -n 16384')
+            
     
     Directory(os.path.dirname(config.logpath))
     Directory(os.path.dirname(config.path))
