@@ -46,7 +46,6 @@ if 'db' in env.config.node.roles:
             Execute('chmod +x %s  && %s -r %s' % (f, f, restore))
         else:
             Execute('chmod +x %s  && %s' % (f, f))
-            
     
     Directory(os.path.dirname(config.logpath))
     Directory(os.path.dirname(config.path))
