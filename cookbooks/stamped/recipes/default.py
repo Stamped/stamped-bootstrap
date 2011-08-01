@@ -102,9 +102,9 @@ if 'webServer' in env.config.node.roles:
         #    Service(name="wsgi_app", 
         #            start_cmd=". %s && python %s > %s 2>&1 &" % (activate, site, log))
 
-if 'crawler' in env.config.node.roles:
-    activate = env.config.node.path + "/bin/activate"
-    ready = '/stamped/bootstrap/bin/ready.py'
-    
-    Execute(r'. %s && python %s&' % (activate, ready))
+#if 'crawler' in env.config.node.roles:
+activate = env.config.node.path + "/bin/activate"
+ready = '/stamped/bootstrap/bin/ready.py'
+
+Execute(r'. %s && python %s&' % (activate, ready))
 
