@@ -18,8 +18,10 @@ Directory(conf)
 if env.system.platform != "mac_os_x":
     Package("python-dev")
     Package("gcc")
-    Package("mdadm")
-    Package("lvm2")
+    
+    if 'db' in env.config.node.roles:
+        Package("mdadm")
+        Package("lvm2")
 
 env.includeRecipe("pip")
 env.includeRecipe("libevent")
@@ -44,10 +46,9 @@ if 'db' in env.config.node.roles:
             Execute('chmod +x %s  && %s -r %s' % (f, f, restore))
         else:
             Execute('chmod +x %s  && %s' % (f, f))
-            
+
         # Up ulimit to 16384
         Execute('ulimit -n 16384')
-            
     
     Directory(os.path.dirname(config.logpath))
     Directory(os.path.dirname(config.path))
@@ -65,18 +66,24 @@ if 'db' in env.config.node.roles:
 
 if 'webServer' in env.config.node.roles or 'crawler' in env.config.node.roles:
     if 'git' in env.config.node and 'repos' in env.config.node.git:
+        system_stamped_path = None
         if env.system.platform == "mac_os_x":
-            for repo in env.config.node.git.repos:
-                repo = AttributeDict(repo)
+            system_stamped_path = "/Users/fisch0920/dev/stamped"
+        
+        # install git repos
+        for repo in env.config.node.git.repos:
+            repo = AttributeDict(repo)
+            
+            if system_stamped_path is not None:
                 Script(name="hack", 
-                       code="ln -s %s %s" % ("/Users/fisch0920/dev/stamped", repo.path))
-        else:
-            # install git repos
-            for repo in env.config.node.git.repos:
-                repo = AttributeDict(repo)
+                       code="ln -s %s %s" % (system_stamped_path, repo.path))
+            else:
                 Script(name="git.clone.%s" % repo.url, 
                        code="git clone %s %s" % (repo.url, repo.path))
-    
+        else:
+            for repo in env.config.node.git.repos:
+                repo = AttributeDict(repo)
+
 if 'webServer' in env.config.node.roles:
     activate = env.config.node.path + "/bin/activate"
     
@@ -96,4 +103,10 @@ if 'webServer' in env.config.node.roles:
         #else:
         #    Service(name="wsgi_app", 
         #            start_cmd=". %s && python %s > %s 2>&1 &" % (activate, site, log))
+
+#if 'crawler' in env.config.node.roles:
+activate = env.config.node.path + "/bin/activate"
+ready = '/stamped/bootstrap/bin/ready.py'
+
+Execute(r'. %s && python %s&' % (activate, ready))
 
