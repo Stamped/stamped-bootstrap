@@ -30,8 +30,8 @@ def config():
 	
 	region = metadata['placement']['availability-zone']
 	instance_id = metadata['instance-id']
-	size = 8 # in GB
-	drives = ['sdf', 'sdg', 'sdh', 'sdi']
+	size = 16 # in GB
+	drives = ['sdf', 'sdg', 'sdh', 'sdi', 'sdj']
 
 	conn = EC2Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
 	
@@ -74,14 +74,10 @@ def config():
 	bash += 'sudo mount /dev/mongodb_vg/mongodb_lv /data \n'
 	
 	print bash
-	
 	os.system(bash)
-	
-	
-def restore(instance):
 
+def restore(instance):
 	conn = EC2Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
-	
 	metadata = utils.get_instance_metadata()
 	
 	region = metadata['placement']['availability-zone']
@@ -141,7 +137,6 @@ def restore(instance):
 	""" % (uuid)
 	
 	os.system(bash)
-	
 
 def parseCommandLine():
     usage   = "Usage: %prog [options] command [args]"
@@ -155,7 +150,6 @@ def parseCommandLine():
     args = map(lambda arg: arg.lower(), args)
     
     return (options, args)
-    
 
 def main():
     # parse commandline
@@ -165,8 +159,7 @@ def main():
         restore(options.restore)
     else:
         config()
-    	
+
 if __name__ == '__main__':
 	main()
-	
-	
+
