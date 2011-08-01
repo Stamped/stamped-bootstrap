@@ -19,21 +19,20 @@ import os
 #     app.run(host='0.0.0.0', port=5001, threaded=True)
 
 def main():
-    if env.system.platform != 'mac_os_x':
-    
-        # Run as root!
-        bash = """
-            apt-get -y install ganglia-monitor
-            ps -e | grep gmond | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9
-            mkdir /etc/ganglia/conf.d
-            mkdir /usr/lib64/ganglia/python_modules
-            cp /stamped/bootstrap/cookbooks/stamped/files/ganglia/gmond.conf /etc/ganglia/gmond.conf
-            cp /stamped/bootstrap/cookbooks/stamped/files/ganglia/modpython.conf /etc/ganglia/conf.d/modpython.conf
-            cp /stamped/bootstrap/cookbooks/stamped/files/ganglia/python_modules/* /usr/lib64/ganglia/python_modules
-            cp /stamped/bootstrap/cookbooks/stamped/files/ganglia/conf.d/* /etc/ganglia/conf.d
-            gmond
-        """
-    	os.system(bash)
+
+    # Run as root!
+    bash = """
+        apt-get -y install ganglia-monitor
+        ps -e | grep gmond | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9
+        mkdir /etc/ganglia/conf.d
+        mkdir /usr/lib64/ganglia/python_modules
+        cp /stamped/bootstrap/cookbooks/stamped/files/ganglia/gmond.conf /etc/ganglia/gmond.conf
+        cp /stamped/bootstrap/cookbooks/stamped/files/ganglia/modpython.conf /etc/ganglia/conf.d/modpython.conf
+        cp /stamped/bootstrap/cookbooks/stamped/files/ganglia/python_modules/* /usr/lib64/ganglia/python_modules
+        cp /stamped/bootstrap/cookbooks/stamped/files/ganglia/conf.d/* /etc/ganglia/conf.d
+        gmond
+    """
+	os.system(bash)
 	
 if __name__ == '__main__':
 	main()
