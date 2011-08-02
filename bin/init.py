@@ -98,7 +98,7 @@ def replSetInit(config):
     utils.log("Running WSGI application server")
     out = open(os.path.join(root, "logs/wsgi.log"), "w")
     app = os.path.join(root, "stamped/sites/stamped.com/bin/serve.py")
-    cmd = ". %s && %s %s" % (activate, python, app)
+    cmd = "nohup bash -c '. %s && %s %s' < /dev/null" % (activate, python, app)
     pp  = Popen(cmd, shell=True, stdout=out, stderr=out)
     
     utils.log("Waiting for WSGI server to come online...")
@@ -119,7 +119,7 @@ def replSetInit(config):
     utils.log("Populating database with initial data...")
     out = open(os.path.join(root, "logs/initDB.log"), "w")
     app = os.path.join(root, "stamped/sites/stamped.com/bin/api/SampleData.py")
-    cmd = ". %s && %s %s" % (activate, python, app)
+    cmd = "nohup bash -c '. %s && %s %s' < /dev/null" % (activate, python, app)
     
     try:
         pp = Popen(cmd, shell=True, stdout=out, stderr=out)
