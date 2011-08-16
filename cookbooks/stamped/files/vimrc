@@ -1,5 +1,5 @@
 " windows-specific settings
-set gfn=Courier\ New:h12:b:cANSI
+"set gfn=Courier\ New:h12:b:cANSI
 "source $VIMRUNTIME/mswin.vim
 "behave mswin
 

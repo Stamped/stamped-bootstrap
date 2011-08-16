@@ -6,6 +6,13 @@ from pynode.errors import Fail
 import os, pickle, string
 from subprocess import Popen, PIPE
 
+if env.system.platform != "mac_os_x":
+    # copy over some useful bash and vim settings
+    File(path='/Users/ubuntu/.bash_profile', 
+         content=StaticFile('stamped/bash_profile'))
+    File(path='/Users/ubuntu/.vimrc', 
+         content=StaticFile('stamped/vimrc'))
+
 # install prerequisites
 env.includeRecipe("virtualenv")
 
@@ -104,7 +111,6 @@ if 'webServer' in env.config.node.roles:
         #    Service(name="wsgi_app", 
         #            start_cmd=". %s && python %s > %s 2>&1 &" % (activate, site, log))
 
-#if 'crawler' in env.config.node.roles:
 activate = env.config.node.path + "/bin/activate"
 ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
 
