@@ -8,9 +8,9 @@ from subprocess import Popen, PIPE
 
 if env.system.platform != "mac_os_x":
     # copy over some useful bash and vim settings
-    File(path='/Users/ubuntu/.bash_profile', 
+    File(path='/home/ubuntu/.bash_profile', 
          content=StaticFile('stamped/bash_profile'))
-    File(path='/Users/ubuntu/.vimrc', 
+    File(path='/home/ubuntu/.vimrc', 
          content=StaticFile('stamped/vimrc'))
 
 # install prerequisites
