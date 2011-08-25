@@ -107,7 +107,7 @@ if 'webServer' in env.config.node.roles:
         cd nginx-1.0.5/
         ./configure --with-pcre=../pcre-8.10/ --with-zlib=../zlib-1.2.5/ --with-http_ssl_module
         make
-        mv objs/nginx %(path)s/bin/nginx
+        mv objs/nginx %(path)s/bin/
         cp conf/mime.types %(path)s/bin/
         cd ../
         rm -rf nginx-1.0.5.tar.gz pcre-8.10.tar.gz zlib-1.2.5.tar.gz pcre-8.10/ zlib-1.2.5/
