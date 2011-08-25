@@ -105,7 +105,7 @@ if 'webServer' in env.config.node.roles:
         wget 'http://zlib.net/zlib-1.2.5.tar.gz'
         tar -xzvf zlib-1.2.5.tar.gz 
         cd nginx-1.0.5/
-        ./configure --with-pcre=../pcre-8.10/ --with-zlib=../zlib-1.2.5/
+        ./configure --with-pcre=../pcre-8.10/ --with-zlib=../zlib-1.2.5/ --with-http_ssl_module
         make
         mv objs/nginx %(path)s/bin/nginx
         cp conf/mime.types %(path)s/bin/

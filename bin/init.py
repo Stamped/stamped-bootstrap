@@ -121,7 +121,7 @@ def replSetInit(config):
     gunicorn = os.path.join(root, "bin/gunicorn")
     nginx    = os.path.join(root, "bin/nginx")
     
-    utils.log("Running Green Unicorn on port 18000")
+    utils.log("Starting Green Unicorn on port 18000")
     path    = os.path.join(root, "stamped/sites/stamped.com/bin/")
     out     = open(os.path.join(root, "logs/gunicorn.log"), "w")
     app     = "%s %s -c gunicorn.conf serve:app" % (python, gunicorn)
@@ -140,15 +140,16 @@ def replSetInit(config):
         else:
             try:
                 utils.getFile("http://0.0.0.0:18000", retry=False)
+                utils.log("Success!")
                 break
             except:
                 sleep(1)
                 pass
     
-    utils.log("Running nginx on port 5000")
+    utils.log("Starting nginx on port 5000")
     conf    = os.path.join(root, "stamped/sites/stamped.com/bin/nginx.conf")
     out     = open(os.path.join(root, "logs/nginx.log"), "w")
-    app     = "%s -p %s -c %s" % (nginx, root, conf)
+    app     = "%s -p %s/ -c %s" % (nginx, root, conf)
     cmd     = "nohup bash -c '. %s && %s ' < /dev/null" % (activate, app)
     pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
     # /stamped/bin/nginx -p /stamped/ -c /stamped/stamped/sites/stamped.com/bin/nginx.conf 
@@ -163,6 +164,7 @@ def replSetInit(config):
         else:
             try:
                 utils.getFile("http://0.0.0.0:5000", retry=False)
+                utils.log("Success!")
                 break
             except:
                 sleep(1)
