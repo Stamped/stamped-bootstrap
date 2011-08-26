@@ -104,13 +104,15 @@ if 'webServer' in env.config.node.roles:
         tar -xzvf pcre-8.10.tar.gz 
         wget 'http://zlib.net/zlib-1.2.5.tar.gz'
         tar -xzvf zlib-1.2.5.tar.gz 
+        wget 'http://www.openssl.org/source/openssl-fips-1.2.3.tar.gz'
+        tar -xzvf openssl-fips-1.2.3.tar.gz
         cd nginx-1.0.5/
-        ./configure --with-pcre=../pcre-8.10/ --with-zlib=../zlib-1.2.5/ --with-http_ssl_module
+        ./configure --with-pcre=../pcre-8.10/ --with-zlib=../zlib-1.2.5/ --with-openssl=../openssl-fips-1.2.3 --with-http_ssl_module
         make
         mv objs/nginx %(path)s/bin/nginx
         cp conf/mime.types %(path)s/bin/
         cd ../
-        rm -rf nginx-1.0.5.tar.gz pcre-8.10.tar.gz zlib-1.2.5.tar.gz pcre-8.10/ zlib-1.2.5/
+        rm -rf nginx-1.0.5.tar.gz pcre-8.10.tar.gz zlib-1.2.5.tar.gz openssl-fips-1.2.3.tar.gz pcre-8.10/ zlib-1.2.5/ openssl-fips-1.2.3/
         """ % { 'path': env.config.node.path }
 
         Execute(r'. %s && %s' % (activate, cmd))
