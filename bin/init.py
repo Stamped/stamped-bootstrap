@@ -122,10 +122,11 @@ def replSetInit(config):
     nginx    = os.path.join(root, "bin/nginx")
     
     utils.log("Starting Green Unicorn on port 18000")
+    out     = open(os.path.join(root, "logs/gunicorn.log"), "w")
     conf    = "cp /stamped/bootstrap/cookbooks/stamped/files/gunicorn.conf /etc/init/gunicorn.conf"
     strt    = "service gunicorn start"
     cmd     = ". %s && %s && %s" % (activate, conf, strt)
-    pp      = Popen(cmd, shell=True)
+    pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
 
     # path    = os.path.join(root, "stamped/sites/stamped.com/bin/")
     # out     = open(os.path.join(root, "logs/gunicorn.log"), "w")
