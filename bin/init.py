@@ -122,13 +122,18 @@ def replSetInit(config):
     nginx    = os.path.join(root, "bin/nginx")
     
     utils.log("Starting Green Unicorn on port 18000")
-    path    = os.path.join(root, "stamped/sites/stamped.com/bin/")
-    out     = open(os.path.join(root, "logs/gunicorn.log"), "w")
-    app     = "%s %s -c gunicorn.conf serve:app" % (python, gunicorn)
-    cmd     = "nohup bash -c '. %s && cd %s && %s && cd %s' < /dev/null" % \
-                (activate, path, app, root)
-    pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
-    # /stamped/bin/python /stamped/bin/gunicorn -c gunicorn.conf serve:app
+    conf    = "cp /stamped/bootstrap/cookbooks/stamped/files/gunicorn.conf /etc/init/gunicorn.conf"
+    strt    = "service gunicorn start"
+    cmd     = ". %s && %s && %s" % (activate, conf, strt)
+    pp      = Popen(cmd, shell=True)
+
+    # path    = os.path.join(root, "stamped/sites/stamped.com/bin/")
+    # out     = open(os.path.join(root, "logs/gunicorn.log"), "w")
+    # app     = "%s %s -c gunicorn.conf serve:app" % (python, gunicorn)
+    # cmd     = "nohup bash -c '. %s && cd %s && %s && cd %s' < /dev/null" % \
+    #             (activate, path, app, root)
+    # pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
+    # # /stamped/bin/python /stamped/bin/gunicorn -c gunicorn.conf serve:app
     
     utils.log("Waiting for Green Unicorn to come online...")
     while True:
