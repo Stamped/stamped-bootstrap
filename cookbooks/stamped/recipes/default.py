@@ -25,6 +25,8 @@ Directory(conf)
 if env.system.platform != "mac_os_x":
     Package("python-dev")
     Package("gcc")
+    Package("libjpeg62")
+    Package("libjpeg62-dev")
     
     if 'db' in env.config.node.roles:
         Package("mdadm")
