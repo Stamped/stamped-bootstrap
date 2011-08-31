@@ -14,6 +14,7 @@
             "flask", 
             "gunicorn", 
             "gevent", 
+            "django", 
         ], 
     }, 
     
