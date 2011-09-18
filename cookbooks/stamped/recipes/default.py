@@ -116,6 +116,8 @@ if 'webServer' in env.config.node.roles:
         cp conf/mime.types %(path)s/bin/
         cd ../
         rm -rf nginx-1.0.5.tar.gz pcre-8.13.tar.gz zlib-1.2.5.tar.gz openssl-1.0.0d.tar.gz pcre-8.13/ zlib-1.2.5/ openssl-1.0.0d/
+        mkdir %(path)s/www
+        mkdir %(path)s/www/cache
         """ % { 'path': env.config.node.path }
 
         Execute(r'. %s && %s' % (activate, cmd))
