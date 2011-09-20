@@ -29,6 +29,7 @@ if env.system.platform != "mac_os_x":
     Package("libjpeg62-dev")
     Package("zlib1g-dev")
     Package("python-lxml")
+    Package("ntp")
     
     if 'db' in env.config.node.roles:
         Package("mdadm")
