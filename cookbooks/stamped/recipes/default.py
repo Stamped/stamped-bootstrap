@@ -171,6 +171,8 @@ if 'webServer' in env.config.node.roles:
     cp /stamped/bootstrap/config/templates/carbon.conf /opt/graphite/conf
     cp /stamped/bootstrap/config/templates/storage-schemas.conf /opt/graphite/conf
     cp /stamped/bootstrap/config/templates/statsd.conf /stamped/conf
+    cp /stamped/bootstrap/config/templates/statsd.upstart.conf /etc/init
+    cp /stamped/bootstrap/config/templates/graphite.upstart.conf /etc/init
     
     cd graphite && sudo python setup.py install && cd ..
     cd node && ./configure --without-ssl && make && make install
@@ -179,11 +181,16 @@ if 'webServer' in env.config.node.roles:
     echo DEBUG = True > webapp/graphite/local_settings.py
     PYTHONPATH=`pwd`/whisper ./bin/carbon-cache.py start
     
-    cd /stamped/stamped/sites/stamped.com/bin/libs/statsd/ && node stats.js /stamped/conf/statsd.conf >& /stamped/logs/statsd.node.log&
+    start statsd
     
     cd /opt/graphite
     PYTHONPATH=`pwd`/webapp:`pwd`/whisper python ./webapp/graphite/manage.py syncdb
     PYTHONPATH=`pwd`/webapp:`pwd`/whisper python ./webapp/graphite/manage.py syncdb
+    """
+    
+    Execute(r'. %s && %s' % (activate, cmd))
+    cmd = """
+    start graphite
     """
     
     Execute(r'. %s && %s' % (activate, cmd))
