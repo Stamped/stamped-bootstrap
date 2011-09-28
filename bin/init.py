@@ -136,6 +136,7 @@ def replSetInit(config):
     # pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
     # # /stamped/bin/python /stamped/bin/gunicorn -c gunicorn.conf serve:app
     
+    """
     utils.log("Waiting for Green Unicorn to come online...")
     while True:
         status = pp.poll()
@@ -151,6 +152,7 @@ def replSetInit(config):
             except:
                 sleep(1)
                 pass
+    """
     
     utils.log("Starting nginx on port 5000")
     conf    = os.path.join(root, "stamped/sites/stamped.com/bin/nginx.conf")
@@ -160,6 +162,7 @@ def replSetInit(config):
     pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
     # /stamped/bin/nginx -p /stamped/ -c /stamped/stamped/sites/stamped.com/bin/nginx.conf 
     
+    """
     utils.log("Waiting for nginx to come online...")
     while True:
         status = pp.poll()
@@ -175,7 +178,9 @@ def replSetInit(config):
             except:
                 sleep(1)
                 pass
+    """
     
+    """
     utils.log("Populating database with initial data...")
     out = open(os.path.join(root, "logs/initDB.log"), "w")
     app = os.path.join(root, "stamped/sites/stamped.com/bin/api/SampleData.py")
@@ -187,6 +192,7 @@ def replSetInit(config):
     except Exception as e:
         utils.log("Error populating the database (likely already populated)")
         utils.printException()
+    """
 
 def parseCommandLine():
     usage   = "Usage: %prog json-pickled-params"
