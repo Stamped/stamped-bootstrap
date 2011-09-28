@@ -175,10 +175,13 @@ def replSetInit(config):
             except:
                 sleep(1)
                 pass
-
-
-
-
+    
+    utils.log("Starting Graphite server on port 8080...")
+    out = open(os.path.join(root, "logs/graphite.log"), "w")
+    app = 'PYTHONPATH=`pwd`/whisper ./bin/run-graphite-devel-server.py --libs=`pwd`/webapp/ /opt/graphite/'
+    cmd = "nohup bash -c '. %s && cd /opt/graphite && %s' < /dev/null" % (activate, app)
+    pp  = Popen(cmd, shell=True, stdout=out, stderr=out)
+    
     utils.log("Populating database with initial data...")
     out = open(os.path.join(root, "logs/initDB.log"), "w")
     app = os.path.join(root, "stamped/sites/stamped.com/bin/api/SampleData.py")

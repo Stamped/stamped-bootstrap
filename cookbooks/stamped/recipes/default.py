@@ -141,6 +141,7 @@ if 'webServer' in env.config.node.roles:
         #    Service(name="wsgi_app", 
         #            start_cmd=". %s && python %s > %s 2>&1 &" % (activate, site, log))
     
+    # install StatsD and its dependencies (graphite, carbon, whisper, cairo, node.js)
     Package("python-cairo-dev")
     Package("g++")
     
@@ -177,10 +178,10 @@ if 'webServer' in env.config.node.roles:
     cd /opt/graphite
     PYTHONPATH=`pwd`/webapp:`pwd`/whisper python ./webapp/graphite/manage.py syncdb
     echo DEBUG = True > webapp/graphite/local_settings.py
-    PYTHONPATH=`pwd`/whisper ./bin/run-graphite-devel-server.py --libs=`pwd`/webapp/ /opt/graphite/ >& /stamped/logs/graphite.log&
-    PYTHONPATH=`pwd`/whisper ./bin/carbon-cache.py start >& /stamped/logs/carbon.log&
+    PYTHONPATH=`pwd`/whisper ./bin/carbon-cache.py start
     
-    node /stamped/stamped/sites/stamped.com/bin/libs/statsd/stats.js /stamped/conf/statsd.conf >& /stamped/logs/statsd.node.log&
+    cd /stamped/stamped/sites/stamped.com/bin/libs/statsd/
+    node stats.js /stamped/conf/statsd.conf >& /stamped/logs/statsd.node.log&
     """
     
     Execute(r'. %s && %s' % (activate, cmd))
