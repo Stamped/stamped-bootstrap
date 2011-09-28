@@ -6,6 +6,8 @@ from pynode.errors import Fail
 import os, pickle, string
 from subprocess import Popen, PIPE
 
+activate = env.config.node.path + "/bin/activate"
+
 if env.system.platform != "mac_os_x":
     # copy over some useful bash and vim settings
     File(path='/home/ubuntu/.bash_profile', 
@@ -94,8 +96,6 @@ if 'webServer' in env.config.node.roles or 'crawler' in env.config.node.roles:
                 repo = AttributeDict(repo)
 
 if 'webServer' in env.config.node.roles:
-    activate = env.config.node.path + "/bin/activate"
-
     if 'wsgi' in env.config.node:
 
         cmd = """
@@ -135,9 +135,51 @@ if 'webServer' in env.config.node.roles:
         #else:
         #    Service(name="wsgi_app", 
         #            start_cmd=". %s && python %s > %s 2>&1 &" % (activate, site, log))
+    
+    Package("python-cairo-dev")
+    Package("g++")
+    
+    cmd = """
+    mkdir -p temp && cd temp
+    
+    wget http://launchpad.net/graphite/1.0/0.9.8/+download/graphite-web-0.9.8.tar.gz
+    wget http://launchpad.net/graphite/1.0/0.9.8/+download/carbon-0.9.8.tar.gz
+    wget http://launchpad.net/graphite/1.0/0.9.8/+download/whisper-0.9.8.tar.gz
+    wget http://nodejs.org/dist/node-v0.4.12.tar.gz
+    
+    tar -xvf graphite-web-0.9.8.tar.gz
+    tar -xvf whisper-0.9.8.tar.gz
+    tar -xvf carbon-0.9.8.tar.gz
+    tar -xvf node-v0.4.12.tar.gz
+    
+    mv carbon-0.9.8  carbon
+    mv whisper-0.9.8 whisper
+    mv graphite-web-0.9.8 graphite
+    mv node-v0.4.12 node
+    
+    rm -f carbon-0.9.8.tar.gz whisper-0.9.8.tar.gz graphite-web-0.9.8.tar.gz node-v0.4.12.tar.gz
+    
+    cd whisper  && sudo python setup.py install && cd ..
+    cd carbon   && sudo python setup.py install && cd ..
+    
+    cp /stamped/bootstrap/config/templates/carbon.conf /opt/graphite/conf
+    cp /stamped/bootstrap/config/templates/storage-schemas.conf /opt/graphite/conf
+    cp /stamped/bootstrap/config/templates/statsd.conf /stamped/conf/statsd.conf
+    
+    cd graphite && sudo python setup.py install && cd ..
+    cd node && ./configure --without-ssl && make && make install
+    
+    cd /opt/graphite
+    PYTHONPATH=`pwd`/webapp:`pwd`/whisper python ./webapp/graphite/manage.py syncdb
+    echo DEBUG = True > webapp/graphite/local_settings.py
+    PYTHONPATH=`pwd`/whisper ./bin/run-graphite-devel-server.py --libs=`pwd`/webapp/ /opt/graphite/ >& /stamped/logs/graphite.log&
+    PYTHONPATH=`pwd`/whisper ./bin/carbon-cache.py start >& /stamped/logs/carbon.log&
+    
+    node /stamped/stamped/sites/stamped.com/bin/libs/statsd/stats.js /stamped/conf/statsd.conf >& /stamped/logs/statsd.node.log&
+    """
+    
+    Execute(r'. %s && %s' % (activate, cmd))
 
-activate = env.config.node.path + "/bin/activate"
 ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
-
 Execute(r'. %s && python %s&' % (activate, ready))
 
