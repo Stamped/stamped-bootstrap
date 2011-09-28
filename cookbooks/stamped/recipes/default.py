@@ -176,11 +176,14 @@ if 'webServer' in env.config.node.roles:
     cd node && ./configure --without-ssl && make && make install
     
     cd /opt/graphite
-    PYTHONPATH=`pwd`/webapp:`pwd`/whisper python ./webapp/graphite/manage.py syncdb
     echo DEBUG = True > webapp/graphite/local_settings.py
     PYTHONPATH=`pwd`/whisper ./bin/carbon-cache.py start
     
     cd /stamped/stamped/sites/stamped.com/bin/libs/statsd/ && node stats.js /stamped/conf/statsd.conf >& /stamped/logs/statsd.node.log&
+    
+    cd /opt/graphite
+    PYTHONPATH=`pwd`/webapp:`pwd`/whisper python ./webapp/graphite/manage.py syncdb
+    PYTHONPATH=`pwd`/webapp:`pwd`/whisper python ./webapp/graphite/manage.py syncdb
     """
     
     Execute(r'. %s && %s' % (activate, cmd))
