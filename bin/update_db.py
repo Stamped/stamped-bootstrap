@@ -6,7 +6,7 @@ __copyright__ = "Copyright (c) 2011 Stamped.com"
 __license__ = "TODO"
 
 import os
-from subprocess import Popen, PIPE
+from subprocess import Popen
 
 def main():
     sources = [
