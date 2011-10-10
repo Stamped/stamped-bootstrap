@@ -18,7 +18,8 @@ except ImportError:
      raise
 
 def replSetInit(config):
-    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    base = os.path.dirname(os.path.abspath(__file__))
+    root = os.path.dirname(os.path.dirname(base))
     
     activate = os.path.join(root, "bin/activate")
     python   = os.path.join(root, "bin/python")
@@ -117,7 +118,13 @@ def replSetInit(config):
                 sleep(1)
                 pass
     """
-
+    
+    utils.log("Initializing cron jobs")
+    cron = os.path.join(base, "cron.sh")
+    cmd  = "crontab %s" % cron
+    pp   = Popen(cmd, shell=True)
+    pp.wait()
+    
     gunicorn = os.path.join(root, "bin/gunicorn")
     nginx    = os.path.join(root, "bin/nginx")
     
@@ -127,7 +134,7 @@ def replSetInit(config):
     strt    = "service gunicorn start"
     cmd     = ". %s && %s && %s" % (activate, conf, strt)
     pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
-
+    
     # path    = os.path.join(root, "stamped/sites/stamped.com/bin/")
     # out     = open(os.path.join(root, "logs/gunicorn.log"), "w")
     # app     = "%s %s -c gunicorn.conf serve:app" % (python, gunicorn)
@@ -146,6 +153,8 @@ def replSetInit(config):
             sys.exit(1)
         else:
             try:
+                # note: to reenable this, will have to GET a different URL like 0.0.0.0:18000/v0/stamps/show.json
+                # and wait for a 401 response to be returned (unauthorized request)
                 utils.getFile("http://0.0.0.0:18000", retry=False)
                 utils.log("Success!")
                 break
@@ -172,6 +181,8 @@ def replSetInit(config):
             sys.exit(1)
         else:
             try:
+                # note: to reenable this, will have to GET a different URL like 0.0.0.0:5000/v0/stamps/show.json
+                # and wait for a 401 response to be returned (unauthorized request)
                 utils.getFile("http://0.0.0.0:5000", retry=False)
                 utils.log("Success!")
                 break
