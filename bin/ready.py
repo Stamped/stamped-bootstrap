@@ -9,7 +9,6 @@ import os, pickle
 from optparse import OptionParser
 
 def ganglia(roles=None):
-		
 	# Run as root!
 	bash = """
 		apt-get -y install ganglia-monitor
@@ -32,7 +31,6 @@ def ganglia(roles=None):
 	"""
 	print bash
 	os.system(bash)
-	
 
 def parseCommandLine():
 	usage	= "Usage: %prog [options] command [args]"
@@ -52,3 +50,4 @@ def main():
 
 if __name__ == '__main__':
 	main()
+

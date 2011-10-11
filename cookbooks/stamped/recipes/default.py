@@ -56,11 +56,12 @@ if 'db' in env.config.node.roles:
         # Setup EBS instances for data
         config.dbpath = "/data/db"
         f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_config.py'
+        
         if restore:
             Execute('chmod +x %s  && %s -r %s' % (f, f, restore))
         else:
             Execute('chmod +x %s  && %s' % (f, f))
-
+        
         # Up ulimit to 16384
         Execute('ulimit -n 16384')
     
@@ -75,10 +76,18 @@ if 'db' in env.config.node.roles:
         Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9")
     
     Service(name="mongod", 
-        start_cmd="mongod --fork --replSet %s --config %s %s" % \
-        (config.replSet, config.path, string.joinfields(options, ' ')))
+            start_cmd="mongod --fork --replSet %s --config %s %s" % \
+            (config.replSet, config.path, string.joinfields(options, ' ')))
+    
+    # initialize db-specific cron jobs (e.g., backup)
+    cron = "/stamped/bootstrap/bin/cron.db.sh"
+    cmd  = "crontab %s" % cron
+    Execute(cmd)
 
-if 'webServer' in env.config.node.roles or 'crawler' in env.config.node.roles:
+if 'webServer' in env.config.node.roles or \
+    'crawler' in env.config.node.roles or \
+    'monitor' in env.config.node.roles:
+    
     if 'git' in env.config.node and 'repos' in env.config.node.git:
         system_stamped_path = None
         if env.system.platform == "mac_os_x":
@@ -100,7 +109,6 @@ if 'webServer' in env.config.node.roles or 'crawler' in env.config.node.roles:
 
 if 'webServer' in env.config.node.roles:
     if 'wsgi' in env.config.node:
-
         cmd = """
         cd %(path)s
         wget 'http://nginx.org/download/nginx-1.0.5.tar.gz'
@@ -193,6 +201,13 @@ if 'webServer' in env.config.node.roles:
     start graphite
     """
     
+    Execute(r'. %s && %s' % (activate, cmd))
+
+if 'monitor' in env.config.node.roles:
+    cmd = "cp /stamped/bootstrap/config/templates/monitor.upstart.conf /etc/init/stampedmon.conf"
+    Execute(r'. %s && %s' % (activate, cmd))
+    
+    cmd = "start stampedmon"
     Execute(r'. %s && %s' % (activate, cmd))
 
 ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
