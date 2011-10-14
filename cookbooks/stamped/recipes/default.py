@@ -103,9 +103,20 @@ if 'webServer' in env.config.node.roles or \
             else:
                 Script(name="git.clone.%s" % repo.url, 
                        code="git clone %s %s" % (repo.url, repo.path))
-        else:
-            for repo in env.config.node.git.repos:
-                repo = AttributeDict(repo)
+    
+    Package('java')
+    
+    """
+    wget http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip
+    unzip ec2-api-tools.zip
+    cd ec2-api-tools-*
+    export EC2_HOME=`pwd`
+    export PATH=$PATH:$EC2_HOME/bin
+    export JAVA_HOME=/usr
+    export EC2_PRIVATE_KEY=/stamped/stamped/deploy/keys/pk-W7ITOSRSFD353R3K6MULWBZCDASTRG3L.pem
+    export EC2_CERT=/stamped/stamped/deploy/keys/cert-W7ITOSRSFD353R3K6MULWBZCDASTRG3L.pem
+    """
+    #Execute(r'. %s && %s' % (activate, cmd))
 
 if 'webServer' in env.config.node.roles:
     if 'wsgi' in env.config.node:

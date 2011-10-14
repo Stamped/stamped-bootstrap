@@ -11,6 +11,7 @@ from subprocess import Popen
 def main():
     sources = [
         "fandango", 
+        "amazonbookfeed", 
     ]
     
     activate = "/stamped/bin/activate"
