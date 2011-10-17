@@ -168,14 +168,14 @@ if 'webServer' in env.config.node.roles:
     cmd = """
     mkdir -p temp && cd temp
     
-    wget http://launchpad.net/graphite/1.0/0.9.8/+download/graphite-web-0.9.8.tar.gz
-    wget http://launchpad.net/graphite/1.0/0.9.8/+download/carbon-0.9.8.tar.gz
-    wget http://launchpad.net/graphite/1.0/0.9.8/+download/whisper-0.9.8.tar.gz
+    wget http://launchpad.net/graphite/0.9/0.9.9/+download/graphite-web-0.9.9.tar.gz
+    wget http://launchpad.net/graphite/0.9/0.9.9/+download/carbon-0.9.9.tar.gz
+    wget http://launchpad.net/graphite/0.9/0.9.9/+download/whisper-0.9.9.tar.gz
     wget http://nodejs.org/dist/node-v0.4.12.tar.gz
     
-    tar -xvf graphite-web-0.9.8.tar.gz
-    tar -xvf whisper-0.9.8.tar.gz
-    tar -xvf carbon-0.9.8.tar.gz
+    tar -xvf graphite-web-0.9.9.tar.gz
+    tar -xvf whisper-0.9.9.tar.gz
+    tar -xvf carbon-0.9.9.tar.gz
     tar -xvf node-v0.4.12.tar.gz
     
     mv carbon-0.9.8  carbon
@@ -183,7 +183,7 @@ if 'webServer' in env.config.node.roles:
     mv graphite-web-0.9.8 graphite
     mv node-v0.4.12 node
     
-    rm -f carbon-0.9.8.tar.gz whisper-0.9.8.tar.gz graphite-web-0.9.8.tar.gz node-v0.4.12.tar.gz
+    rm -f carbon-0.9.9.tar.gz whisper-0.9.9.tar.gz graphite-web-0.9.9.tar.gz node-v0.4.12.tar.gz
     
     cd whisper  && sudo python setup.py install && cd ..
     cd carbon   && sudo python setup.py install && cd ..
