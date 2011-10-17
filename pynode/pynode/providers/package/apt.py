@@ -37,7 +37,11 @@ class DebianAptProvider(PackageProvider):
             raise Fail("APT does not provide a version of package %s" % self.resource.name)
     
     def _install_package(self, name, version):
-        return 0 == check_call("DEBIAN_FRONTEND=noninteractive apt-get -q -y install %s=%s" % (name, version),
+        version_str = ""
+        if version is not None:
+            version_str = '=%s' % version
+        
+        return 0 == check_call("DEBIAN_FRONTEND=noninteractive apt-get -q -y install %s%s" % (name, version_str),
                                shell=True, stdout=PIPE, stderr=STDOUT)
     
     def _remove_package(self, name):

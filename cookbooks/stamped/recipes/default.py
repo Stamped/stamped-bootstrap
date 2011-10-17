@@ -104,7 +104,8 @@ if 'webServer' in env.config.node.roles or \
                 Script(name="git.clone.%s" % repo.url, 
                        code="git clone %s %s" % (repo.url, repo.path))
     
-    Package('java')
+    # install JRE
+    Package('openjdk-6-jre-headless')
     
     """
     wget http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip
