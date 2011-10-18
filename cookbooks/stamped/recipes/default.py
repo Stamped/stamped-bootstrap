@@ -164,6 +164,7 @@ if 'webServer' in env.config.node.roles:
     # install StatsD and its dependencies (graphite, carbon, whisper, cairo, node.js)
     Package("python-cairo-dev")
     Package("g++")
+    env.cookbooks.pip.PipPackage("django-tagging", virtualenv=path)
     
     cmd = """
     mkdir -p temp && cd temp
@@ -198,7 +199,7 @@ if 'webServer' in env.config.node.roles:
     cd node && ./configure --without-ssl && make && make install
     
     cd /opt/graphite
-    echo DEBUG = True > webapp/graphite/local_settings.py
+    echo DEBUG = True >> webapp/graphite/local_settings.py
     PYTHONPATH=`pwd`/whisper ./bin/carbon-cache.py start
     
     start statsd
