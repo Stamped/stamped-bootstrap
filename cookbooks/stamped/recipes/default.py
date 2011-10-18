@@ -178,9 +178,9 @@ if 'webServer' in env.config.node.roles:
     tar -xvf carbon-0.9.9.tar.gz
     tar -xvf node-v0.4.12.tar.gz
     
-    mv carbon-0.9.8  carbon
-    mv whisper-0.9.8 whisper
-    mv graphite-web-0.9.8 graphite
+    mv carbon-0.9.9  carbon
+    mv whisper-0.9.9 whisper
+    mv graphite-web-0.9.9 graphite
     mv node-v0.4.12 node
     
     rm -f carbon-0.9.9.tar.gz whisper-0.9.9.tar.gz graphite-web-0.9.9.tar.gz node-v0.4.12.tar.gz
