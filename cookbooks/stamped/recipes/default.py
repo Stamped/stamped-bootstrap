@@ -217,7 +217,7 @@ if 'webServer' in env.config.node.roles:
     Execute(r'. %s && %s' % (activate, cmd))
 
 if 'monitor' in env.config.node.roles:
-    cmd = "cp /stamped/bootstrap/config/templates/monitor.upstart.conf /etc/init/stampedmon.conf"
+    cmd = "cp /stamped/bootstrap/config/templates/stampedmon.upstart.conf /etc/init/stampedmon.conf"
     Execute(r'. %s && %s' % (activate, cmd))
     
     cmd = "start stampedmon"
