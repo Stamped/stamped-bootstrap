@@ -44,6 +44,12 @@ env.includeRecipe("libevent")
 for package in env.config.node.python.requirements:
     env.cookbooks.pip.PipPackage(package, virtualenv=path)
 
+# Copy Boto config
+cmd = """
+cp /stamped/bootstrap/cookbooks/stamped/files/boto.cfg /etc/boto.cfg
+"""
+Execute(r'. %s && %s' % (activate, cmd))
+
 if 'db' in env.config.node.roles:
     env.includeRecipe('mongodb')
     

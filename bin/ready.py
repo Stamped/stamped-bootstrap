@@ -16,7 +16,6 @@ def ganglia(roles=None):
 		mkdir /usr/lib64/ganglia/python_modules
 		cp /stamped/bootstrap/cookbooks/stamped/files/ganglia/gmond.conf /etc/ganglia/gmond.conf
 		cp /stamped/bootstrap/cookbooks/stamped/files/ganglia/modpython.conf /etc/ganglia/conf.d/modpython.conf
-		cp /stamped/bootstrap/cookbooks/stamped/files/boto.cfg /etc/boto.cfg
 	"""
 	
 	if roles != None:
