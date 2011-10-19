@@ -19,10 +19,11 @@ if env.system.platform != "mac_os_x":
 env.includeRecipe("virtualenv")
 
 path = env.config.node.path
-Directory(path)
-
 conf = os.path.join(path, "conf")
+
+Directory(path)
 Directory(conf)
+Directory(os.path.dirname(config.logpath))
 
 if env.system.platform != "mac_os_x":
     Package("python-dev")
@@ -71,7 +72,6 @@ if 'db' in env.config.node.roles:
         # Up ulimit to 16384
         Execute('ulimit -n 16384')
     
-    Directory(os.path.dirname(config.logpath))
     Directory(os.path.dirname(config.path))
     Directory(config.dbpath)
     
