@@ -51,44 +51,46 @@ cp /stamped/bootstrap/cookbooks/stamped/files/boto.cfg /etc/boto.cfg
 """
 Execute(r'. %s && %s' % (activate, cmd))
 
-if 'db' in env.config.node.roles:
+if 'db' in env.config.node.roles or 'monitor' in env.config.node.roles:
     env.includeRecipe('mongodb')
     
-    options = env.config.node.mongodb.options
-    config  = env.config.node.mongodb.config
-    restore = env.config.node.raid.restore
-    ebs     = env.config.node.raid.config
-    
-    if env.system.platform != "mac_os_x":
-        # Setup EBS instances for data
-        config.dbpath = "/data/db"
-        f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_config.py'
+    if 'db' in env.config.node.roles:
+        options = env.config.node.mongodb.options
+        config  = env.config.node.mongodb.config
+        restore = env.config.node.raid.restore
+        ebs     = env.config.node.raid.config
         
-        if restore:
-            Execute('chmod +x %s  && %s -r %s' % (f, f, restore))
-        else:
-            Execute('chmod +x %s  && %s' % (f, f))
+        if env.system.platform != "mac_os_x":
+            # Setup EBS instances for data
+            config.dbpath = "/data/db"
+            f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_config.py'
+            
+            if restore:
+                Execute('chmod +x %s  && %s -r %s' % (f, f, restore))
+            else:
+                Execute('chmod +x %s  && %s' % (f, f))
+            
+            # Up ulimit to 16384
+            Execute('ulimit -n 16384')
         
-        # Up ulimit to 16384
-        Execute('ulimit -n 16384')
-    
-    Directory(os.path.dirname(config.path))
-    Directory(config.dbpath)
-    
-    env.cookbooks.mongodb.MongoDBConfigFile(**config)
+        Directory(os.path.dirname(config.path))
+        Directory(config.dbpath)
+        
+        env.cookbooks.mongodb.MongoDBConfigFile(**config)
     
     # TODO: where is this rogue mongod process coming from?!
     if env.system.platform != 'mac_os_x':
         Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9")
     
-    Service(name="mongod", 
-            start_cmd="mongod --fork --replSet %s --config %s %s" % \
-            (config.replSet, config.path, string.joinfields(options, ' ')))
-    
-    # initialize db-specific cron jobs (e.g., backup)
-    cron = "/stamped/bootstrap/bin/cron.db.sh"
-    cmd  = "crontab %s" % cron
-    Execute(cmd)
+    if 'db' in env.config.node.roles:
+        Service(name="mongod", 
+                start_cmd="mongod --fork --replSet %s --config %s %s" % \
+                (config.replSet, config.path, string.joinfields(options, ' ')))
+        
+        # initialize db-specific cron jobs (e.g., backup)
+        cron = "/stamped/bootstrap/bin/cron.db.sh"
+        cmd  = "crontab %s" % cron
+        Execute(cmd)
 
 if 'webServer' in env.config.node.roles or \
     'crawler' in env.config.node.roles or \
