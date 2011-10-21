@@ -23,7 +23,10 @@ conf = os.path.join(path, "conf")
 
 Directory(path)
 Directory(conf)
-Directory(os.path.dirname(env.config.logpath))
+try:
+    Directory(os.path.dirname(env.config.node.mongodb.config.logpath))
+except:
+    pass
 
 if env.system.platform != "mac_os_x":
     Package("python-dev")
