@@ -23,6 +23,12 @@ conf = os.path.join(path, "conf")
 
 Directory(path)
 Directory(conf)
+
+try:
+    Directory(os.path.dirname(env.config.node.mongodb.config.logpath))
+except:
+    pass
+
 Directory(os.path.dirname(config.logpath))
 Directory("/stamped/")
 Directory("/stamped/logs")

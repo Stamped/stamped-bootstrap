@@ -135,6 +135,12 @@ def replSetInit(config):
     cmd     = ". %s && %s && %s" % (activate, conf, strt)
     pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
     
+    utils.log("Starting Green Unicorn on port 80")
+    out     = open(os.path.join(root, "logs/gunicorn-80.log"), "w")
+    strt    = "/stamped/bin/python /stamped/bin/gunicorn_django -c /stamped/stamped/sites/stamped.com/bin/www/gunicorn.conf /stamped/stamped/sites/stamped.com/bin/www/settings.py"
+    cmd     = ". %s && %s" % (activate, strt)
+    pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
+    
     # path    = os.path.join(root, "stamped/sites/stamped.com/bin/")
     # out     = open(os.path.join(root, "logs/gunicorn.log"), "w")
     # app     = "%s %s -c gunicorn.conf serve:app" % (python, gunicorn)
