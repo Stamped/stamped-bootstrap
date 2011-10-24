@@ -24,6 +24,8 @@ conf = os.path.join(path, "conf")
 Directory(path)
 Directory(conf)
 Directory(os.path.dirname(config.logpath))
+Directory("/stamped/")
+Directory("/stamped/logs")
 
 if env.system.platform != "mac_os_x":
     Package("python-dev")
