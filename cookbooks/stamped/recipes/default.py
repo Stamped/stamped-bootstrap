@@ -29,10 +29,10 @@ Execute('cat /stamped/bootstrap/cookbooks/stamped/files/bash_profile >> /etc/pro
 
 try:
     Directory(os.path.dirname(env.config.node.mongodb.config.logpath))
+    Directory(os.path.dirname(env.config.node.wsgi.log))
 except:
     pass
 
-Directory(os.path.dirname(env.config.logpath))
 Directory("/stamped/")
 Directory("/stamped/logs")
 
