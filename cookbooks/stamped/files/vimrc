@@ -25,7 +25,10 @@ set expandtab
 " indent on enter according to previous line's format
 set smartindent
 " color :)
-syntax on
+if has("syntax")
+  syntax on
+endif
+
 " incremental search-as-you-type
 "set incsearch
 " highlight search terms

@@ -24,6 +24,9 @@ conf = os.path.join(path, "conf")
 Directory(path)
 Directory(conf)
 
+Execute('cp /stamped/bootstrap/cookbooks/stamped/files/vimrc /etc/vim/vimrc.local')
+Execute('cat /stamped/bootstrap/cookbooks/stamped/files/bash_profile >> /etc/profile && . /etc/profile')
+
 try:
     Directory(os.path.dirname(env.config.node.mongodb.config.logpath))
 except:
@@ -176,7 +179,8 @@ if 'webServer' in env.config.node.roles:
         #else:
         #    Service(name="wsgi_app", 
         #            start_cmd=". %s && python %s > %s 2>&1 &" % (activate, site, log))
-    
+
+if 'monitor' in env.config.node.roles:
     # install StatsD and its dependencies (graphite, carbon, whisper, cairo, node.js)
     Package("python-cairo-dev")
     Package("g++")
