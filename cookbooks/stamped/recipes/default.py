@@ -32,7 +32,7 @@ try:
 except:
     pass
 
-Directory(os.path.dirname(config.logpath))
+Directory(os.path.dirname(env.config.logpath))
 Directory("/stamped/")
 Directory("/stamped/logs")
 
