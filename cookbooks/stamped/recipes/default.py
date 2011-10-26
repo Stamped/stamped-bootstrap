@@ -105,7 +105,8 @@ if 'db' in env.config.node.roles or 'monitor' in env.config.node.roles:
 
 if 'webServer' in env.config.node.roles or \
     'crawler' in env.config.node.roles or \
-    'monitor' in env.config.node.roles:
+    'monitor' in env.config.node.roles or \
+    'test' in env.config.node.roles:
     
     if 'git' in env.config.node and 'repos' in env.config.node.git:
         system_stamped_path = None
@@ -230,13 +231,12 @@ if 'monitor' in env.config.node.roles:
     """
     
     Execute(r'. %s && %s' % (activate, cmd))
-    cmd = """
-    start graphite
-    """
     
+    # start graphite daemon
+    cmd = "start graphite"
     Execute(r'. %s && %s' % (activate, cmd))
-
-if 'monitor' in env.config.node.roles:
+    
+    # start monitoring daemon
     cmd = "cp /stamped/bootstrap/config/templates/stampedmon.upstart.conf /etc/init/stampedmon.conf"
     Execute(r'. %s && %s' % (activate, cmd))
     

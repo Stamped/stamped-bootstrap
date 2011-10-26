@@ -61,7 +61,6 @@ def replSetInit(config):
             break
         except AutoReconnect:
             sleep(5)
-            pass
     
     if not replSetInitialized:
         utils.log("Waiting for replica set '%s' to come online..." % config._id)
@@ -72,7 +71,6 @@ def replSetInit(config):
                 break
             except (AutoReconnect, OperationFailure):
                 sleep(1)
-                pass
     
     conn.disconnect()
     
@@ -84,7 +82,6 @@ def replSetInit(config):
             break
         except (AutoReconnect):
             sleep(2)
-            pass
     
     # write replica set configuration now that replica set is online
     conf_str = json.dumps(conf, sort_keys=True, indent=2)
@@ -116,7 +113,6 @@ def replSetInit(config):
                 break
             except:
                 sleep(1)
-                pass
     """
     
     utils.log("Initializing cron jobs")
@@ -135,7 +131,7 @@ def replSetInit(config):
     cmd     = ". %s && %s && %s" % (activate, conf, strt)
     pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
     
-    utils.log("Starting Green Unicorn on port 80")
+    utils.log("Starting Green Unicorn on port 19000")
     out     = open(os.path.join(root, "logs/gunicorn-80.log"), "w")
     strt    = "/stamped/bin/python /stamped/bin/gunicorn_django -c /stamped/stamped/sites/stamped.com/bin/www/gunicorn.conf /stamped/stamped/sites/stamped.com/bin/www/settings.py"
     cmd     = ". %s && %s" % (activate, strt)
@@ -166,7 +162,6 @@ def replSetInit(config):
                 break
             except:
                 sleep(1)
-                pass
     """
     
     utils.log("Starting nginx on port 5000")
@@ -194,7 +189,6 @@ def replSetInit(config):
                 break
             except:
                 sleep(1)
-                pass
     """
     
     """
