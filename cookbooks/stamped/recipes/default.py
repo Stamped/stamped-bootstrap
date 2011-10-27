@@ -12,8 +12,7 @@ if env.system.platform != "mac_os_x":
     # copy over some useful bash and vim settings
     File(path='/home/ubuntu/.bash_profile', 
          content=StaticFile('stamped/bash_profile'))
-    File(path='/home/ubuntu/.vimrc', 
-         content=StaticFile('stamped/vimrc'))
+    #File(path='/home/ubuntu/.vimrc', content=StaticFile('stamped/vimrc'))
 
 # install prerequisites
 env.includeRecipe("virtualenv")
