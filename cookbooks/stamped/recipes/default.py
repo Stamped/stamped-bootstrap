@@ -82,6 +82,7 @@ if 'db' in env.config.node.roles or 'monitor' in env.config.node.roles:
             
             # Up ulimit to 16384
             Execute('ulimit -n 16384')
+            Execute('echo "* hard nofile 16384" >> /etc/security/limits.conf')
         
         Directory(os.path.dirname(config.path))
         Directory(config.dbpath)
