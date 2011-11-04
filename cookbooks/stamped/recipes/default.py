@@ -81,7 +81,7 @@ if 'db' in env.config.node.roles or 'monitor' in env.config.node.roles:
                 Execute('chmod +x %s  && %s' % (f, f))
             
             # Up ulimit to 16384
-            Execute('ulimit -n 16384; sudo ulimit -n 16384')
+            Execute('ulimit -n 16384')
             Execute('echo "* hard nofile 16384" >> /etc/security/limits.conf')
         
         Directory(os.path.dirname(config.path))
