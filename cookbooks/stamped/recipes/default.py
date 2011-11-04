@@ -102,41 +102,37 @@ if 'db' in env.config.node.roles or 'monitor' in env.config.node.roles:
         # initialize db-specific cron jobs (e.g., backup)
         Execute("crontab /stamped/bootstrap/bin/cron.db.sh")
 
-if 'webServer' in env.config.node.roles or \
-    'crawler' in env.config.node.roles or \
-    'monitor' in env.config.node.roles or \
-    'test' in env.config.node.roles:
+# clone git repo
+if 'git' in env.config.node and 'repos' in env.config.node.git:
+    system_stamped_path = None
+    if env.system.platform == "mac_os_x":
+        system_stamped_path = "/Users/fisch0920/dev/stamped"
     
-    if 'git' in env.config.node and 'repos' in env.config.node.git:
-        system_stamped_path = None
-        if env.system.platform == "mac_os_x":
-            system_stamped_path = "/Users/fisch0920/dev/stamped"
+    # install git repos
+    for repo in env.config.node.git.repos:
+        repo = AttributeDict(repo)
         
-        # install git repos
-        for repo in env.config.node.git.repos:
-            repo = AttributeDict(repo)
-            
-            if system_stamped_path is not None:
-                Script(name="hack", 
-                       code="ln -s %s %s" % (system_stamped_path, repo.path))
-            else:
-                Script(name="git.clone.%s" % repo.url, 
-                       code="git clone %s %s" % (repo.url, repo.path))
-    
-    # install JRE
-    Package('openjdk-6-jre-headless')
-    
-    """
-    wget http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip
-    unzip ec2-api-tools.zip
-    cd ec2-api-tools-*
-    export EC2_HOME=`pwd`
-    export PATH=$PATH:$EC2_HOME/bin
-    export JAVA_HOME=/usr
-    export EC2_PRIVATE_KEY=/stamped/stamped/deploy/keys/pk-W7ITOSRSFD353R3K6MULWBZCDASTRG3L.pem
-    export EC2_CERT=/stamped/stamped/deploy/keys/cert-W7ITOSRSFD353R3K6MULWBZCDASTRG3L.pem
-    """
-    #Execute(r'. %s && %s' % (activate, cmd))
+        if system_stamped_path is not None:
+            Script(name="hack", 
+                   code="ln -s %s %s" % (system_stamped_path, repo.path))
+        else:
+            Script(name="git.clone.%s" % repo.url, 
+                   code="git clone %s %s" % (repo.url, repo.path))
+
+# install JRE
+Package('openjdk-6-jre-headless')
+
+"""
+wget http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip
+unzip ec2-api-tools.zip
+cd ec2-api-tools-*
+export EC2_HOME=`pwd`
+export PATH=$PATH:$EC2_HOME/bin
+export JAVA_HOME=/usr
+export EC2_PRIVATE_KEY=/stamped/stamped/deploy/keys/pk-W7ITOSRSFD353R3K6MULWBZCDASTRG3L.pem
+export EC2_CERT=/stamped/stamped/deploy/keys/cert-W7ITOSRSFD353R3K6MULWBZCDASTRG3L.pem
+"""
+#Execute(r'. %s && %s' % (activate, cmd))
 
 if 'webServer' in env.config.node.roles:
     if 'wsgi' in env.config.node:
