@@ -116,7 +116,7 @@ def replSetInit(config):
     """
     
     utils.log("Initializing cron jobs")
-    cron = os.path.join(base, "cron.sh")
+    cron = os.path.join(base, "cron.api.sh")
     cmd  = "crontab %s" % cron
     pp   = Popen(cmd, shell=True)
     pp.wait()

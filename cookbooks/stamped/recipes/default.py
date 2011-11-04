@@ -100,9 +100,7 @@ if 'db' in env.config.node.roles or 'monitor' in env.config.node.roles:
                 (config.replSet, config.path, string.joinfields(options, ' ')))
         
         # initialize db-specific cron jobs (e.g., backup)
-        cron = "/stamped/bootstrap/bin/cron.db.sh"
-        cmd  = "crontab %s" % cron
-        Execute(cmd)
+        Execute("crontab /stamped/bootstrap/bin/cron.db.sh")
 
 if 'webServer' in env.config.node.roles or \
     'crawler' in env.config.node.roles or \
@@ -243,6 +241,9 @@ if 'monitor' in env.config.node.roles:
     
     cmd = "start stampedmon"
     Execute(r'. %s && %s' % (activate, cmd))
+    
+    # initialize mon-specific cron jobs (e.g., alerts)
+    Execute("crontab /stamped/bootstrap/bin/cron.mon.sh")
 
 ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
 Execute(r'. %s && python %s&' % (activate, ready))
