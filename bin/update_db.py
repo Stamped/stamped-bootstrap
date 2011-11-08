@@ -16,7 +16,6 @@ def main():
     
     activate = "/stamped/bin/activate"
     crawler  = "/stamped/stamped/sites/stamped.com/bin/crawler"
-    top      = "/stamped/stamped/sites/stamped.com/bin"
     log = open("/stamped/logs/update_db.log", "a")
     
     for source in sources:
@@ -24,11 +23,6 @@ def main():
         
         Popen(cmd, shell=True, stdout=log, stderr=log).wait()
     
-    log.close()
-    
-    log = open("/stamped/logs/update_apple.log", "a")
-    cmd = ". %s && cd %s && python update_apple.py" % (activate, top)
-    Popen(cmd, shell=True, stdout=log, stderr=log).wait()
     log.close()
 
 if __name__ == '__main__':
