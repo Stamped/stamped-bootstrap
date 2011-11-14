@@ -64,7 +64,9 @@ class PipPackageProvider(PackageProvider):
             virtualenv = ""
         
         if name == 'pip' or not version:
-            (_, status) = self._shell("%s %s %s install -U %s" % \
+            (_, status) = self._shell("%s %s %s install %s" % \
+                (prefix, self.pip_binary_path, virtualenv, name))
+            (_, __) = self._shell("%s %s %s install -U %s" % \
                 (prefix, self.pip_binary_path, virtualenv, name))
         else:
             (_, status) = self._shell("%s %s %s install %s==%s" % \
