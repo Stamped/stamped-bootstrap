@@ -60,7 +60,9 @@ cmd = "cp /stamped/bootstrap/cookbooks/stamped/files/boto.cfg /etc/boto.cfg"
 Execute(r'. %s && %s' % (activate, cmd))
 
 # Ensure most recent version of boto is installed
-cmd = ". %s; pip install boto; pip install -U boto"
+cmd = "pip install boto"
+Execute(r'. %s && %s' % (activate, cmd))
+cmd = "pip install -U boto"
 Execute(r'. %s && %s' % (activate, cmd))
 
 if 'db' in env.config.node.roles or 'monitor' in env.config.node.roles:
