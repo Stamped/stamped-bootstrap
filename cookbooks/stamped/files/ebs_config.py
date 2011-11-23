@@ -30,7 +30,7 @@ def config():
     
     region = metadata['placement']['availability-zone']
     instance_id = metadata['instance-id']
-    size = 16 # in GB
+    size = 64 # in GB
     drives = ['sdf', 'sdg', 'sdh', 'sdi', 'sdj']
 
     conn = EC2Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
