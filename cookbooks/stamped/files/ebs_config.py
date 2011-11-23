@@ -25,14 +25,13 @@ def createEBS(conn, size, region, snapshot=None):
     return conn.create_volume(size, region, snapshot)
 
 def config():
-
     metadata = utils.get_instance_metadata()
     
     region = metadata['placement']['availability-zone']
     instance_id = metadata['instance-id']
     size = 64 # in GB
-    drives = ['sdf', 'sdg', 'sdh', 'sdi', 'sdj']
-
+    drives = ['sdf', 'sdg', 'sdh', 'sdi' ]
+    
     conn = EC2Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
     
     for drive in drives:
@@ -53,7 +52,7 @@ def config():
             else:
                 time.sleep(5)
 
-    # Build bash command to run             
+    # Build bash command to run
     bash = ''
     for drive in drives:
         bash += '\n echo ",,L" | sudo sfdisk /dev/' + drive
