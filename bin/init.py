@@ -93,27 +93,6 @@ def replSetInit(config):
     if 0 == utils.shell2(find_wsgi_server):
         utils.shell2(r"%s | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9" % find_wsgi_server)
     
-    """
-    utils.log("Running WSGI application server")
-    out = open(os.path.join(root, "logs/wsgi.log"), "w")
-    app = os.path.join(root, "stamped/sites/stamped.com/bin/serve.py")
-    cmd = "nohup bash -c '. %s && %s %s' < /dev/null" % (activate, python, app)
-    pp  = Popen(cmd, shell=True, stdout=out, stderr=out)
-    
-    utils.log("Waiting for WSGI server to come online...")
-    while True:
-        status = pp.poll()
-        if status != None and status != 0:
-            # process was terminated, probably abnormally
-            utils.log("WSGI server process '%d' terminated with returncode '%d'" % (pp.pid, status))
-            sys.exit(1)
-        else:
-            try:
-                utils.getFile("http://0.0.0.0:5000", retry=False)
-                break
-            except:
-                sleep(1)
-    """
     
     utils.log("Initializing cron jobs")
     cron = os.path.join(base, "cron.api.sh")
@@ -123,87 +102,40 @@ def replSetInit(config):
     
     gunicorn = os.path.join(root, "bin/gunicorn")
     nginx    = os.path.join(root, "bin/nginx")
+
+    if config.role == 'api':
     
-    utils.log("Starting Green Unicorn on port 18000")
-    out     = open(os.path.join(root, "logs/gunicorn.log"), "w")
-    conf    = "cp /stamped/bootstrap/cookbooks/stamped/files/gunicorn.conf /etc/init/gunicorn.conf"
-    strt    = "service gunicorn start"
-    cmd     = ". %s && %s && %s" % (activate, conf, strt)
-    pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
+        utils.log("Starting Green Unicorn on port 18000")
+        out     = open(os.path.join(root, "logs/gunicorn_api.log"), "w")
+        strt    = "/stamped/bin/python /stamped/bin/gunicorn_django -c /stamped/stamped/sites/stamped.com/bin/httpapi/gunicorn.conf /stamped/stamped/sites/stamped.com/bin/httpapi/settings.py"
+        cmd     = ". %s && %s" % (activate, strt)
+        pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
+
+        utils.log("Starting nginx on port 5000")
+        conf    = os.path.join(root, "stamped/sites/stamped.com/bin/httpapi/nginx_api.conf")
+        out     = open(os.path.join(root, "logs/nginx_api.log"), "w")
+        app     = "%s -p %s/ -c %s" % (nginx, root, conf)
+        cmd     = "nohup bash -c '. %s && %s ' < /dev/null" % (activate, app)
+        pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
+
+    elif config.role == 'web':
     
-    utils.log("Starting Green Unicorn on port 19000")
-    out     = open(os.path.join(root, "logs/gunicorn-80.log"), "w")
-    strt    = "/stamped/bin/python /stamped/bin/gunicorn_django -c /stamped/stamped/sites/stamped.com/bin/www/gunicorn.conf /stamped/stamped/sites/stamped.com/bin/www/settings.py"
-    cmd     = ". %s && %s" % (activate, strt)
-    pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
-    
-    # path    = os.path.join(root, "stamped/sites/stamped.com/bin/")
-    # out     = open(os.path.join(root, "logs/gunicorn.log"), "w")
-    # app     = "%s %s -c gunicorn.conf serve:app" % (python, gunicorn)
-    # cmd     = "nohup bash -c '. %s && cd %s && %s && cd %s' < /dev/null" % \
-    #             (activate, path, app, root)
-    # pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
-    # # /stamped/bin/python /stamped/bin/gunicorn -c gunicorn.conf serve:app
-    
-    """
-    utils.log("Waiting for Green Unicorn to come online...")
-    while True:
-        status = pp.poll()
-        if status != None and status != 0:
-            # process was terminated, probably abnormally
-            utils.log("Green Unicorn process '%d' terminated with returncode '%d'" % (pp.pid, status))
-            sys.exit(1)
-        else:
-            try:
-                # note: to reenable this, will have to GET a different URL like 0.0.0.0:18000/v0/stamps/show.json
-                # and wait for a 401 response to be returned (unauthorized request)
-                utils.getFile("http://0.0.0.0:18000", retry=False)
-                utils.log("Success!")
-                break
-            except:
-                sleep(1)
-    """
-    
-    utils.log("Starting nginx on port 5000")
-    conf    = os.path.join(root, "stamped/sites/stamped.com/bin/nginx.conf")
-    out     = open(os.path.join(root, "logs/nginx.log"), "w")
-    app     = "%s -p %s/ -c %s" % (nginx, root, conf)
-    cmd     = "nohup bash -c '. %s && %s ' < /dev/null" % (activate, app)
-    pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
-    # /stamped/bin/nginx -p /stamped/ -c /stamped/stamped/sites/stamped.com/bin/nginx.conf 
-    
-    """
-    utils.log("Waiting for nginx to come online...")
-    while True:
-        status = pp.poll()
-        if status != None and status != 0:
-            # process was terminated, probably abnormally
-            utils.log("nginx process '%d' terminated with returncode '%d'" % (pp.pid, status))
-            sys.exit(1)
-        else:
-            try:
-                # note: to reenable this, will have to GET a different URL like 0.0.0.0:5000/v0/stamps/show.json
-                # and wait for a 401 response to be returned (unauthorized request)
-                utils.getFile("http://0.0.0.0:5000", retry=False)
-                utils.log("Success!")
-                break
-            except:
-                sleep(1)
-    """
-    
-    """
-    utils.log("Populating database with initial data...")
-    out = open(os.path.join(root, "logs/initDB.log"), "w")
-    app = os.path.join(root, "stamped/sites/stamped.com/bin/api/SampleData.py")
-    cmd = "nohup bash -c '. %s && %s %s' < /dev/null" % (activate, python, app)
-    
-    try:
-        pp = Popen(cmd, shell=True, stdout=out, stderr=out)
-        pp.wait()
-    except Exception as e:
-        utils.log("Error populating the database (likely already populated)")
-        utils.printException()
-    """
+        utils.log("Starting Green Unicorn on port 19000")
+        out     = open(os.path.join(root, "logs/gunicorn_web.log"), "w")
+        strt    = "/stamped/bin/python /stamped/bin/gunicorn_django -c /stamped/stamped/sites/stamped.com/bin/www/gunicorn.conf /stamped/stamped/sites/stamped.com/bin/www/settings.py"
+        cmd     = ". %s && %s" % (activate, strt)
+        pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
+
+        utils.log("Starting nginx on port 5000")
+        conf    = os.path.join(root, "stamped/sites/stamped.com/bin/www/nginx_web.conf")
+        out     = open(os.path.join(root, "logs/nginx_web.log"), "w")
+        app     = "%s -p %s/ -c %s" % (nginx, root, conf)
+        cmd     = "nohup bash -c '. %s && %s ' < /dev/null" % (activate, app)
+        pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
+
+    else:
+        utils.log("Not an 'api' or 'web' instance!")        
+
 
 def parseCommandLine():
     usage   = "Usage: %prog json-pickled-params"

@@ -138,7 +138,7 @@ export EC2_CERT=/stamped/stamped/deploy/keys/cert-W7ITOSRSFD353R3K6MULWBZCDASTRG
 """
 #Execute(r'. %s && %s' % (activate, cmd))
 
-if 'webServer' in env.config.node.roles:
+if 'webServer' in env.config.node.roles or 'apiServer' in env.config.node.roles:
     if 'wsgi' in env.config.node:
         cmd = """
         cd %(path)s

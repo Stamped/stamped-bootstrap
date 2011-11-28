@@ -27,7 +27,7 @@ def main():
             cmd = "cd %s && git pull" % repo
             execute(cmd)
     
-    cmd = "kill -s HUP `cat /stamped/conf/gunicorn.pid`"
+    cmd = "kill -s HUP `cat /stamped/conf/gunicorn_api.pid`"
     execute(cmd)
     
     cmd = "kill -s HUP `cat /stamped/conf/gunicorn_web.pid`"
