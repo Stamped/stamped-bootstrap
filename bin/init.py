@@ -24,6 +24,9 @@ def replSetInit(config):
     activate = os.path.join(root, "bin/activate")
     python   = os.path.join(root, "bin/python")
     
+    role = config.role
+    config.pop('role')
+
     if len(config.members) <= 1:
         raise Exception("Error: must define at least 2 replica set members")
     
@@ -103,7 +106,7 @@ def replSetInit(config):
     gunicorn = os.path.join(root, "bin/gunicorn")
     nginx    = os.path.join(root, "bin/nginx")
 
-    if config.role == 'api':
+    if role == 'api':
     
         utils.log("Starting Green Unicorn on port 18000")
         out     = open(os.path.join(root, "logs/gunicorn_api.log"), "w")
@@ -118,7 +121,7 @@ def replSetInit(config):
         cmd     = "nohup bash -c '. %s && %s ' < /dev/null" % (activate, app)
         pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
 
-    elif config.role == 'web':
+    elif role == 'web':
     
         utils.log("Starting Green Unicorn on port 19000")
         out     = open(os.path.join(root, "logs/gunicorn_web.log"), "w")
