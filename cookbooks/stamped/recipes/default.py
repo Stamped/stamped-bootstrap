@@ -240,23 +240,20 @@ if 'monitor' in env.config.node.roles:
     Execute(r'. %s && %s' % (activate, cmd))
     
     # start monitoring daemon
-    cmd = "cp /stamped/bootstrap/config/templates/stampedmon.upstart.conf /etc/init/stampedmon.conf && start stampedmon"
-    Execute(cmd)
+    init_daemon("stampedmon")
     
     # initialize mon-specific cron jobs (e.g., alerts)
     Execute("crontab /stamped/bootstrap/bin/cron.mon.sh")
 
 if 'webServer' in env.config.node.roles:
-    # start web server
-    Execute("cp /stamped/bootstrap/config/templates/nginx_web.upstart.conf /etc/init/nginx_web.conf && start nginx_web")
-    Execute("cp /stamped/bootstrap/config/templates/gunicorn_web.upstart.conf /etc/init/gunicorn_web.conf && start gunicorn_web")
+    init_daemon("nginx_web")
+    init_daemon("gunicorn_web")
 
 elif 'apiServer' in env.config.node.roles:
-    Execute("cp /stamped/bootstrap/config/templates/nginx_api.upstart.conf /etc/init/nginx_api.conf && start nginx_api")
-    Execute("cp /stamped/bootstrap/config/templates/gunicorn_api.upstart.conf /etc/init/gunicorn_api.conf && start gunicorn_api")
+    init_daemon("nginx_api")
+    init_daemon("gunicorn_api")
     
-    cron = "/stamped/bootstrap/bin/cron.api.sh"
-    Execute("crontab %s" % )
+    Execute("crontab /stamped/bootstrap/bin/cron.api.sh")
 
 ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
 Execute(r'. %s && python %s&' % (activate, ready))
