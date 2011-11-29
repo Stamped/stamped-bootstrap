@@ -115,7 +115,7 @@ def replSetInit(config):
         pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
 
         utils.log("Starting nginx on port 5000")
-        conf    = os.path.join(root, "stamped/sites/stamped.com/bin/httpapi/nginx_api.conf")
+        conf    = os.path.join(root, "stamped/sites/stamped.com/bin/httpapi/nginx.conf")
         out     = open(os.path.join(root, "logs/nginx_api.log"), "w")
         app     = "%s -p %s/ -c %s" % (nginx, root, conf)
         cmd     = "nohup bash -c '. %s && %s ' < /dev/null" % (activate, app)
@@ -130,7 +130,7 @@ def replSetInit(config):
         pp      = Popen(cmd, shell=True, stdout=out, stderr=out)
 
         utils.log("Starting nginx on port 5000")
-        conf    = os.path.join(root, "stamped/sites/stamped.com/bin/www/nginx_web.conf")
+        conf    = os.path.join(root, "stamped/sites/stamped.com/bin/www/nginx.conf")
         out     = open(os.path.join(root, "logs/nginx_web.log"), "w")
         app     = "%s -p %s/ -c %s" % (nginx, root, conf)
         cmd     = "nohup bash -c '. %s && %s ' < /dev/null" % (activate, app)
