@@ -8,6 +8,10 @@ from subprocess import Popen, PIPE
 
 activate = env.config.node.path + "/bin/activate"
 
+def init_daemon(name):
+    Execute("cp /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
+            (name, name, name))
+
 if env.system.platform != "mac_os_x":
     # copy over some useful bash and vim settings
     File(path='/home/ubuntu/.bash_profile', 
@@ -236,14 +240,23 @@ if 'monitor' in env.config.node.roles:
     Execute(r'. %s && %s' % (activate, cmd))
     
     # start monitoring daemon
-    cmd = "cp /stamped/bootstrap/config/templates/stampedmon.upstart.conf /etc/init/stampedmon.conf"
-    Execute(r'. %s && %s' % (activate, cmd))
-    
-    cmd = "start stampedmon"
-    Execute(r'. %s && %s' % (activate, cmd))
+    cmd = "cp /stamped/bootstrap/config/templates/stampedmon.upstart.conf /etc/init/stampedmon.conf && start stampedmon"
+    Execute(cmd)
     
     # initialize mon-specific cron jobs (e.g., alerts)
     Execute("crontab /stamped/bootstrap/bin/cron.mon.sh")
+
+if 'webServer' in env.config.node.roles:
+    # start web server
+    Execute("cp /stamped/bootstrap/config/templates/nginx_web.upstart.conf /etc/init/nginx_web.conf && start nginx_web")
+    Execute("cp /stamped/bootstrap/config/templates/gunicorn_web.upstart.conf /etc/init/gunicorn_web.conf && start gunicorn_web")
+
+elif 'apiServer' in env.config.node.roles:
+    Execute("cp /stamped/bootstrap/config/templates/nginx_api.upstart.conf /etc/init/nginx_api.conf && start nginx_api")
+    Execute("cp /stamped/bootstrap/config/templates/gunicorn_api.upstart.conf /etc/init/gunicorn_api.conf && start gunicorn_api")
+    
+    cron = "/stamped/bootstrap/bin/cron.api.sh"
+    Execute("crontab %s" % )
 
 ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
 Execute(r'. %s && python %s&' % (activate, ready))

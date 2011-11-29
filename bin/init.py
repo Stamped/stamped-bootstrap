@@ -87,6 +87,7 @@ def replSetInit(config):
             sleep(2)
     
     # write replica set configuration now that replica set is online
+    """
     conf_str = json.dumps(conf, sort_keys=True, indent=2)
     conf_path = os.path.join(root, "conf/stamped.conf")
     
@@ -95,7 +96,7 @@ def replSetInit(config):
     find_wsgi_server = r"ps -e | grep python | grep 'serve\.py' | grep -v grep"
     if 0 == utils.shell2(find_wsgi_server):
         utils.shell2(r"%s | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9" % find_wsgi_server)
-    
+    """
     
     utils.log("Initializing cron jobs")
     cron = os.path.join(base, "cron.api.sh")
@@ -107,7 +108,6 @@ def replSetInit(config):
     nginx    = os.path.join(root, "bin/nginx")
 
     if role == 'api':
-    
         utils.log("Starting Green Unicorn on port 18000")
         out     = open(os.path.join(root, "logs/gunicorn_api.log"), "w")
         strt    = "/stamped/bin/python /stamped/bin/gunicorn_django -c /stamped/stamped/sites/stamped.com/bin/httpapi/gunicorn.conf /stamped/stamped/sites/stamped.com/bin/httpapi/settings.py"
