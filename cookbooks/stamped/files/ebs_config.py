@@ -75,13 +75,15 @@ def config():
     print bash
     os.system(bash)
     
+    cmd = '/bin/bash -c %s' % path
+    
+    """
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.temp.sh')
     f=open(path, 'w')
     f.write(cmd)
     f.close()
     os.system('chmod +x %s' % path)
-    
-    cmd = '/bin/bash -c %s' % path
+    """
 
 def restore(instance):
     conn = EC2Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
