@@ -27,11 +27,11 @@ def main():
             cmd = "cd %s && git pull" % repo
             execute(cmd)
     
-    cmd = "kill -s HUP `cat /stamped/conf/gunicorn_api.pid`"
-    execute(cmd)
+    #execute("kill -s HUP `cat /stamped/conf/gunicorn_api.pid`")
+    execute("reload gunicorn_api")
     
-    cmd = "kill -s HUP `cat /stamped/conf/gunicorn_web.pid`"
-    execute(cmd)
+    #execute("kill -s HUP `cat /stamped/conf/gunicorn_web.pid`")
+    execute("reload gunicorn_web")
 
 if __name__ == '__main__':
     main()
