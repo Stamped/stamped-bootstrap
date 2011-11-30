@@ -45,6 +45,8 @@ if env.system.platform != "mac_os_x":
     Package("libjpeg62")
     Package("libjpeg62-dev")
     Package("zlib1g-dev")
+    Package("libxml2-dev")
+    Package("libxslt1-dev")
     Package("python-lxml")
     Package("ntp")
     
