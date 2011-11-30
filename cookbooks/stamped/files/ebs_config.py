@@ -91,10 +91,9 @@ def config():
     print bash
     os.system(bash)
     
-    cmd = '/bin/bash -c %s' % path
-    
     """
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.temp.sh')
+    cmd = '/bin/bash -c %s' % path
     f=open(path, 'w')
     f.write(cmd)
     f.close()
