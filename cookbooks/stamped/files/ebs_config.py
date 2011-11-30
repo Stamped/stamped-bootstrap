@@ -12,7 +12,7 @@ __version__ = "1.0"
 __copyright__ = "Copyright (c) 2011 Stamped.com"
 __license__ = "TODO"
 
-import time, os, subprocess
+import time, os, subprocess, sys, traceback
 from datetime import datetime
 from optparse import OptionParser
 from boto.ec2.connection import EC2Connection
@@ -23,6 +23,20 @@ AWS_SECRET_KEY = 'q2RysVdSHvScrIZtiEOiO2CQ5iOxmk6/RKPS1LvX'
 
 def createEBS(conn, size, region, snapshot=None):
     return conn.create_volume(size, region, snapshot)
+
+def printException():
+    """
+        Simple debug utility to print a stack trace.
+    """
+    #traceback.print_exc()
+    exc_type, exc_value, exc_traceback = sys.exc_info()
+    
+    #traceback.print_exception(exc_type, exc_value, exc_traceback,
+    #                          limit=8, file=sys.stderr)
+    f = traceback.format_exception(exc_type, exc_value, exc_traceback)
+    f = ''.join(f)
+    sys.stderr.write(f)
+    sys.stderr.flush()
 
 def config():
     metadata = utils.get_instance_metadata()
@@ -44,12 +58,14 @@ def config():
                 vol.attach(instance_id, target)
                 break
             except:
+                printException()
                 time.sleep(5)
         
         while True:
             if os.path.exists(target):
                 break
             else:
+                printException()
                 time.sleep(5)
 
     # Build bash command to run
