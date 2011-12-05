@@ -8,187 +8,98 @@ from subprocess import Popen, PIPE
 
 activate = env.config.node.path + "/bin/activate"
 
+path = env.config.node.path
+conf = os.path.join(path, "conf")
+
 def init_daemon(name):
     Execute("cp /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
             (name, name, name))
 
-if env.system.platform != "mac_os_x":
-    # copy over some useful bash and vim settings
-    File(path='/home/ubuntu/.bash_profile', 
-         content=StaticFile('stamped/bash_profile'))
-    #File(path='/home/ubuntu/.vimrc', content=StaticFile('stamped/vimrc'))
+if 'bootstrap' in env.config.node.roles:
+    # install prerequisites
+    env.includeRecipe("virtualenv")
 
-# install prerequisites
-env.includeRecipe("virtualenv")
+    Directory(path)
+    Directory(conf)
 
-path = env.config.node.path
-conf = os.path.join(path, "conf")
+    Execute('cp /stamped/bootstrap/cookbooks/stamped/files/vimrc /etc/vim/vimrc.local')
+    Execute('cat /stamped/bootstrap/cookbooks/stamped/files/bash_profile >> /etc/profile && . /etc/profile')
 
-Directory(path)
-Directory(conf)
+    try:
+        Directory(os.path.dirname(env.config.node.mongodb.config.logpath))
+        Directory(os.path.dirname(env.config.node.wsgi.log))
+    except:
+        pass
 
-Execute('cp /stamped/bootstrap/cookbooks/stamped/files/vimrc /etc/vim/vimrc.local')
-Execute('cat /stamped/bootstrap/cookbooks/stamped/files/bash_profile >> /etc/profile && . /etc/profile')
+    Directory("/stamped/")
+    Directory("/stamped/logs")
 
-try:
-    Directory(os.path.dirname(env.config.node.mongodb.config.logpath))
-    Directory(os.path.dirname(env.config.node.wsgi.log))
-except:
-    pass
+    if env.system.platform != "mac_os_x":
+        # copy over some useful bash and vim settings
+        File(path='/home/ubuntu/.bash_profile', 
+             content=StaticFile('stamped/bash_profile'))
+        #File(path='/home/ubuntu/.vimrc', content=StaticFile('stamped/vimrc'))
+        
+        Package("python-dev")
+        Package("gcc")
+        Package("libjpeg62")
+        Package("libjpeg62-dev")
+        Package("zlib1g-dev")
+        Package("libxml2-dev")
+        Package("libxslt1-dev")
+        Package("python-lxml")
+        Package("ntp")
+        
+        if 'db' in env.config.node.roles or 'bootstrap' in env.config.node.roles:
+            Package("mdadm")
+            Package("lvm2")
 
-Directory("/stamped/")
-Directory("/stamped/logs")
+    env.includeRecipe("pip")
+    env.includeRecipe("libevent")
 
-if env.system.platform != "mac_os_x":
-    Package("python-dev")
-    Package("gcc")
-    Package("libjpeg62")
-    Package("libjpeg62-dev")
-    Package("zlib1g-dev")
-    Package("libxml2-dev")
-    Package("libxslt1-dev")
-    Package("python-lxml")
-    Package("ntp")
+    # install python packages
+    for package in env.config.node.python.requirements:
+        env.cookbooks.pip.PipPackage(package, virtualenv=path)
+
+    # Copy Boto config
+    cmd = "cp /stamped/bootstrap/cookbooks/stamped/files/boto.cfg /etc/boto.cfg"
+    Execute(r'. %s && %s' % (activate, cmd))
+
+    # Ensure most recent version of boto is installed
+    cmd = "pip install boto"
+    Execute(r'. %s && %s' % (activate, cmd))
+    cmd = "pip install -U boto"
+    Execute(r'. %s && %s' % (activate, cmd))
     
-    if 'db' in env.config.node.roles or 'all' in env.config.node.roles:
-        Package("mdadm")
-        Package("lvm2")
-
-env.includeRecipe("pip")
-env.includeRecipe("libevent")
-
-# install python packages
-for package in env.config.node.python.requirements:
-    env.cookbooks.pip.PipPackage(package, virtualenv=path)
-
-# Copy Boto config
-cmd = "cp /stamped/bootstrap/cookbooks/stamped/files/boto.cfg /etc/boto.cfg"
-Execute(r'. %s && %s' % (activate, cmd))
-
-# Ensure most recent version of boto is installed
-cmd = "pip install boto"
-Execute(r'. %s && %s' % (activate, cmd))
-cmd = "pip install -U boto"
-Execute(r'. %s && %s' % (activate, cmd))
-
-if 'db' in env.config.node.roles or 'monitor' in env.config.node.roles or 'all' in env.config.node.roles:
     env.includeRecipe('mongodb')
     
-    if 'db' in env.config.node.roles:
-        options = env.config.node.mongodb.options
-        config  = env.config.node.mongodb.config
-        restore = env.config.node.raid.restore
-        ebs     = env.config.node.raid.config
-        
-        if env.system.platform != "mac_os_x":
-            # Setup EBS instances for data
-            config.dbpath = "/data/db"
-            f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_config.py'
-            
-            if restore:
-                Execute('chmod +x %s  && %s -r %s' % (f, f, restore))
-            else:
-                Execute('chmod +x %s  && %s' % (f, f))
-            
-            # Up ulimit to 16384
-            Execute('ulimit -n 16384')
-            Execute('echo "* hard nofile 16384" >> /etc/security/limits.conf')
-        
-        if 'all' in env.config.node.roles:
-            Directory(os.path.dirname(config.path))
-            Directory(config.dbpath)
-            
-            env.cookbooks.mongodb.MongoDBConfigFile(**config)
+    # install JRE
+    Package('openjdk-6-jre-headless')
     
-    if 'all' in env.config.node.roles:
-        if env.system.platform != 'mac_os_x':
-            # note: installing mongodb seems to start a mongod process for some
-            # retarded reason, so kill it before starting our own instance
-            Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9")
-        
-        if 'db' in env.config.node.roles:
-            Service(name="mongod", 
-                    start_cmd="mongod --fork --replSet %s --config %s %s" % \
-                    (config.replSet, config.path, string.joinfields(options, ' ')))
-            
-            # initialize db-specific cron jobs (e.g., backup)
-            Execute("crontab /stamped/bootstrap/bin/cron.db.sh")
-
-# clone git repo
-if 'git' in env.config.node and 'repos' in env.config.node.git and not 'all' in env.config.node.roles:
-    system_stamped_path = None
-    if env.system.platform == "mac_os_x":
-        system_stamped_path = "/Users/fisch0920/dev/stamped"
+    # install nginx
+    cmd = """
+    cd %(path)s
+    wget 'http://nginx.org/download/nginx-1.0.5.tar.gz'
+    tar -xzvf nginx-1.0.5.tar.gz 
+    wget 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.13.tar.gz'
+    tar -xzvf pcre-8.13.tar.gz 
+    wget 'http://zlib.net/zlib-1.2.5.tar.gz'
+    tar -xzvf zlib-1.2.5.tar.gz 
+    wget 'http://www.openssl.org/source/openssl-1.0.0d.tar.gz'
+    tar -xzvf openssl-1.0.0d.tar.gz
+    cd nginx-1.0.5/
+    ./configure --with-pcre=../pcre-8.13/ --with-zlib=../zlib-1.2.5/ --with-openssl=../openssl-1.0.0d --with-http_ssl_module
+    make
+    mv objs/nginx %(path)s/bin/nginx
+    cp conf/mime.types %(path)s/bin/
+    cd ../
+    rm -rf nginx-1.0.5.tar.gz pcre-8.13.tar.gz zlib-1.2.5.tar.gz openssl-1.0.0d.tar.gz pcre-8.13/ zlib-1.2.5/ openssl-1.0.0d/
+    mkdir %(path)s/www
+    mkdir %(path)s/www/cache
+    """ % { 'path': env.config.node.path }
     
-    # install git repos
-    for repo in env.config.node.git.repos:
-        repo = AttributeDict(repo)
-        
-        if system_stamped_path is not None:
-            Script(name="hack", 
-                   code="ln -s %s %s" % (system_stamped_path, repo.path))
-        else:
-            Script(name="git.clone.%s" % repo.url, 
-                   code="git clone %s %s" % (repo.url, repo.path))
-
-# install JRE
-Package('openjdk-6-jre-headless')
-
-"""
-wget http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip
-unzip ec2-api-tools.zip
-cd ec2-api-tools-*
-export EC2_HOME=`pwd`
-export PATH=$PATH:$EC2_HOME/bin
-export JAVA_HOME=/usr
-export EC2_PRIVATE_KEY=/stamped/stamped/deploy/keys/pk-W7ITOSRSFD353R3K6MULWBZCDASTRG3L.pem
-export EC2_CERT=/stamped/stamped/deploy/keys/cert-W7ITOSRSFD353R3K6MULWBZCDASTRG3L.pem
-"""
-#Execute(r'. %s && %s' % (activate, cmd))
-
-if 'webServer' in env.config.node.roles or 'apiServer' in env.config.node.roles or 'all' in env.config.node.roles:
-    if 'wsgi' in env.config.node:
-        cmd = """
-        cd %(path)s
-        wget 'http://nginx.org/download/nginx-1.0.5.tar.gz'
-        tar -xzvf nginx-1.0.5.tar.gz 
-        wget 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.13.tar.gz'
-        tar -xzvf pcre-8.13.tar.gz 
-        wget 'http://zlib.net/zlib-1.2.5.tar.gz'
-        tar -xzvf zlib-1.2.5.tar.gz 
-        wget 'http://www.openssl.org/source/openssl-1.0.0d.tar.gz'
-        tar -xzvf openssl-1.0.0d.tar.gz
-        cd nginx-1.0.5/
-        ./configure --with-pcre=../pcre-8.13/ --with-zlib=../zlib-1.2.5/ --with-openssl=../openssl-1.0.0d --with-http_ssl_module
-        make
-        mv objs/nginx %(path)s/bin/nginx
-        cp conf/mime.types %(path)s/bin/
-        cd ../
-        rm -rf nginx-1.0.5.tar.gz pcre-8.13.tar.gz zlib-1.2.5.tar.gz openssl-1.0.0d.tar.gz pcre-8.13/ zlib-1.2.5/ openssl-1.0.0d/
-        mkdir %(path)s/www
-        mkdir %(path)s/www/cache
-        """ % { 'path': env.config.node.path }
-
-        Execute(r'. %s && %s' % (activate, cmd))
+    Execute(r'. %s && %s' % (activate, cmd))
     
-    # start wsgi application (flask server)
-    if 'wsgi' in env.config.node or 'all' in env.config.node.roles:
-        site = env.config.node.wsgi.app
-        log  = env.config.node.wsgi.log
-        
-        Directory(os.path.dirname(log))
-        
-        # TODO: use /bin/bash as default interpreter? this bourne shell redirection 
-        # syntax blows and is incompatible with the default redirection syntax on bash
-        # under mac os x
-        #if env.system.platform == "mac_os_x":
-        #    Service(name="wsgi_app", 
-        #            start_cmd=". %s && python %s >& %s &" % (activate, site, log))
-        #else:
-        #    Service(name="wsgi_app", 
-        #            start_cmd=". %s && python %s > %s 2>&1 &" % (activate, site, log))
-
-if 'monitor' in env.config.node.roles:
     # install StatsD and its dependencies (graphite, carbon, whisper, cairo, node.js)
     Package("python-cairo-dev")
     Package("g++")
@@ -228,8 +139,64 @@ if 'monitor' in env.config.node.roles:
     """
     
     Execute(r'. %s && %s' % (activate, cmd))
+else:
+    # clone git repo
+    if 'git' in env.config.node and 'repos' in env.config.node.git:
+        system_stamped_path = None
+        if env.system.platform == "mac_os_x":
+            system_stamped_path = "/Users/fisch0920/dev/stamped"
+        
+        # install git repos
+        for repo in env.config.node.git.repos:
+            repo = AttributeDict(repo)
+            
+            if system_stamped_path is not None:
+                Script(name="hack", 
+                       code="ln -s %s %s" % (system_stamped_path, repo.path))
+            else:
+                Script(name="git.clone.%s" % repo.url, 
+                       code="git clone %s %s" % (repo.url, repo.path))
     
-    if not 'all' in env.config.node.roles:
+    if 'db' in env.config.node.roles:
+        options = env.config.node.mongodb.options
+        config  = env.config.node.mongodb.config
+        restore = env.config.node.raid.restore
+        ebs     = env.config.node.raid.config
+        
+        if env.system.platform != "mac_os_x":
+            # Setup EBS instances for data
+            config.dbpath = "/data/db"
+            f = '/stamped/bootstrap/cookbooks/stamped/files/ebs_config.py'
+            
+            if restore:
+                Execute('chmod +x %s  && %s -r %s' % (f, f, restore))
+            else:
+                Execute('chmod +x %s  && %s' % (f, f))
+            
+            # Up ulimit to 16384
+            Execute('ulimit -n 16384')
+            Execute('echo "* hard nofile 16384" >> /etc/security/limits.conf')
+        
+        if 'bootstrap' in env.config.node.roles:
+            Directory(os.path.dirname(config.path))
+            Directory(config.dbpath)
+            
+            env.cookbooks.mongodb.MongoDBConfigFile(**config)
+        
+        if env.system.platform != 'mac_os_x':
+            # note: installing mongodb seems to start a mongod process for some
+            # retarded reason, so kill it before starting our own instance
+            Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9")
+        
+        if 'db' in env.config.node.roles:
+            Service(name="mongod", 
+                    start_cmd="mongod --fork --replSet %s --config %s %s" % \
+                    (config.replSet, config.path, string.joinfields(options, ' ')))
+            
+            # initialize db-specific cron jobs (e.g., backup)
+            Execute("crontab /stamped/bootstrap/bin/cron.db.sh")
+    
+    elif 'monitor' in env.config.node.roles:
         cmd = """
         cd /opt/graphite
         echo DEBUG = True >> webapp/graphite/local_settings.py
@@ -251,9 +218,7 @@ if 'monitor' in env.config.node.roles:
         
         # initialize mon-specific cron jobs (e.g., alerts)
         Execute("crontab /stamped/bootstrap/bin/cron.mon.sh")
-
-if not 'all' in env.config.node.roles:
-    if 'webServer' in env.config.node.roles:
+    elif 'webServer' in env.config.node.roles:
         init_daemon("nginx_web")
         init_daemon("gunicorn_web")
 
