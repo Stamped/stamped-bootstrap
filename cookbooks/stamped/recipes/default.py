@@ -229,7 +229,7 @@ if 'monitor' in env.config.node.roles:
     
     Execute(r'. %s && %s' % (activate, cmd))
     
-    if not 'all' in env.node.config.roles:
+    if not 'all' in env.config.node.roles:
         cmd = """
         cd /opt/graphite
         echo DEBUG = True >> webapp/graphite/local_settings.py
@@ -252,7 +252,7 @@ if 'monitor' in env.config.node.roles:
         # initialize mon-specific cron jobs (e.g., alerts)
         Execute("crontab /stamped/bootstrap/bin/cron.mon.sh")
 
-if not 'all' in env.node.config.roles:
+if not 'all' in env.config.node.roles:
     if 'webServer' in env.config.node.roles:
         init_daemon("nginx_web")
         init_daemon("gunicorn_web")
