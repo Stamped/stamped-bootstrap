@@ -50,7 +50,7 @@ if env.system.platform != "mac_os_x":
     Package("python-lxml")
     Package("ntp")
     
-    if 'db' in env.config.node.roles:
+    if 'db' in env.config.node.roles or 'all' in env.config.node.roles:
         Package("mdadm")
         Package("lvm2")
 
@@ -71,7 +71,7 @@ Execute(r'. %s && %s' % (activate, cmd))
 cmd = "pip install -U boto"
 Execute(r'. %s && %s' % (activate, cmd))
 
-if 'db' in env.config.node.roles or 'monitor' in env.config.node.roles:
+if 'db' in env.config.node.roles or 'monitor' in env.config.node.roles or 'all' in env.config.node.roles:
     env.includeRecipe('mongodb')
     
     if 'db' in env.config.node.roles:
@@ -94,26 +94,28 @@ if 'db' in env.config.node.roles or 'monitor' in env.config.node.roles:
             Execute('ulimit -n 16384')
             Execute('echo "* hard nofile 16384" >> /etc/security/limits.conf')
         
-        Directory(os.path.dirname(config.path))
-        Directory(config.dbpath)
-        
-        env.cookbooks.mongodb.MongoDBConfigFile(**config)
+        if 'all' in env.config.node.roles:
+            Directory(os.path.dirname(config.path))
+            Directory(config.dbpath)
+            
+            env.cookbooks.mongodb.MongoDBConfigFile(**config)
     
-    if env.system.platform != 'mac_os_x':
-        # note: installing mongodb seems to start a mongod process for some
-        # retarded reason, so kill it before starting our own instance
-        Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9")
-    
-    if 'db' in env.config.node.roles:
-        Service(name="mongod", 
-                start_cmd="mongod --fork --replSet %s --config %s %s" % \
-                (config.replSet, config.path, string.joinfields(options, ' ')))
+    if 'all' in env.config.node.roles:
+        if env.system.platform != 'mac_os_x':
+            # note: installing mongodb seems to start a mongod process for some
+            # retarded reason, so kill it before starting our own instance
+            Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9")
         
-        # initialize db-specific cron jobs (e.g., backup)
-        Execute("crontab /stamped/bootstrap/bin/cron.db.sh")
+        if 'db' in env.config.node.roles:
+            Service(name="mongod", 
+                    start_cmd="mongod --fork --replSet %s --config %s %s" % \
+                    (config.replSet, config.path, string.joinfields(options, ' ')))
+            
+            # initialize db-specific cron jobs (e.g., backup)
+            Execute("crontab /stamped/bootstrap/bin/cron.db.sh")
 
 # clone git repo
-if 'git' in env.config.node and 'repos' in env.config.node.git:
+if 'git' in env.config.node and 'repos' in env.config.node.git and not 'all' in env.config.node.roles:
     system_stamped_path = None
     if env.system.platform == "mac_os_x":
         system_stamped_path = "/Users/fisch0920/dev/stamped"
@@ -144,7 +146,7 @@ export EC2_CERT=/stamped/stamped/deploy/keys/cert-W7ITOSRSFD353R3K6MULWBZCDASTRG
 """
 #Execute(r'. %s && %s' % (activate, cmd))
 
-if 'webServer' in env.config.node.roles or 'apiServer' in env.config.node.roles:
+if 'webServer' in env.config.node.roles or 'apiServer' in env.config.node.roles or 'all' in env.config.node.roles:
     if 'wsgi' in env.config.node:
         cmd = """
         cd %(path)s
@@ -170,7 +172,7 @@ if 'webServer' in env.config.node.roles or 'apiServer' in env.config.node.roles:
         Execute(r'. %s && %s' % (activate, cmd))
     
     # start wsgi application (flask server)
-    if 'wsgi' in env.config.node:
+    if 'wsgi' in env.config.node or 'all' in env.config.node.roles:
         site = env.config.node.wsgi.app
         log  = env.config.node.wsgi.log
         
@@ -223,39 +225,43 @@ if 'monitor' in env.config.node.roles:
     
     cd graphite && sudo python setup.py install && cd ..
     cd node && ./configure --without-ssl && make && make install
-    
-    cd /opt/graphite
-    echo DEBUG = True >> webapp/graphite/local_settings.py
-    PYTHONPATH=`pwd`/whisper ./bin/carbon-cache.py start
-    
-    start statsd
-    
-    cd /opt/graphite
-    PYTHONPATH=`pwd`/webapp:`pwd`/whisper python ./webapp/graphite/manage.py syncdb
-    PYTHONPATH=`pwd`/webapp:`pwd`/whisper python ./webapp/graphite/manage.py syncdb
     """
     
     Execute(r'. %s && %s' % (activate, cmd))
     
-    # start graphite daemon
-    cmd = "start graphite"
-    Execute(r'. %s && %s' % (activate, cmd))
-    
-    # start monitoring daemon
-    init_daemon("stampedmon")
-    
-    # initialize mon-specific cron jobs (e.g., alerts)
-    Execute("crontab /stamped/bootstrap/bin/cron.mon.sh")
+    if not 'all' in env.node.config.roles:
+        cmd = """
+        cd /opt/graphite
+        echo DEBUG = True >> webapp/graphite/local_settings.py
+        PYTHONPATH=`pwd`/whisper ./bin/carbon-cache.py start
+        
+        cd /opt/graphite
+        PYTHONPATH=`pwd`/webapp:`pwd`/whisper python ./webapp/graphite/manage.py syncdb
+        PYTHONPATH=`pwd`/webapp:`pwd`/whisper python ./webapp/graphite/manage.py syncdb
+        """
+        
+        Execute(r'. %s && %s' % (activate, cmd))
+        
+        # start graphite daemon
+        Execute("start statsd")
+        Execute("start graphite")
+        
+        # start monitoring daemon
+        init_daemon("stampedmon")
+        
+        # initialize mon-specific cron jobs (e.g., alerts)
+        Execute("crontab /stamped/bootstrap/bin/cron.mon.sh")
 
-if 'webServer' in env.config.node.roles:
-    init_daemon("nginx_web")
-    init_daemon("gunicorn_web")
+if not 'all' in env.node.config.roles:
+    if 'webServer' in env.config.node.roles:
+        init_daemon("nginx_web")
+        init_daemon("gunicorn_web")
 
-elif 'apiServer' in env.config.node.roles:
-    init_daemon("nginx_api")
-    init_daemon("gunicorn_api")
-    
-    Execute("crontab /stamped/bootstrap/bin/cron.api.sh")
+    elif 'apiServer' in env.config.node.roles:
+        init_daemon("nginx_api")
+        init_daemon("gunicorn_api")
+        
+        Execute("crontab /stamped/bootstrap/bin/cron.api.sh")
 
 ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
 Execute(r'. %s && python %s&' % (activate, ready))
