@@ -172,11 +172,10 @@ else:
             Execute('ulimit -n 16384')
             Execute('echo "* hard nofile 16384" >> /etc/security/limits.conf')
         
-        if 'bootstrap' in env.config.node.roles:
-            Directory(os.path.dirname(config.path))
-            Directory(config.dbpath)
-            
-            env.cookbooks.mongodb.MongoDBConfigFile(**config)
+        Directory(os.path.dirname(config.path))
+        Directory(config.dbpath)
+        
+        env.cookbooks.mongodb.MongoDBConfigFile(**config)
         
         if env.system.platform != 'mac_os_x':
             # note: installing mongodb seems to start a mongod process for some
