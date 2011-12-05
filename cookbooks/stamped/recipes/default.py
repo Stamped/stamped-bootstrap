@@ -49,10 +49,8 @@ if 'bootstrap' in env.config.node.roles:
         Package("libxslt1-dev")
         Package("python-lxml")
         Package("ntp")
-        
-        if 'db' in env.config.node.roles or 'bootstrap' in env.config.node.roles:
-            Package("mdadm")
-            Package("lvm2")
+        Package("mdadm")
+        Package("lvm2")
 
     env.includeRecipe("pip")
     env.includeRecipe("libevent")
