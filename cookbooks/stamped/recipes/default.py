@@ -3,13 +3,13 @@ from pynode.resources import *
 from pynode.source import *
 from pynode.utils import AttributeDict
 from pynode.errors import Fail
+
 import os, pickle, string
 from subprocess import Popen, PIPE
 
-activate = env.config.node.path + "/bin/activate"
-
-path = env.config.node.path
-conf = os.path.join(path, "conf")
+path     = env.config.node.path
+conf     = os.path.join(path, "conf")
+activate = os.path.join(path, "bin/activate")
 
 def init_daemon(name):
     Execute("cp /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
@@ -36,8 +36,7 @@ if 'bootstrap' in env.config.node.roles:
     
     if env.system.platform != "mac_os_x":
         # copy over some useful bash and vim settings
-        File(path='/home/ubuntu/.bash_profile', 
-             content=StaticFile('stamped/bash_profile'))
+        File(path='/home/ubuntu/.bash_profile', content=StaticFile('stamped/bash_profile'))
         #File(path='/home/ubuntu/.vimrc', content=StaticFile('stamped/vimrc'))
         
         Package("python-dev")

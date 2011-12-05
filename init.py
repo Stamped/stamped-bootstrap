@@ -60,10 +60,12 @@ def main():
     virtualenv_path = os.path.dirname(path)
     os.chdir(path)
     
+    """
     if os.path.exists(os.path.join(virtualenv_path, "bin")):
         # remove virtualenv if it previously exists for some reason
         # otherwise, the virtualenv creation step will fail
         utils.shell('rm -rf %s/bin %s/install %s/lib' % (virtualenv_path, virtualenv_path, virtualenv_path))
+    """
     
     # parse commandline
     (options, params) = parseCommandLine()
@@ -77,7 +79,9 @@ def main():
     pprint(params)
     
     check_shell('easy_install virtualenv', True)
-    check_shell('virtualenv %s && . %s/bin/activate' % (virtualenv_path, virtualenv_path))
+    if not os.path.exists(os.path.join(virtualenv_path, "bin")):
+        check_shell('virtualenv %s && . %s/bin/activate' % (virtualenv_path, virtualenv_path))
+    
     check_shell('pip install Jinja2')
     
     template_dir = os.path.join(path, "config/templates")
