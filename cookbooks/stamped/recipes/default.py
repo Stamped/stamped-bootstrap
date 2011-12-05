@@ -18,22 +18,22 @@ def init_daemon(name):
 if 'bootstrap' in env.config.node.roles:
     # install prerequisites
     env.includeRecipe("virtualenv")
-
+    
     Directory(path)
     Directory(conf)
-
+    
     Execute('cp /stamped/bootstrap/cookbooks/stamped/files/vimrc /etc/vim/vimrc.local')
     Execute('cat /stamped/bootstrap/cookbooks/stamped/files/bash_profile >> /etc/profile && . /etc/profile')
-
+    
     try:
         Directory(os.path.dirname(env.config.node.mongodb.config.logpath))
         Directory(os.path.dirname(env.config.node.wsgi.log))
     except:
         pass
-
+    
     Directory("/stamped/")
     Directory("/stamped/logs")
-
+    
     if env.system.platform != "mac_os_x":
         # copy over some useful bash and vim settings
         File(path='/home/ubuntu/.bash_profile', 
@@ -51,18 +51,18 @@ if 'bootstrap' in env.config.node.roles:
         Package("ntp")
         Package("mdadm")
         Package("lvm2")
-
+    
     env.includeRecipe("pip")
     env.includeRecipe("libevent")
-
+    
     # install python packages
     for package in env.config.node.python.requirements:
         env.cookbooks.pip.PipPackage(package, virtualenv=path)
-
+    
     # Copy Boto config
     cmd = "cp /stamped/bootstrap/cookbooks/stamped/files/boto.cfg /etc/boto.cfg"
     Execute(r'. %s && %s' % (activate, cmd))
-
+    
     # Ensure most recent version of boto is installed
     cmd = "pip install boto"
     Execute(r'. %s && %s' % (activate, cmd))
@@ -192,7 +192,7 @@ else:
             # initialize db-specific cron jobs (e.g., backup)
             Execute("crontab /stamped/bootstrap/bin/cron.db.sh")
     
-    elif 'monitor' in env.config.node.roles:
+    if 'monitor' in env.config.node.roles:
         cmd = """
         cd /opt/graphite
         echo DEBUG = True >> webapp/graphite/local_settings.py
@@ -216,11 +216,12 @@ else:
         
         # initialize mon-specific cron jobs (e.g., alerts)
         Execute("crontab /stamped/bootstrap/bin/cron.mon.sh")
-    elif 'webServer' in env.config.node.roles:
+    
+    if 'webServer' in env.config.node.roles:
         init_daemon("nginx_web")
         init_daemon("gunicorn_web")
-
-    elif 'apiServer' in env.config.node.roles:
+    
+    if 'apiServer' in env.config.node.roles:
         init_daemon("nginx_api")
         init_daemon("gunicorn_api")
         
