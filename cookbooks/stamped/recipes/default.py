@@ -129,8 +129,6 @@ if 'bootstrap' in env.config.node.roles:
     cp /stamped/bootstrap/config/templates/carbon.conf /opt/graphite/conf
     cp /stamped/bootstrap/config/templates/storage-schemas.conf /opt/graphite/conf
     cp /stamped/bootstrap/config/templates/statsd.conf /stamped/conf
-    cp /stamped/bootstrap/config/templates/statsd.upstart.conf /etc/init/statsd.conf
-    cp /stamped/bootstrap/config/templates/graphite.upstart.conf /etc/init/graphite.conf
     
     cd graphite && sudo python setup.py install && cd ..
     cd node && ./configure --without-ssl && make && make install
@@ -207,9 +205,11 @@ else:
         
         Execute(r'. %s && %s' % (activate, cmd))
         
-        # start graphite daemon
-        Execute("start statsd")
-        Execute("start graphite")
+        # start statsd aggregator
+        init_daemon("statsd")
+        
+        # start graphite web service
+        init_daemon("graphite")
         
         # start monitoring daemon
         init_daemon("stampedmon")
