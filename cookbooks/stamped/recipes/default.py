@@ -175,6 +175,7 @@ else:
         Directory(os.path.dirname(config.path))
         Directory(config.dbpath)
         
+        env.includeRecipe('mongodb')
         env.cookbooks.mongodb.MongoDBConfigFile(**config)
         
         if env.system.platform != 'mac_os_x':
