@@ -155,6 +155,10 @@ else:
     if 'db' in env.config.node.roles:
         env.includeRecipe('mongodb')
         
+        # note: installing mongodb seems to start a mongod process for some
+        # retarded reason, so kill it before starting our own instance
+        Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9 || echo test")
+        
         options = env.config.node.mongodb.options
         config  = env.config.node.mongodb.config
         restore = env.config.node.raid.restore
@@ -178,10 +182,6 @@ else:
         Directory(config.dbpath)
         
         env.cookbooks.mongodb.MongoDBConfigFile(**config)
-        
-        # note: installing mongodb seems to start a mongod process for some
-        # retarded reason, so kill it before starting our own instance
-        Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9")
         
         Service(name="mongod", 
                 start_cmd="mongod --fork --replSet %s --config %s %s" % \
