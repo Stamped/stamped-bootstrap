@@ -134,6 +134,9 @@ if 'bootstrap' in env.config.node.roles:
     """
     
     Execute(r'. %s && %s' % (activate, cmd))
+    
+    ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
+    Execute(r'. %s && python %s&' % (activate, ready))
 else:
     # clone git repo
     if 'git' in env.config.node and 'repos' in env.config.node.git:
@@ -224,7 +227,4 @@ else:
         init_daemon("gunicorn_api")
         
         Execute("crontab /stamped/bootstrap/bin/cron.api.sh")
-
-ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
-Execute(r'. %s && python %s&' % (activate, ready))
 
