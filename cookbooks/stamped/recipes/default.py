@@ -138,6 +138,8 @@ if 'bootstrap' in env.config.node.roles:
     ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
     Execute(r'. %s && python %s&' % (activate, ready))
 else:
+    Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9 || echo test")
+    
     # clone git repo
     if 'git' in env.config.node and 'repos' in env.config.node.git:
         system_stamped_path = None
