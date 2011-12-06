@@ -23,7 +23,7 @@ if 'bootstrap' in env.config.node.roles:
     Directory(conf)
     
     Execute('cp /stamped/bootstrap/cookbooks/stamped/files/vimrc /etc/vim/vimrc.local')
-    Execute('cat /stamped/bootstrap/cookbooks/stamped/files/bash_profile >> /etc/profile && . /etc/profile')
+    Execute('cat /stamped/bootstrap/cookbooks/stamped/files/bash_profile >> /etc/bash.bashrc')
     
     try:
         Directory(os.path.dirname(env.config.node.mongodb.config.logpath))
