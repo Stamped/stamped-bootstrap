@@ -153,6 +153,8 @@ else:
                        code="git clone %s %s" % (repo.url, repo.path))
     
     if 'db' in env.config.node.roles:
+        env.includeRecipe('mongodb')
+        
         options = env.config.node.mongodb.options
         config  = env.config.node.mongodb.config
         restore = env.config.node.raid.restore
@@ -175,21 +177,18 @@ else:
         Directory(os.path.dirname(config.path))
         Directory(config.dbpath)
         
-        env.includeRecipe('mongodb')
         env.cookbooks.mongodb.MongoDBConfigFile(**config)
         
-        if env.system.platform != 'mac_os_x':
-            # note: installing mongodb seems to start a mongod process for some
-            # retarded reason, so kill it before starting our own instance
-            Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9")
+        # note: installing mongodb seems to start a mongod process for some
+        # retarded reason, so kill it before starting our own instance
+        Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9")
         
-        if 'db' in env.config.node.roles:
-            Service(name="mongod", 
-                    start_cmd="mongod --fork --replSet %s --config %s %s" % \
-                    (config.replSet, config.path, string.joinfields(options, ' ')))
-            
-            # initialize db-specific cron jobs (e.g., backup)
-            Execute("crontab /stamped/bootstrap/bin/cron.db.sh")
+        Service(name="mongod", 
+                start_cmd="mongod --fork --replSet %s --config %s %s" % \
+                (config.replSet, config.path, string.joinfields(options, ' ')))
+        
+        # initialize db-specific cron jobs (e.g., backup)
+        Execute("crontab /stamped/bootstrap/bin/cron.db.sh")
     
     if 'monitor' in env.config.node.roles:
         cmd = """
