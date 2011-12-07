@@ -50,6 +50,16 @@ if 'bootstrap' in env.config.node.roles:
         Package("ntp")
         Package("mdadm")
         Package("lvm2")
+        
+        cmd = """
+        echo 'deb http://www.rabbitmq.com/debian/ testing main' >> /etc/apt/sources.list
+        wget http://www.rabbitmq.com/rabbitmq-signing-key-public.asc
+        apt-key add rabbitmq-signing-key-public.asc
+        apt-get -y update
+        """
+        Execute(cmd)
+        Package("rabbitmq-server")
+        Execute("rabbitmqctl stop")
     
     env.includeRecipe("pip")
     env.includeRecipe("libevent")
