@@ -2,7 +2,7 @@
 
 __all__ = [ "PipPackageProvider" ]
 
-import re
+import re, time
 
 from subprocess import check_call, Popen, PIPE, STDOUT
 from pynode.utils import log, lazyProperty, shell3
@@ -63,17 +63,24 @@ class PipPackageProvider(PackageProvider):
             prefix     = ""
             virtualenv = ""
         
-        if name == 'pip' or not version:
-            (_, status) = self._shell("%s %s %s install %s" % \
-                (prefix, self.pip_binary_path, virtualenv, name))
-            (_, __) = self._shell("%s %s %s install -U %s" % \
-                (prefix, self.pip_binary_path, virtualenv, name))
-        else:
-            (_, status) = self._shell("%s %s %s install %s==%s" % \
-                (prefix, self.pip_binary_path, virtualenv, name, version))
-        
-        if 0 != status:
-            raise Fail("error installing package %s with version %s" % (name, version))
+        retries = 0
+        while True:
+            if name == 'pip' or not version:
+                (_, status) = self._shell("%s %s %s install %s" % \
+                    (prefix, self.pip_binary_path, virtualenv, name))
+                (_, __) = self._shell("%s %s %s install -U %s" % \
+                    (prefix, self.pip_binary_path, virtualenv, name))
+            else:
+                (_, status) = self._shell("%s %s %s install %s==%s" % \
+                    (prefix, self.pip_binary_path, virtualenv, name, version))
+            
+            if 0 == status:
+                break
+            elif retries < 5:
+                retries += 1
+                time.sleep(1)
+            else:
+                raise Fail("error installing package %s with version %s" % (name, version))
     
     def _upgrade_package(self, name, version):
         (_, status) = self.install_package(name, version)
