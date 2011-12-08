@@ -59,7 +59,7 @@ if 'bootstrap' in env.config.node.roles:
         """
         Execute(cmd)
         Package("rabbitmq-server")
-        Execute("rabbitmqctl stop")
+        Execute("/etc/init.d/rabbitmq-server stop; rm -f /etc/init.d/rabbitmq-server")
     
     env.includeRecipe("pip")
     env.includeRecipe("libevent")
@@ -239,4 +239,10 @@ else:
         init_daemon("gunicorn_api")
         
         Execute("crontab /stamped/bootstrap/bin/cron.api.sh")
+    
+    if 'work' in env.config.node.roles:
+        
+        # TODO: test this!
+        
+        #init_daemon("celeryd")
 
