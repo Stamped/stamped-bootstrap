@@ -221,11 +221,14 @@ else:
         # start statsd aggregator
         init_daemon("statsd")
         
-        # start graphite web service
+        # start graphite web server
         init_daemon("graphite")
         
         # start monitoring daemon
         init_daemon("stampedmon")
+        
+        # start rabbit message queuing server
+        init_daemon("rabbitmq-server")
         
         # initialize mon-specific cron jobs (e.g., alerts)
         Execute("crontab /stamped/bootstrap/bin/cron.mon.sh")
