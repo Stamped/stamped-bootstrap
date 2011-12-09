@@ -32,6 +32,7 @@ def main():
     
     #execute("kill -s HUP `cat /stamped/conf/gunicorn_web.pid`")
     execute("reload gunicorn_web")
+    execute("reload celeryd")
 
 if __name__ == '__main__':
     main()
