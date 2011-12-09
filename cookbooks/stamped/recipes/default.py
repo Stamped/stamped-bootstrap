@@ -244,8 +244,5 @@ else:
         Execute("crontab /stamped/bootstrap/bin/cron.api.sh")
     
     if 'work' in env.config.node.roles:
-        pass
-        # TODO: test this!
-        
-        #init_daemon("celeryd")
+        init_daemon("celeryd")
 
