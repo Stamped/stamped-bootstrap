@@ -1,11 +1,12 @@
 
-from pynode.resources import *
-from pynode.source import *
-from pynode.utils import AttributeDict
-from pynode.errors import Fail
+from pynode.resources   import *
+from pynode.source      import *
+from pynode.utils       import AttributeDict
+from pynode.errors      import Fail
+from subprocess         import Popen, PIPE
 
 import os, pickle, string
-from subprocess import Popen, PIPE
+import pynode.utils
 
 path     = env.config.node.path
 conf     = os.path.join(path, "conf")
@@ -14,6 +15,28 @@ activate = os.path.join(path, "bin/activate")
 def init_daemon(name):
     Execute("cp /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
             (name, name, name))
+
+def set_hostname(name):
+    cmd = """
+    echo '%s' > /etc/hostname
+    sysctl kernel.hostname='%s'
+    sed -i 's/localhost/localhost %s/' /etc/hosts
+    hostname -F /etc/hostname
+    """ % (name, name, name)
+    
+    Execute(cmd)
+
+def init_hostname():
+    try:
+        import ec2_utils
+        
+        stack = ec2_utils.get_stack()
+        name  = stack.instance.name
+        
+        if name is not None and len(name) > 0:
+            set_hostname(name)
+    except:
+        pynode.utils.printException()
 
 if 'bootstrap' in env.config.node.roles:
     # install prerequisites
@@ -149,6 +172,7 @@ if 'bootstrap' in env.config.node.roles:
     Execute(r'. %s && python %s&' % (activate, ready))
 else:
     Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9 || echo test")
+    init_hostname()
     
     # clone git repo
     if 'git' in env.config.node and 'repos' in env.config.node.git:
