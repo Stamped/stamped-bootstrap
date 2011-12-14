@@ -283,7 +283,7 @@ else:
     def init_hostname():
         try:
             stack = get_stack()
-            name  = stack.instance.name
+            name  = "%s_%s" % (stack.instance.stack, stack.instance.name)
             
             if name is not None and len(name) > 0:
                 set_hostname(name)
