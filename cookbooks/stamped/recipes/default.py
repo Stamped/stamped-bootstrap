@@ -16,30 +16,6 @@ def init_daemon(name):
     Execute("cp /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
             (name, name, name))
 
-def set_hostname(name):
-    cmd = """
-    echo '%s' > /etc/hostname
-    sysctl kernel.hostname='%s'
-    sed -i 's/localhost/localhost %s/' /etc/hosts
-    hostname -F /etc/hostname
-    """ % (name, name, name)
-    
-    Execute(cmd)
-
-def init_hostname():
-    try:
-        import sys
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        import ec2_utils
-        
-        stack = ec2_utils.get_stack()
-        name  = stack.instance.name
-        
-        if name is not None and len(name) > 0:
-            set_hostname(name)
-    except:
-        pynode.utils.printException()
-
 if 'bootstrap' in env.config.node.roles:
     # install prerequisites
     env.includeRecipe("virtualenv")
@@ -173,6 +149,131 @@ if 'bootstrap' in env.config.node.roles:
     ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
     Execute(r'. %s && python %s&' % (activate, ready))
 else:
+    import aws, datetime, json, os, time
+    
+    from boto.route53.connection    import Route53Connection
+    from boto.exception             import EC2ResponseError
+    from boto.ec2.connection        import EC2Connection
+    from boto.ec2.elb               import ELBConnection
+    from collections                import defaultdict
+    from subprocess                 import Popen, PIPE
+    
+    def get_modified_time(filename):
+        return datetime.datetime.fromtimestamp(os.path.getmtime(filename))
+    
+    def get_local_instance_id():
+        # cache instance id locally
+        path = os.path.join(os.path.dirname(os.path.abspath('/stamped/bootstrap/')), '.instance.id.txt')
+        
+        if os.path.exists(path):
+            f = open(path, 'r')
+            instance_id = f.read()
+            f.close()
+            
+            if len(instance_id) > 1 and instance_id.startswith('i-'):
+                return instance_id
+        
+        ret = _shell('wget -q -O - http://169.254.169.254/latest/meta-data/instance-id')
+        
+        if 0 != ret[1]:
+            return None
+        else:
+            f = open(path, 'w')
+            f.write(ret[0])
+            f.close()
+            
+            return ret[0]
+
+    def get_stack(stack=None):
+        if stack is not None:
+            stack = stack.lower()
+        
+        name = '.%s.stack.txt' % ('__local__' if stack is None else stack)
+        path = os.path.join(os.path.dirname(os.path.abspath('/stamped/bootstrap/')), name)
+        
+        if os.path.exists(path):
+            modified = get_modified_time(path)
+            current  = datetime.datetime.utcnow() - datetime.timedelta(minutes=15)
+            
+            # only try to use the cached config if it's recent enough
+            if modified >= current:
+                try:
+                    f = open(path, 'r')
+                    info = json.loads(f.read())
+                    f.close()
+                    info = utils.AttributeDict(info)
+                    if info.instance is not None and len(info.nodes) > 0:
+                        info.nodes = map(utils.AttributeDict, info.nodes)
+                        return info
+                except:
+                    utils.log("error getting cached stack info; recomputing")
+                    utils.printException()
+        
+        conn = EC2Connection(aws.AWS_ACCESS_KEY_ID, aws.AWS_SECRET_KEY)
+        
+        reservations = conn.get_all_instances()
+        instance_id  = get_local_instance_id()
+        stacks       = defaultdict(list)
+        cur_instance = None
+        
+        for reservation in reservations:
+            for instance in reservation.instances:
+                try:
+                    if instance.state == 'running':
+                        stack_name = instance.tags['stack']
+                        
+                        node = dict(
+                            name=instance.tags['name'], 
+                            stack=stack_name, 
+                            roles=eval(instance.tags['roles']), 
+                            instance_id=instance.id, 
+                            public_dns_name=instance.public_dns_name, 
+                            private_dns_name=instance.private_dns_name, 
+                            private_ip_address=instance.private_ip_address, 
+                        )
+                        
+                        stacks[stack_name].append(node)
+                        
+                        if stack is None and instance.id == instance_id:
+                            stack = stack_name
+                            cur_instance = node
+                except:
+                    pass
+        
+        info = {
+            'instance' : cur_instance, 
+            'nodes'    : stacks[stack], 
+        }
+        
+        f = open(path, 'w')
+        f.write(json.dumps(info, indent=2))
+        f.close()
+        
+        info = utils.AttributeDict(info)
+        info.nodes = map(utils.AttributeDict, info.nodes)
+        
+        return info
+    
+    def set_hostname(name):
+        cmd = """
+        echo '%s' > /etc/hostname
+        sysctl kernel.hostname='%s'
+        sed -i 's/localhost/localhost %s/' /etc/hosts
+        hostname -F /etc/hostname
+        """ % (name, name, name)
+        
+        Execute(cmd)
+    
+    def init_hostname():
+        try:
+            stack = get_stack()
+            name  = stack.instance.name
+            
+            if name is not None and len(name) > 0:
+                set_hostname(name)
+        except:
+            pynode.utils.printException()
+    
     Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9 || echo test")
     init_hostname()
     
