@@ -12,6 +12,9 @@ path     = env.config.node.path
 conf     = os.path.join(path, "conf")
 activate = os.path.join(path, "bin/activate")
 
+AWS_ACCESS_KEY_ID = 'AKIAIXLZZZT4DMTKZBDQ'
+AWS_SECRET_KEY    = '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'
+
 def init_daemon(name):
     Execute("cp /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
             (name, name, name))
@@ -149,14 +152,11 @@ if 'bootstrap' in env.config.node.roles:
     ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
     Execute(r'. %s && python %s&' % (activate, ready))
 else:
-    import aws, datetime, json, os, time
+    import datetime, json, os, time
     
     from boto.route53.connection    import Route53Connection
-    from boto.exception             import EC2ResponseError
     from boto.ec2.connection        import EC2Connection
-    from boto.ec2.elb               import ELBConnection
     from collections                import defaultdict
-    from subprocess                 import Popen, PIPE
     
     def get_modified_time(filename):
         return datetime.datetime.fromtimestamp(os.path.getmtime(filename))
@@ -183,7 +183,23 @@ else:
             f.close()
             
             return ret[0]
-
+    
+    def _shell(cmd, env=None):
+        print cmd
+        pp = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, env=env)
+        delay = 0.01
+        
+        while pp.returncode is None:
+            time.sleep(delay)
+            delay *= 2
+            if delay > 1:
+                delay = 1
+            
+            pp.poll()
+        
+        output = pp.stdout.read().strip()
+        return (output, pp.returncode)
+    
     def get_stack(stack=None):
         if stack is not None:
             stack = stack.lower()
@@ -209,7 +225,7 @@ else:
                     utils.log("error getting cached stack info; recomputing")
                     utils.printException()
         
-        conn = EC2Connection(aws.AWS_ACCESS_KEY_ID, aws.AWS_SECRET_KEY)
+        conn = EC2Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
         
         reservations = conn.get_all_instances()
         instance_id  = get_local_instance_id()
