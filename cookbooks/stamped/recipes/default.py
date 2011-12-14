@@ -272,10 +272,10 @@ else:
     
     def set_hostname(name):
         cmd = """
-        echo '%s' > /etc/hostname
-        sysctl kernel.hostname='%s'
-        sed -i 's/localhost/localhost %s/' /etc/hosts
-        hostname -F /etc/hostname
+        echo '%s' > /etc/hostname; 
+        sysctl kernel.hostname='%s'; 
+        sed -i 's/localhost/localhost %s/' /etc/hosts; 
+        hostname -b -F /etc/hostname || echo "nevermind"
         """ % (name, name, name)
         
         Execute(cmd)
