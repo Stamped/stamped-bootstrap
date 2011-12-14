@@ -217,13 +217,13 @@ else:
                     f = open(path, 'r')
                     info = json.loads(f.read())
                     f.close()
-                    info = utils.AttributeDict(info)
+                    info = AttributeDict(info)
                     if info.instance is not None and len(info.nodes) > 0:
-                        info.nodes = map(utils.AttributeDict, info.nodes)
+                        info.nodes = map(AttributeDict, info.nodes)
                         return info
                 except:
-                    utils.log("error getting cached stack info; recomputing")
-                    utils.printException()
+                    print "error getting cached stack info; recomputing"
+                    pynode.utils.printException()
         
         conn = EC2Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
         
@@ -265,8 +265,8 @@ else:
         f.write(json.dumps(info, indent=2))
         f.close()
         
-        info = utils.AttributeDict(info)
-        info.nodes = map(utils.AttributeDict, info.nodes)
+        info = AttributeDict(info)
+        info.nodes = map(AttributeDict, info.nodes)
         
         return info
     
