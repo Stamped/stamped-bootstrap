@@ -28,6 +28,7 @@ def set_hostname(name):
 
 def init_hostname():
     try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         import ec2_utils
         
         stack = ec2_utils.get_stack()
