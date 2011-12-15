@@ -8,9 +8,17 @@ __license__ = "TODO"
 import os
 from subprocess import Popen, PIPE
 
-def execute(cmd):
+def execute(cmd, **kwargs):
     print cmd
-    return Popen(cmd, shell=True).wait()
+    return Popen(cmd, shell=True, **kwargs).wait()
+
+def reload_upstart_daemon(name):
+    ret = execute("initctl status %s" % name, stdout=PIPE, stderr=PIPE)
+    
+    if 0 == ret:
+        execute("initctl reload %s" % name)
+    elif os.path.exists("/etc/init/%s.conf"):
+        execute("initctl start %s" % name)
 
 def main():
     bootstrap = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,12 +35,9 @@ def main():
             cmd = "cd %s && git pull" % repo
             execute(cmd)
     
-    #execute("kill -s HUP `cat /stamped/conf/gunicorn_api.pid`")
-    execute("reload gunicorn_api")
-    
-    #execute("kill -s HUP `cat /stamped/conf/gunicorn_web.pid`")
-    execute("reload gunicorn_web")
-    execute("reload celeryd")
+    reload_upstart_daemon("reload gunicorn_api")
+    reload_upstart_daemon("reload gunicorn_web")
+    reload_upstart_daemon("reload celeryd")
 
 if __name__ == '__main__':
     main()
