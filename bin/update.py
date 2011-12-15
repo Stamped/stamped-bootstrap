@@ -9,11 +9,15 @@ import os
 from subprocess import Popen, PIPE
 
 def execute(cmd, **kwargs):
-    print cmd
+    verbose = kwargs.pop('verbose', True)
+    
+    if verbose:
+        print cmd
+    
     return Popen(cmd, shell=True, **kwargs).wait()
 
 def reload_upstart_daemon(name):
-    ret = execute("initctl status %s" % name, stdout=PIPE, stderr=PIPE)
+    ret = execute("initctl status %s" % name, verbose=False, stdout=PIPE, stderr=PIPE)
     
     if 0 == ret:
         execute("initctl reload %s" % name)
