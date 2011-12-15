@@ -19,9 +19,11 @@ def execute(cmd, **kwargs):
 def reload_upstart_daemon(name):
     ret = execute("initctl status %s" % name, verbose=False, stdout=PIPE, stderr=PIPE)
     
+    print ret
+    
     if 0 == ret:
         execute("initctl reload %s" % name)
-    elif os.path.exists("/etc/init/%s.conf"):
+    elif os.path.exists("/etc/init/%s.conf" % name):
         execute("initctl start %s" % name)
 
 def main():
@@ -39,9 +41,9 @@ def main():
             cmd = "cd %s && git pull" % repo
             execute(cmd)
     
-    reload_upstart_daemon("reload gunicorn_api")
-    reload_upstart_daemon("reload gunicorn_web")
-    reload_upstart_daemon("reload celeryd")
+    reload_upstart_daemon("gunicorn_api")
+    reload_upstart_daemon("gunicorn_web")
+    reload_upstart_daemon("celeryd")
 
 if __name__ == '__main__':
     main()
