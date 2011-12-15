@@ -14,14 +14,14 @@ def execute(cmd, **kwargs):
     if verbose:
         print cmd
     
-    pp     = Popen(cmd, shell=True, **kwargs)
+    pp     = Popen(cmd, shell=True, stdout=PIPE, **kwargs)
     output = pp.stdout.read().strip()
     status = pp.wait()
     
     return (output, status)
 
 def reload_upstart_daemon(name):
-    ret = execute("initctl status %s" % name, verbose=False, stdout=PIPE, stderr=PIPE)
+    ret = execute("initctl status %s" % name, verbose=False, stderr=PIPE)
     
     if 0 == ret[1]:
         ret = execute("initctl reload %s" % name)
