@@ -14,17 +14,21 @@ def execute(cmd, **kwargs):
     if verbose:
         print cmd
     
-    return Popen(cmd, shell=True, **kwargs).wait()
+    pp     = Popen(cmd, shell=True, **kwargs)
+    output = pp.stdout.read().strip()
+    status = pp.wait()
+    
+    return (output, status)
 
 def reload_upstart_daemon(name):
     ret = execute("initctl status %s" % name, verbose=False, stdout=PIPE, stderr=PIPE)
     
-    print ret
-    
-    if 0 == ret:
-        execute("initctl reload %s" % name)
+    if 0 == ret[1]:
+        ret = execute("initctl reload %s" % name)
+        print ret[0]
     elif os.path.exists("/etc/init/%s.conf" % name):
-        execute("initctl start %s" % name)
+        ret = execute("initctl start %s" % name)
+        print ret[0]
 
 def main():
     bootstrap = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
