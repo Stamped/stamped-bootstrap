@@ -1,6 +1,6 @@
 /stamped/logs/*.log {
     daily
-    size 20mb
+    size 20M
     rotate 10
     compress
     delaycompress
