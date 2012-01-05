@@ -1,3 +1,9 @@
+#!/usr/bin/python
+
+__author__    = "Stamped (dev@stamped.com)"
+__version__   = "1.0"
+__copyright__ = "Copyright (c) 2012 Stamped.com"
+__license__   = "TODO"
 
 from pynode.resources   import *
 from pynode.source      import *
@@ -16,6 +22,10 @@ AWS_ACCESS_KEY_ID = 'AKIAIXLZZZT4DMTKZBDQ'
 AWS_SECRET_KEY    = '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'
 
 def init_daemon(name):
+    # note: we use ubuntu upstart as our daemonization utility of choice, and since ubuntu's 
+    # apt package installer frequently installs an init.d version of the daemon upon initial 
+    # package install, we manually remove it from /etc/init.d and replace it with a roughly 
+    # analogous, arguably simpler upstart version in /etc/init
     Execute("cp /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
             (name, name, name))
 
@@ -23,11 +33,20 @@ if 'bootstrap' in env.config.node.roles:
     # install prerequisites
     env.includeRecipe("virtualenv")
     
+    # copy over some useful bash and vim settings
+    # -------------------------------------------
+    Execute('cp /stamped/bootstrap/cookbooks/stamped/files/vimrc /etc/vim/vimrc.local')
+    Execute('cat /stamped/bootstrap/cookbooks/stamped/files/bash_profile >> /etc/bash.bashrc')
+    File(path='/home/ubuntu/.bash_profile', content=StaticFile('stamped/bash_profile'))
+    #File(path='/home/ubuntu/.vimrc', content=StaticFile('stamped/vimrc'))
+    
+    # setup core directories (/stamped root directory, log dir, conf dir, etc.)
+    # -------------------------------------------
     Directory(path)
     Directory(conf)
     
-    Execute('cp /stamped/bootstrap/cookbooks/stamped/files/vimrc /etc/vim/vimrc.local')
-    Execute('cat /stamped/bootstrap/cookbooks/stamped/files/bash_profile >> /etc/bash.bashrc')
+    Directory("/stamped/")
+    Directory("/stamped/logs")
     
     try:
         Directory(os.path.dirname(env.config.node.mongodb.config.logpath))
@@ -35,59 +54,78 @@ if 'bootstrap' in env.config.node.roles:
     except:
         pass
     
-    Directory("/stamped/")
-    Directory("/stamped/logs")
-    
-    if env.system.platform != "mac_os_x":
-        # copy over some useful bash and vim settings
-        File(path='/home/ubuntu/.bash_profile', content=StaticFile('stamped/bash_profile'))
-        #File(path='/home/ubuntu/.vimrc', content=StaticFile('stamped/vimrc'))
-        
-        Package("python-dev")
-        Package("gcc")
-        Package("libjpeg62")
-        Package("libjpeg62-dev")
-        Package("zlib1g-dev")
-        Package("libxml2-dev")
-        Package("libxslt1-dev")
-        Package("python-lxml")
-        Package("ntp")
-        Package("mdadm")
-        Package("lvm2")
-        
-        cmd = """
-        echo 'deb http://www.rabbitmq.com/debian/ testing main' >> /etc/apt/sources.list
-        wget http://www.rabbitmq.com/rabbitmq-signing-key-public.asc
-        apt-key add rabbitmq-signing-key-public.asc
-        apt-get -y update
-        """
-        Execute(cmd)
-        Package("rabbitmq-server")
-        Execute("/etc/init.d/rabbitmq-server stop; rm -f /etc/init.d/rabbitmq-server")
+    # install base package dependencies that are referenced by other packages
+    # -----------------------------------------------------------------------
+    Package("python-dev")
+    Package("gcc")
+    Package("g++")
+    Package("libjpeg62")
+    Package("libjpeg62-dev")
+    Package("zlib1g-dev")
+    Package("libxml2-dev")
+    Package("libxslt1-dev")
+    Package("python-lxml")
+    Package("ntp")
+    Package("mdadm")
+    Package("lvm2")
     
     env.includeRecipe("pip")
     env.includeRecipe("libevent")
     
+    # install rabbitmq-server
+    # -----------------------
+    cmd = """
+    echo 'deb http://www.rabbitmq.com/debian/ testing main' >> /etc/apt/sources.list
+    wget http://www.rabbitmq.com/rabbitmq-signing-key-public.asc
+    apt-key add rabbitmq-signing-key-public.asc
+    apt-get -y update
+    """
+    Execute(cmd)
+    Package("rabbitmq-server")
+    Execute("/etc/init.d/rabbitmq-server stop; rm -f /etc/init.d/rabbitmq-server")
+    
+    # install memcached and libmemcached
+    # ----------------------------------
+    Package("memcached")
+    Execute("/etc/init.d/memcached stop; rm -f /etc/init.d/memcached")
+    
+    cmd = """
+    wget http://launchpad.net/libmemcached/1.0/1.0.2/+download/libmemcached-1.0.2.tar.gz
+    tar -xvf libmemcached-1.0.2.tar.gz
+    cd libmemcached-1.0.2.tar.gz
+    make && make install
+    cd ..
+    """
+    Execute(cmd)
+    
     # install python packages
+    # -----------------------
     for package in env.config.node.python.requirements:
         env.cookbooks.pip.PipPackage(package, virtualenv=path)
     
-    # Copy Boto config
+    # initialize boto
+    # -----------------------
+    
+    # copy boto config
     cmd = "cp /stamped/bootstrap/cookbooks/stamped/files/boto.cfg /etc/boto.cfg"
     Execute(r'. %s && %s' % (activate, cmd))
     
-    # Ensure most recent version of boto is installed
+    # ensure most recent version of boto is installed
     cmd = "pip install boto"
     Execute(r'. %s && %s' % (activate, cmd))
     cmd = "pip install -U boto"
     Execute(r'. %s && %s' % (activate, cmd))
     
+    # install mongodb
+    # ---------------
     env.includeRecipe('mongodb')
     
     # install JRE
+    # -----------
     Package('openjdk-6-jre-headless')
     
     # install nginx
+    # -------------
     cmd = """
     cd %(path)s
     wget 'http://nginx.org/download/nginx-1.0.5.tar.gz'
@@ -112,8 +150,8 @@ if 'bootstrap' in env.config.node.roles:
     Execute(r'. %s && %s' % (activate, cmd))
     
     # install StatsD and its dependencies (graphite, carbon, whisper, cairo, node.js)
+    # -------------------------------------------------------------------------------
     Package("python-cairo-dev")
-    Package("g++")
     env.cookbooks.pip.PipPackage("django-tagging", virtualenv=path)
     
     cmd = """
@@ -149,6 +187,8 @@ if 'bootstrap' in env.config.node.roles:
     
     Execute(r'. %s && %s' % (activate, cmd))
     
+    # notify dependencies that we are done with bootstrap initialization
+    # ------------------------------------------------------------------
     ready = '/stamped/bootstrap/bin/ready.py "%s"' % (pickle.dumps(env.config.node.roles))
     Execute(r'. %s && python %s&' % (activate, ready))
 else:
@@ -388,4 +428,7 @@ else:
     
     if 'work' in env.config.node.roles:
         init_daemon("celeryd")
+    
+    if 'mem' in env.config.node.roles:
+        init_daemon("memcached")
 
