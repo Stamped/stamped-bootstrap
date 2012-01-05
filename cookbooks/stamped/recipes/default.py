@@ -90,9 +90,9 @@ if 'bootstrap' in env.config.node.roles:
     Execute("/etc/init.d/memcached stop; rm -f /etc/init.d/memcached")
     
     cmd = """
-    wget http://launchpad.net/libmemcached/1.0/1.0.2/+download/libmemcached-1.0.2.tar.gz -O libmemcached.tar.gz
-    tar -xvf libmemcached.tar.gz
-    cd libmemcached
+    wget http://launchpad.net/libmemcached/1.0/1.0.2/+download/libmemcached-1.0.2.tar.gz
+    tar -xvf libmemcached-1.0.2.tar.gz
+    cd libmemcached-1.0.2
     make && make install
     cd ..
     """
@@ -128,21 +128,21 @@ if 'bootstrap' in env.config.node.roles:
     # -------------
     cmd = """
     cd %(path)s
-    wget 'http://nginx.org/download/nginx-1.0.5.tar.gz' -O nginx.tar.gz
-    tar -xzvf nginx.tar.gz 
-    wget 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.13.tar.gz' -O pcre.tar.gz
-    tar -xzvf pcre.tar.gz 
-    wget 'http://zlib.net/zlib-1.2.5.tar.gz' -O zlib.tar.gz
-    tar -xzvf zlib.tar.gz 
-    wget 'http://www.openssl.org/source/openssl-1.0.0d.tar.gz' -O openssl.tar.gz
-    tar -xzvf openssl.tar.gz
-    cd nginx/
-    ./configure --with-pcre=../pcre/ --with-zlib=../zlib/ --with-openssl=../openssl/ --with-http_ssl_module
+    wget 'http://nginx.org/download/nginx-1.0.5.tar.gz'
+    tar -xzvf nginx-1.0.5.tar.gz 
+    wget 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.13.tar.gz'
+    tar -xzvf pcre-8.13.tar.gz 
+    wget 'http://zlib.net/zlib-1.2.5.tar.gz'
+    tar -xzvf zlib-1.2.5.tar.gz 
+    wget 'http://www.openssl.org/source/openssl-1.0.0d.tar.gz'
+    tar -xzvf openssl-1.0.0d.tar.gz
+    cd nginx-1.0.5/
+    ./configure --with-pcre=../pcre-8.13/ --with-zlib=../zlib-1.2.5/ --with-openssl=../openssl-1.0.0d --with-http_ssl_module
     make
     mv objs/nginx %(path)s/bin/nginx
     cp conf/mime.types %(path)s/bin/
     cd ../
-    rm -rf nginx.tar.gz pcre.tar.gz zlib.tar.gz openssl.tar.gz pcre/ zlib/ openssl/
+    rm -rf nginx-1.0.5.tar.gz pcre-8.13.tar.gz zlib-1.2.5.tar.gz openssl-1.0.0d.tar.gz pcre-8.13/ zlib-1.2.5/ openssl-1.0.0d/
     mkdir %(path)s/www
     mkdir %(path)s/www/cache
     """ % { 'path': env.config.node.path }
