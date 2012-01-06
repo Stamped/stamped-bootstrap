@@ -93,6 +93,7 @@ if 'bootstrap' in env.config.node.roles:
     wget http://launchpad.net/libmemcached/1.0/1.0.2/+download/libmemcached-1.0.2.tar.gz
     tar -xvf libmemcached-1.0.2.tar.gz
     cd libmemcached-1.0.2
+    ./configure
     make && make install
     cd ..
     """
