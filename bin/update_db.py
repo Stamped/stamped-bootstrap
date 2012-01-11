@@ -15,7 +15,7 @@ def main():
     ]
     
     activate = "/stamped/bin/activate"
-    crawler  = "/stamped/stamped/sites/stamped.com/bin/crawler"
+    crawler  = "/stamped/stamped/platform/crawler"
     log = open("/stamped/logs/update_db.log", "a")
     
     for source in sources:
