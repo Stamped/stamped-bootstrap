@@ -29,6 +29,10 @@ def init_daemon(name):
     Execute("cp /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
             (name, name, name))
 
+def kill_mongo():
+    Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9 || echo test")
+    Execute(r"rm -rf /etc/init.d/mongodb /var/lib/mongodb/journal")
+
 if 'bootstrap' in env.config.node.roles:
     # install prerequisites
     env.includeRecipe("virtualenv")
@@ -120,6 +124,7 @@ if 'bootstrap' in env.config.node.roles:
     # install mongodb
     # ---------------
     env.includeRecipe('mongodb')
+    kill_mongo()
     
     # install JRE
     # -----------
@@ -331,7 +336,7 @@ else:
         except:
             pynode.utils.printException()
     
-    Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9 || echo test")
+    kill_mongo()
     init_hostname()
     
     # clone git repo
@@ -354,9 +359,9 @@ else:
     if 'db' in env.config.node.roles:
         env.includeRecipe('mongodb')
         
-        # note: installing mongodb seems to start a mongod process for some
+        # note: installing mongodb starts a mongod process for some
         # retarded reason, so kill it before starting our own instance
-        Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9 || echo test")
+        kill_mongo()
         
         options = env.config.node.mongodb.options
         config  = env.config.node.mongodb.config
