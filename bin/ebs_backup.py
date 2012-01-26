@@ -81,7 +81,7 @@ def backupEBS():
 def sendmail(subject, body):
     try:
         ses = boto.connect_ses(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
-        ses.send_email('alerts@stamped.com', str(subject), str(body), 'dev@stamped.com', format='text')
+        ses.send_email('noreply@stamped.com', str(subject), str(body), 'dev@stamped.com', format='text')
     except:
         import string, sys, traceback
         exc_type, exc_value, exc_traceback = sys.exc_info()
