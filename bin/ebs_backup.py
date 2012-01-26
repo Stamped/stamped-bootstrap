@@ -110,7 +110,7 @@ def main():
     
     if len(running[0].split('\n')) > 1:
         msg = "%s already running!" % prog
-        sendmail(msg, running)
+        sendmail(msg, "duplicate instances of '%s' running\n\n%s" % (prog, running))
         
         print msg
         print "Aborting"
