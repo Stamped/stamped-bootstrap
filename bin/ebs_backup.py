@@ -76,23 +76,43 @@ def backupEBS():
             print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
             print '!!!!!!!!!!!!!!!!! UNLOCK FAILED !!!!!!!!!!!!!!!!!'
             print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-            try:
-                ses = boto.connect_ses(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
-                ses.send_email('alerts@stamped.com', 'DB SERVER LOCKED', str(metadata), 'dev@stamped.com', format='text')
-            except:
-                pass
+            sendmail("DB SERVER LOCKED (unlock failed)", str(metadata))
+
+def sendmail(subject, body):
+    try:
+        ses = boto.connect_ses(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
+        ses.send_email('alerts@stamped.com', str(subject), str(body), 'dev@stamped.com', format='text')
+    except:
+        import string, sys, traceback
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        
+        f = traceback.format_exception(exc_type, exc_value, exc_traceback)
+        print string.joinfields(f, '')
+
+def shell(cmd, customEnv=None):
+    pp = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, env=customEnv)
+    
+    output = pp.stdout.read().strip()
+    status = pp.wait()
+    
+    return (output, status)
 
 def get_running(cmd):
-    return shell("ps -ef | grep '%s' | grep -v grep")
+    return shell("ps -ef | grep '%s' | grep -v grep" % cmd)
 
 def main():
     print 
     print "###### BEGIN EBS BACKUP ######"
     print "Time: %s" % datetime.utcnow()
     
-    running = get_running(os.path.basename(sys.argv[0]))
-    if len(running[0]) > 1:
-        print "%s already running!"
+    prog = os.path.basename(sys.argv[0])
+    running = get_running(prog)
+    
+    if len(running[0].split('\n')) > 1:
+        msg = "%s already running!" % prog
+        sendmail(msg, running)
+        
+        print msg
         print "Aborting"
     else:
         # Only run if secondary node in replica set
