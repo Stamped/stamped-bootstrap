@@ -6,9 +6,10 @@ __copyright__ = "Copyright (c) 2012 Stamped.com"
 __license__ = "TODO"
 
 import time, os, subprocess, re, sys, boto
-from datetime import datetime
+
+from datetime            import datetime
 from boto.ec2.connection import EC2Connection
-from boto import utils
+from boto                import utils
 
 AWS_ACCESS_KEY_ID = 'AKIAIXLZZZT4DMTKZBDQ'
 AWS_SECRET_KEY = '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'
@@ -81,24 +82,31 @@ def backupEBS():
             except:
                 pass
 
+def get_running(cmd):
+    return shell("ps -ef | grep '%s' | grep -v grep")
 
 def main():
     print 
-    print '###### BEGIN EBS BACKUP ######'
-    print 'Time: %s' % datetime.utcnow()
-
-    # Only run if secondary node in replica set
-    cmd = "mongo localhost:27017/admin --eval 'printjson(db.isMaster());'"
-    status = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
-    if re.search(r'"ismaster" : false', status[0]) and re.search(r'"secondary" : true', status[0]):
-        print 'isSecondary: True'
-        backupEBS()
-    else:
-        print 'isSecondary: False'
-        print 'Aborting'
+    print "###### BEGIN EBS BACKUP ######"
+    print "Time: %s" % datetime.utcnow()
     
-    print '###### END EBS BACKUP ######'
-    print 'Time: %s' % datetime.utcnow()
+    running = get_running(os.path.basename(sys.argv[0]))
+    if len(running[0]) > 1:
+        print "%s already running!"
+        print "Aborting"
+    else:
+        # Only run if secondary node in replica set
+        cmd = "mongo localhost:27017/admin --eval 'printjson(db.isMaster());'"
+        status = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
+        if re.search(r'"ismaster" : false', status[0]) and re.search(r'"secondary" : true', status[0]):
+            print "isSecondary: True"
+            backupEBS()
+        else:
+            print "isSecondary: False"
+            print "Aborting"
+    
+    print "###### END EBS BACKUP ######"
+    print "Time: %s" % datetime.utcnow()
     print
 
 if __name__ == '__main__':
