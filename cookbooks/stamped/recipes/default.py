@@ -31,7 +31,7 @@ def init_daemon(name):
 
 def kill_mongo():
     Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9 || echo test")
-    Execute(r"rm -rf /etc/init.d/mongodb /var/lib/mongodb/journal")
+    Execute(r"rm -rf /etc/init/mongodb.conf /etc/init.d/mongodb /var/lib/mongodb/journal")
 
 if 'bootstrap' in env.config.node.roles:
     # install prerequisites
