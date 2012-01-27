@@ -20,7 +20,7 @@ def execute(cmd, **kwargs):
     
     return (output, status)
 
-def reload_upstart_daemon(name):
+def restart_upstart_daemon(name):
     ret = execute("initctl status %s" % name, verbose=False, stderr=PIPE)
     
     if 0 == ret[1]:
@@ -45,9 +45,9 @@ def main():
             cmd = "cd %s && git pull" % repo
             execute(cmd)
     
-    reload_upstart_daemon("gunicorn_api")
-    reload_upstart_daemon("gunicorn_web")
-    reload_upstart_daemon("celeryd")
+    restart_upstart_daemon("gunicorn_api")
+    restart_upstart_daemon("gunicorn_web")
+    restart_upstart_daemon("celeryd")
 
 if __name__ == '__main__':
     main()

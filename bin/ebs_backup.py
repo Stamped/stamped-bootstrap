@@ -12,7 +12,7 @@ from boto.ec2.connection import EC2Connection
 from boto                import utils
 
 AWS_ACCESS_KEY_ID = 'AKIAIXLZZZT4DMTKZBDQ'
-AWS_SECRET_KEY = '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'
+AWS_SECRET_KEY    = 'q2RysVdSHvScrIZtiEOiO2CQ5iOxmk6/RKPS1LvX'
 
 def backupEBS():
     ec2 = EC2Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_KEY)
