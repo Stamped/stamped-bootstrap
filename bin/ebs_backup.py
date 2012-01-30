@@ -5,7 +5,7 @@ __version__ = "1.0"
 __copyright__ = "Copyright (c) 2012 Stamped.com"
 __license__ = "TODO"
 
-import time, os, subprocess, re, sys, boto
+import time, os, subprocess, re, sys, boto, traceback
 
 from datetime            import datetime
 from boto.ec2.connection import EC2Connection
