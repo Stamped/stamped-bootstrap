@@ -104,26 +104,31 @@ def main():
     print 
     print "###### BEGIN EBS BACKUP ######"
     print "Time: %s" % datetime.utcnow()
-    
-    prog = os.path.basename(sys.argv[0])
-    running = get_running(prog)
-    
-    if len(running[0].split('\n')) > 1:
-        msg = "%s already running!" % prog
-        sendmail(msg, "duplicate instances of '%s' running\n\n%s" % (prog, running))
-        
-        print msg
-        print "Aborting"
+
+    lock = os.path.join(base, 'ebs_backup.lock')
+    if os.path.exists(lock):
+        print 'LOCKED: Aborting'
+        prog = os.path.basename(sys.argv[0])
+        sendmail(msg, "duplicate instances of '%s' running" % prog)
+
     else:
-        # Only run if secondary node in replica set
-        cmd = "mongo localhost:27017/admin --eval 'printjson(db.isMaster());'"
-        status = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
-        if re.search(r'"ismaster" : false', status[0]) and re.search(r'"secondary" : true', status[0]):
-            print "isSecondary: True"
-            backupEBS()
-        else:
-            print "isSecondary: False"
-            print "Aborting"
+        try:
+            open(lock, 'w').close()
+
+            # Only run if secondary node in replica set
+            cmd = "mongo localhost:27017/admin --eval 'printjson(db.isMaster());'"
+            status = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
+            if re.search(r'"ismaster" : false', status[0]) and re.search(r'"secondary" : true', status[0]):
+                print "isSecondary: True"
+                backupEBS()
+            else:
+                print "isSecondary: False"
+                print "Aborting"
+
+        except:
+            pass
+        finally:
+            os.remove(lock)
     
     print "###### END EBS BACKUP ######"
     print "Time: %s" % datetime.utcnow()
