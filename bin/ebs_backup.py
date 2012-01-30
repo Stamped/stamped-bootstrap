@@ -105,6 +105,7 @@ def main():
     print "###### BEGIN EBS BACKUP ######"
     print "Time: %s" % datetime.utcnow()
 
+    base = os.path.dirname(os.path.abspath(__file__))
     lock = os.path.join(base, 'ebs_backup.lock')
     if os.path.exists(lock):
         print 'LOCKED: Aborting'
