@@ -55,8 +55,27 @@ def backupEBS():
                 print 'Begin snapshot (%s):' % datetime.utcnow()
                 print 'Volume Id: %s' % volume.id
                 print 'Description: "%s"' % description
-                ec2.create_snapshot(volume.id, description)
-                print 'Success!'
+
+                num_retries = 0
+                max_retries = 5
+
+                while True:
+                    try:
+                        ec2.create_snapshot(volume.id, description)
+                        print 'Success!'
+                        break
+                    
+                    except Exception as e:
+                        logs.warning('EC2 Exception: %s' % e)
+                        num_retries += 1
+                        if num_retries > max_retries:
+                            msg = "Unable to connect to S3 after %d retries (%s)" % \
+                                (max_retries, self.__class__.__name__)
+                            logs.warning(msg)
+                            raise Exception(msg)
+                        
+                        logs.info("Retrying (%s)" % (num_retries))
+                        time.sleep(5)
                 
         print '-------------------'
     
