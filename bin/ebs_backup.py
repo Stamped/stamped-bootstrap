@@ -5,7 +5,7 @@ __version__ = "1.0"
 __copyright__ = "Copyright (c) 2012 Stamped.com"
 __license__ = "TODO"
 
-import time, os, subprocess, re, sys, boto
+import time, os, subprocess, re, sys, boto, traceback
 
 from datetime            import datetime
 from boto.ec2.connection import EC2Connection
@@ -55,8 +55,27 @@ def backupEBS():
                 print 'Begin snapshot (%s):' % datetime.utcnow()
                 print 'Volume Id: %s' % volume.id
                 print 'Description: "%s"' % description
-                ec2.create_snapshot(volume.id, description)
-                print 'Success!'
+
+                num_retries = 0
+                max_retries = 5
+
+                while True:
+                    try:
+                        ec2.create_snapshot(volume.id, description)
+                        print 'Success!'
+                        break
+                    
+                    except Exception as e:
+                        logs.warning('EC2 Exception: %s' % e)
+                        num_retries += 1
+                        if num_retries > max_retries:
+                            msg = "Unable to connect to S3 after %d retries (%s)" % \
+                                (max_retries, self.__class__.__name__)
+                            logs.warning(msg)
+                            raise Exception(msg)
+                        
+                        logs.info("Retrying (%s)" % (num_retries))
+                        time.sleep(5)
                 
         print '-------------------'
     
@@ -104,26 +123,32 @@ def main():
     print 
     print "###### BEGIN EBS BACKUP ######"
     print "Time: %s" % datetime.utcnow()
-    
-    prog = os.path.basename(sys.argv[0])
-    running = get_running(prog)
-    
-    if len(running[0].split('\n')) > 1:
-        msg = "%s already running!" % prog
-        sendmail(msg, "duplicate instances of '%s' running\n\n%s" % (prog, running))
-        
-        print msg
-        print "Aborting"
+
+    base = os.path.dirname(os.path.abspath(__file__))
+    lock = os.path.join(base, 'ebs_backup.lock')
+    if os.path.exists(lock):
+        print 'LOCKED: Aborting'
+        prog = os.path.basename(sys.argv[0])
+        sendmail(msg, "duplicate instances of '%s' running" % prog)
+
     else:
-        # Only run if secondary node in replica set
-        cmd = "mongo localhost:27017/admin --eval 'printjson(db.isMaster());'"
-        status = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
-        if re.search(r'"ismaster" : false', status[0]) and re.search(r'"secondary" : true', status[0]):
-            print "isSecondary: True"
-            backupEBS()
-        else:
-            print "isSecondary: False"
-            print "Aborting"
+        try:
+            open(lock, 'w').close()
+
+            # Only run if secondary node in replica set
+            cmd = "mongo localhost:27017/admin --eval 'printjson(db.isMaster());'"
+            status = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()
+            if re.search(r'"ismaster" : false', status[0]) and re.search(r'"secondary" : true', status[0]):
+                print "isSecondary: True"
+                backupEBS()
+            else:
+                print "isSecondary: False"
+                print "Aborting"
+
+        except:
+            pass
+        finally:
+            os.remove(lock)
     
     print "###### END EBS BACKUP ######"
     print "Time: %s" % datetime.utcnow()
