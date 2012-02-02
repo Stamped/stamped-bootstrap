@@ -37,6 +37,9 @@ def parseCommandLine():
     version = "%prog " + __version__
     parser   = OptionParser(usage=usage, version=version)
     
+    parser.add_option("-i", "--SearchIndex", action="store", default=defaults['SearchIndex'], 
+                      help="Amazon SearchIndex parameter (defaults to %s)" % defaults['SearchIndex'])
+    
     (options, args) = parser.parse_args()
     try:
         roles = pickle.loads(args[0])
