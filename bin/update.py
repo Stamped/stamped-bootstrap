@@ -43,8 +43,12 @@ def restart_upstart_daemon(name):
 
 def sync_repo(path, force=False):
     clean_repo = "git reset --hard HEAD && git clean -fd && "
+     
     cmd = "cd %s && %sgit pull" % (path, clean_repo if force else "")
-    execute(cmd)
+    ret = execute(cmd)
+    
+    if 0 != ret[1]:
+        log("\nWARNING: failed to update %s (%s); possibly retry with force to override local changes\n" % (path, ret[0]))
 
 def parseCommandLine():
     usage    = "Usage: %prog [options]"
