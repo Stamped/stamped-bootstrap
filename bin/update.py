@@ -37,7 +37,7 @@ def restart_upstart_daemon(name):
 
 def sync_repo(path, force=False):
     clean_repo = "git reset --hard HEAD && git clean -fd && "
-    cmd = "cd %s && %sgit pull" % (clean_repo if force else "")
+    cmd = "cd %s && %sgit pull" % (path, clean_repo if force else "")
     execute(cmd)
 
 def parseCommandLine():
