@@ -24,7 +24,7 @@ def restart_upstart_daemon(name):
     ret = execute("initctl status %s" % name, verbose=False, stderr=PIPE)
     
     if 0 == ret[1]:
-        ret = execute("initctl reload %s" % name)
+        ret = execute("initctl restart %s" % name)
         print ret[0]
     elif os.path.exists("/etc/init/%s.conf" % name):
         ret = execute("initctl start %s" % name)
