@@ -5,15 +5,19 @@ __version__ = "1.0"
 __copyright__ = "Copyright (c) 2012 Stamped.com"
 __license__ = "TODO"
 
-import os
+import os, socket
 from subprocess import Popen, PIPE
 from optparse   import OptionParser
+__hostname = socket.gethostname()
+
+def log(s):
+    print "%s) %s" % (__hostname, str(s))
 
 def execute(cmd, **kwargs):
     verbose = kwargs.pop('verbose', True)
     
     if verbose:
-        print cmd
+        log(cmd)
     
     pp     = Popen(cmd, shell=True, stdout=PIPE, **kwargs)
     output = pp.stdout.read().strip()
@@ -27,15 +31,15 @@ def restart_upstart_daemon(name):
     if 0 == ret[1]:
         ret = execute("initctl restart %s" % name)
     elif os.path.exists("/etc/init/%s.conf" % name):
-        print "\nWARNING: %s not running; attempting to start\n" % name
+        log("\nWARNING: %s not running; attempting to start\n" % name)
         ret = execute("initctl start %s" % name)
     else:
         return
     
     if 0 == ret[1]:
-        print ret[0]
+        log(ret[0])
     else:
-        print "\nWARNING: %s failed (%s)\n" % (name, ret[0])
+        log("\nWARNING: %s failed (%s)\n" % (name, ret[0]))
 
 def sync_repo(path, force=False):
     clean_repo = "git reset --hard HEAD && git clean -fd && "
