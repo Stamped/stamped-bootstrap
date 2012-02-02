@@ -31,7 +31,7 @@ def restart_upstart_daemon(name):
     if 0 == ret[1]:
         ret = execute("initctl restart %s" % name)
     elif os.path.exists("/etc/init/%s.conf" % name):
-        log("\nWARNING: %s not running; attempting to start\n" % name)
+        log("WARNING: %s not running; attempting to start\n" % name)
         ret = execute("initctl start %s" % name)
     else:
         return
@@ -39,7 +39,7 @@ def restart_upstart_daemon(name):
     if 0 == ret[1]:
         log(ret[0])
     else:
-        log("\nWARNING: %s failed (%s)\n" % (name, ret[0]))
+        log("WARNING: %s failed (%s)\n" % (name, ret[0]))
 
 def sync_repo(path, force=False):
     clean_repo = "git reset --hard HEAD && git clean -fd && "
@@ -48,7 +48,7 @@ def sync_repo(path, force=False):
     ret = execute(cmd)
     
     if 0 != ret[1]:
-        log("\nWARNING: failed to update %s (%s); possibly retry with force to override local changes\n" % (path, ret[0]))
+        log("WARNING: failed to update %s (%s); possibly retry with force to override local changes\n" % (path, ret[0]))
 
 def parseCommandLine():
     usage    = "Usage: %prog [options]"
