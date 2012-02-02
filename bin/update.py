@@ -29,6 +29,8 @@ def restart_upstart_daemon(name):
     elif os.path.exists("/etc/init/%s.conf" % name):
         print "\nWARNING: %s not running; attempting to start\n" % name
         ret = execute("initctl start %s" % name)
+    else:
+        return
     
     if 0 == ret[1]:
         print ret[0]
