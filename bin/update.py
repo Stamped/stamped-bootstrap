@@ -85,7 +85,7 @@ def main():
     restart_upstart_daemon("gunicorn_web")
     restart_upstart_daemon("celeryd")
     
-    sys.exit(__error)
+    sys.exit(1 if __error else 0)
 
 if __name__ == '__main__':
     main()
