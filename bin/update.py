@@ -5,13 +5,19 @@ __version__ = "1.0"
 __copyright__ = "Copyright (c) 2012 Stamped.com"
 __license__ = "TODO"
 
-import os, socket
+import os, socket, sys
+
 from subprocess import Popen, PIPE
 from optparse   import OptionParser
-__hostname = socket.gethostname()
 
-def log(s):
-    print "%s) %s" % (__hostname, str(s))
+__hostname  = socket.gethostname()
+__error     = False
+
+def log(s, error=False):
+    global __error
+    __error |= error
+    
+    print "%s) %s%s" % (__hostname, "WARNING: " if error else "", str(s))
 
 def execute(cmd, **kwargs):
     verbose = kwargs.pop('verbose', True)
@@ -31,7 +37,7 @@ def restart_upstart_daemon(name):
     if 0 == ret[1]:
         ret = execute("initctl restart %s" % name)
     elif os.path.exists("/etc/init/%s.conf" % name):
-        log("WARNING: %s not running; attempting to start\n" % name)
+        log("%s not running; attempting to start\n" % name, error=True)
         ret = execute("initctl start %s" % name)
     else:
         return
@@ -39,7 +45,7 @@ def restart_upstart_daemon(name):
     if 0 == ret[1]:
         log(ret[0])
     else:
-        log("WARNING: %s failed (%s)\n" % (name, ret[0]))
+        log("%s failed (%s)\n" % (name, ret[0]), error=True)
 
 def sync_repo(path, force=False):
     clean_repo = "git reset --hard HEAD && git clean -fd && "
@@ -48,7 +54,7 @@ def sync_repo(path, force=False):
     ret = execute(cmd)
     
     if 0 != ret[1]:
-        log("WARNING: failed to update %s (%s); possibly retry with force to override local changes\n" % (path, ret[0]))
+        log("failed to update %s (%s); possibly retry with force to override local changes\n" % (path, ret[0]), error=True)
 
 def parseCommandLine():
     usage    = "Usage: %prog [options]"
@@ -78,6 +84,8 @@ def main():
     restart_upstart_daemon("gunicorn_api")
     restart_upstart_daemon("gunicorn_web")
     restart_upstart_daemon("celeryd")
+    
+    sys.exit(__error)
 
 if __name__ == '__main__':
     main()
