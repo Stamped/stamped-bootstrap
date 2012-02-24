@@ -46,7 +46,7 @@ class PipPackageProvider(PackageProvider):
     
     @property
     def pip_binary_path(self):
-	if self.resource.virtualenv:
+        if self.resource.virtualenv:
             return self.resource.virtualenv + "/bin/pip"
         else:
             return "pip"
@@ -58,7 +58,7 @@ class PipPackageProvider(PackageProvider):
     def _install_package(self, name, version):
         if self.resource.virtualenv is not None:
             prefix     = ". %s/bin/activate && " % self.resource.virtualenv
-            virtualenv = "--environment %s" % self.resource.virtualenv
+            #virtualenv = "--environment %s" % self.resource.virtualenv
         else:
             prefix     = ""
             virtualenv = ""
@@ -67,13 +67,13 @@ class PipPackageProvider(PackageProvider):
         while True:
             try:
                 if name == 'pip' or not version:
-                    (_, status) = self._shell("%s %s %s install %s" % \
-                        (prefix, self.pip_binary_path, virtualenv, name))
-                    (_, __) = self._shell("%s %s %s install -U %s" % \
-                        (prefix, self.pip_binary_path, virtualenv, name))
+                    (_, status) = self._shell("%s %s install %s" % \
+                        (prefix, self.pip_binary_path, name))
+                    (_, __) = self._shell("%s %s install -U %s" % \
+                        (prefix, self.pip_binary_path, name))
                 else:
-                    (_, status) = self._shell("%s %s %s install %s==%s" % \
-                        (prefix, self.pip_binary_path, virtualenv, name, version))
+                    (_, status) = self._shell("%s %s install %s==%s" % \
+                        (prefix, self.pip_binary_path, name, version))
                 
                 if 0 == status:
                     break
