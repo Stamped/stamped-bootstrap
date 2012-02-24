@@ -155,6 +155,19 @@ if 'bootstrap' in env.config.node.roles:
     
     Execute(r'. %s && %s' % (activate, cmd))
     
+    # install elasticsearch
+    # ---------------------
+    elasticsearch_url = "https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.0.RC3.tar.gz"
+    
+    cmd = """
+    mkdir -p temp && cd temp
+    curl -OL %s
+    tar -xvf elasticsearch-* && rm -f elasticsearch-*.tar.gz
+    mv elasticsearch-* /usr/local/elasticsearch
+    cd .. && rm -rf temp
+    """ % elasticsearch_url
+    Execute(cmd)
+    
     # install StatsD and its dependencies (graphite, carbon, whisper, cairo, node.js)
     # -------------------------------------------------------------------------------
     Package("python-cairo-dev")
@@ -437,4 +450,7 @@ else:
     
     if 'mem' in env.config.node.roles:
         init_daemon("memcached")
+    
+    if 'search' in env.config.node.roles:
+        init_daemon("elasticsearch")
 
