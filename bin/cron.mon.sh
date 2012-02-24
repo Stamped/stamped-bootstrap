@@ -1,3 +1,4 @@
+MAILTO=""
 
 # Every two minutes: Run email / APNs alerts
 */2 * * * * . /stamped/bin/activate && python /stamped/stamped/platform/alerts/alerts.py >> /stamped/logs/alerts.log
