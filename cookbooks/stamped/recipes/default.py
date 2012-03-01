@@ -136,19 +136,19 @@ if 'bootstrap' in env.config.node.roles:
     cd %(path)s
     wget 'http://nginx.org/download/nginx-1.0.5.tar.gz'
     tar -xzvf nginx-1.0.5.tar.gz 
-    wget 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.13.tar.gz'
-    tar -xzvf pcre-8.13.tar.gz 
-    wget 'http://zlib.net/zlib-1.2.5.tar.gz'
-    tar -xzvf zlib-1.2.5.tar.gz 
+    wget 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.21.tar.gz'
+    tar -xzvf pcre-8.21.tar.gz 
+    wget 'http://zlib.net/zlib-1.2.6.tar.gz'
+    tar -xzvf zlib-1.2.6.tar.gz 
     wget 'http://www.openssl.org/source/openssl-1.0.0d.tar.gz'
     tar -xzvf openssl-1.0.0d.tar.gz
     cd nginx-1.0.5/
-    ./configure --with-pcre=../pcre-8.13/ --with-zlib=../zlib-1.2.5/ --with-openssl=../openssl-1.0.0d --with-http_ssl_module
+    ./configure --with-pcre=../pcre-8.21/ --with-zlib=../zlib-1.2.6/ --with-openssl=../openssl-1.0.0d --with-http_ssl_module
     make
     mv objs/nginx %(path)s/bin/nginx
     cp conf/mime.types %(path)s/bin/
     cd ../
-    rm -rf nginx-1.0.5.tar.gz pcre-8.13.tar.gz zlib-1.2.5.tar.gz openssl-1.0.0d.tar.gz pcre-8.13/ zlib-1.2.5/ openssl-1.0.0d/
+    rm -rf nginx-1.0.5.tar.gz pcre-8.21.tar.gz zlib-1.2.6.tar.gz openssl-1.0.0d.tar.gz pcre-8.21/ zlib-1.2.6/ openssl-1.0.0d/
     mkdir %(path)s/www
     mkdir %(path)s/www/cache
     """ % { 'path': env.config.node.path }
