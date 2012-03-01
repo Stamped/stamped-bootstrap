@@ -132,6 +132,9 @@ if 'bootstrap' in env.config.node.roles:
     
     # install nginx
     # -------------
+    
+    # TODO (travis): these URL dependencies are very prone to breaking (already happened twice).
+    # When we get some cleanup time, find a simpler way (ideally using apt) to install nginx
     cmd = """
     cd %(path)s
     wget 'http://nginx.org/download/nginx-1.0.5.tar.gz'
