@@ -437,6 +437,9 @@ else:
         
         # initialize mon-specific cron jobs (e.g., alerts)
         Execute("crontab /stamped/bootstrap/bin/cron.mon.sh")
+        
+        # start elasticmongo
+        init_daemon("elasticmongo")
     
     if 'webServer' in env.config.node.roles:
         init_daemon("nginx_web")
