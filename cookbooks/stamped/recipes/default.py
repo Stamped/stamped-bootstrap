@@ -174,6 +174,14 @@ if 'bootstrap' in env.config.node.roles:
     # install StatsD and its dependencies (graphite, carbon, whisper, cairo, node.js)
     # -------------------------------------------------------------------------------
     Package("python-cairo-dev")
+    Package("build-essential")
+    Package("curl")
+    
+    # LESS CSS dependencies
+    Package("openssl")
+    Package("libssl-dev")
+    Package("pkg-config")
+    
     env.cookbooks.pip.PipPackage("django-tagging", virtualenv=path)
     
     cmd = """
@@ -182,19 +190,19 @@ if 'bootstrap' in env.config.node.roles:
     wget http://launchpad.net/graphite/0.9/0.9.9/+download/graphite-web-0.9.9.tar.gz
     wget http://launchpad.net/graphite/0.9/0.9.9/+download/carbon-0.9.9.tar.gz
     wget http://launchpad.net/graphite/0.9/0.9.9/+download/whisper-0.9.9.tar.gz
-    wget http://nodejs.org/dist/node-v0.4.12.tar.gz
+    wget http://nodejs.org/dist/v0.6.17/node-v0.6.17.tar.gz
     
     tar -xvf graphite-web-0.9.9.tar.gz
     tar -xvf whisper-0.9.9.tar.gz
     tar -xvf carbon-0.9.9.tar.gz
-    tar -xvf node-v0.4.12.tar.gz
+    tar -xvf node-v0.6.17
     
     mv carbon-0.9.9  carbon
     mv whisper-0.9.9 whisper
     mv graphite-web-0.9.9 graphite
-    mv node-v0.4.12 node
+    mv node-v0.6.17 node
     
-    rm -f carbon-0.9.9.tar.gz whisper-0.9.9.tar.gz graphite-web-0.9.9.tar.gz node-v0.4.12.tar.gz
+    rm -f carbon-0.9.9.tar.gz whisper-0.9.9.tar.gz graphite-web-0.9.9.tar.gz node-v0.6.17
     
     cd whisper  && sudo python setup.py install && cd ..
     cd carbon   && sudo python setup.py install && cd ..
@@ -204,9 +212,16 @@ if 'bootstrap' in env.config.node.roles:
     cp /stamped/bootstrap/config/templates/statsd.conf /stamped/conf
     
     cd graphite && sudo python setup.py install && cd ..
-    cd node && ./configure --without-ssl && make && make install
+    cd node && ./configure && make && make install
     """
+    Execute(r'. %s && %s' % (activate, cmd))
     
+    # install NPM package manager and LESS
+    # ------------------------------------
+    cmd = "curl http://npmjs.org/install.sh | sh"
+    Execute(r'. %s && %s' % (activate, cmd))
+    
+    cmd = "npm install less"
     Execute(r'. %s && %s' % (activate, cmd))
     
     # notify dependencies that we are done with bootstrap initialization
