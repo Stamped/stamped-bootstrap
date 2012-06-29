@@ -21,13 +21,15 @@ activate = os.path.join(path, "bin/activate")
 AWS_ACCESS_KEY_ID = 'AKIAIXLZZZT4DMTKZBDQ'
 AWS_SECRET_KEY    = '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'
 
-def init_daemon(name):
+def init_daemon(name, template=None):
     # note: we use ubuntu upstart as our daemonization utility of choice, and since ubuntu's 
     # apt package installer frequently installs an init.d version of the daemon upon initial 
     # package install, we manually remove it from /etc/init.d and replace it with a roughly 
     # analogous, arguably simpler upstart version in /etc/init
+    if template is None:
+        template = name
     Execute("cp /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
-            (name, name, name))
+            (template, name, name))
 
 def kill_mongo():
     Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9 || echo test")
@@ -451,7 +453,11 @@ else:
         
         Execute("crontab /stamped/bootstrap/bin/cron.api.sh")
     
-    if 'work' in env.config.node.roles:
+    if 'work-api' in env.config.node.roles:
+        init_daemon("celeryd", template="celeryd-api")
+    elif 'work-enrich' in env.config.node.roles:
+        init_daemon("celeryd", template="celeryd-enrich")
+    elif 'work' in env.config.node.roles:
         init_daemon("celeryd")
     
     if 'mem' in env.config.node.roles:
