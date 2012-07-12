@@ -437,6 +437,9 @@ else:
         # start rabbit message queuing server
         init_daemon("rabbitmq-server")
         
+        # start rabbit message queuing server
+        init_daemon("celerybeat")
+
         # initialize mon-specific cron jobs (e.g., alerts)
         Execute("crontab /stamped/bootstrap/bin/cron.mon.sh")
     
