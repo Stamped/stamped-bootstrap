@@ -83,6 +83,7 @@ def main():
     
     restart_upstart_daemon("gunicorn_api")
     restart_upstart_daemon("gunicorn_web")
+    restart_upstart_daemon("gunicorn_analytics")
     restart_upstart_daemon("celeryd")
     
     sys.exit(1 if __error else 0)

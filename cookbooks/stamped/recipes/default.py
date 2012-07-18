@@ -21,13 +21,15 @@ activate = os.path.join(path, "bin/activate")
 AWS_ACCESS_KEY_ID = 'AKIAIXLZZZT4DMTKZBDQ'
 AWS_SECRET_KEY    = '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'
 
-def init_daemon(name):
+def init_daemon(name, template=None):
     # note: we use ubuntu upstart as our daemonization utility of choice, and since ubuntu's 
     # apt package installer frequently installs an init.d version of the daemon upon initial 
     # package install, we manually remove it from /etc/init.d and replace it with a roughly 
     # analogous, arguably simpler upstart version in /etc/init
+    if template is None:
+        template = name
     Execute("cp /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
-            (name, name, name))
+            (template, name, name))
 
 def kill_mongo():
     Execute(r"ps -e | grep mongod | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9 || echo test")
@@ -141,17 +143,17 @@ if 'bootstrap' in env.config.node.roles:
     tar -xzvf nginx-1.0.5.tar.gz 
     wget 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.21.tar.gz'
     tar -xzvf pcre-8.21.tar.gz 
-    wget 'http://zlib.net/zlib-1.2.6.tar.gz'
-    tar -xzvf zlib-1.2.6.tar.gz 
+    wget 'http://zlib.net/zlib-1.2.7.tar.gz'
+    tar -xzvf zlib-1.2.7.tar.gz 
     wget 'http://www.openssl.org/source/openssl-1.0.0d.tar.gz'
     tar -xzvf openssl-1.0.0d.tar.gz
     cd nginx-1.0.5/
-    ./configure --with-pcre=../pcre-8.21/ --with-zlib=../zlib-1.2.6/ --with-openssl=../openssl-1.0.0d --with-http_ssl_module
+    ./configure --with-pcre=../pcre-8.21/ --with-zlib=../zlib-1.2.7/ --with-openssl=../openssl-1.0.0d --with-http_ssl_module
     make
     mv objs/nginx %(path)s/bin/nginx
     cp conf/mime.types %(path)s/bin/
     cd ../
-    rm -rf nginx-1.0.5.tar.gz pcre-8.21.tar.gz zlib-1.2.6.tar.gz openssl-1.0.0d.tar.gz pcre-8.21/ zlib-1.2.6/ openssl-1.0.0d/
+    rm -rf nginx-1.0.5.tar.gz pcre-8.21.tar.gz zlib-1.2.7.tar.gz openssl-1.0.0d.tar.gz pcre-8.21/ zlib-1.2.7/ openssl-1.0.0d/
     mkdir %(path)s/www
     mkdir %(path)s/www/cache
     """ % { 'path': env.config.node.path }
@@ -450,11 +452,15 @@ else:
         # start rabbit message queuing server
         init_daemon("rabbitmq-server")
         
+        # start rabbit message queuing server
+        init_daemon("celerybeat")
+
         # initialize mon-specific cron jobs (e.g., alerts)
         Execute("crontab /stamped/bootstrap/bin/cron.mon.sh")
-        
-        # start elasticmongo
-        init_daemon("elasticmongo")
+    
+    if 'analytics' in env.config.node.roles:
+        init_daemon("nginx_analytics")
+        init_daemon("gunicorn_analytics")
     
     if 'webServer' in env.config.node.roles:
         init_daemon("nginx_web")
@@ -466,7 +472,11 @@ else:
         
         Execute("crontab /stamped/bootstrap/bin/cron.api.sh")
     
-    if 'work' in env.config.node.roles:
+    if 'work-api' in env.config.node.roles:
+        init_daemon("celeryd", template="celeryd-api")
+    elif 'work-enrich' in env.config.node.roles:
+        init_daemon("celeryd", template="celeryd-enrich")
+    elif 'work' in env.config.node.roles:
         init_daemon("celeryd")
     
     if 'mem' in env.config.node.roles:
