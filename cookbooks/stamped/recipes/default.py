@@ -438,16 +438,16 @@ else:
         PYTHONPATH=`pwd`/webapp:`pwd`/whisper python ./webapp/graphite/manage.py syncdb
         """
         
-        Execute(r'. %s && %s' % (activate, cmd))
+        # Execute(r'. %s && %s' % (activate, cmd))
         
         # start statsd aggregator
-        init_daemon("statsd")
+        # init_daemon("statsd")
         
         # start graphite web server
-        init_daemon("graphite")
+        # init_daemon("graphite")
         
         # start monitoring daemon
-        init_daemon("stampedmon")
+        # init_daemon("stampedmon")
         
         # start rabbit message queuing server
         init_daemon("rabbitmq-server")
