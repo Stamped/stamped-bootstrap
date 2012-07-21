@@ -46,3 +46,6 @@ alias gs='git status'
 # quickly kill the python program 'crawler'
 alias kc='ps -e | grep "python.*crawler" | grep -v grep | sed "s/^ *\([0-9]*\).*/\1/" | xargs kill -9'
 
+# add lessc to path
+PATH=$PATH:/stamped/node/node_modules/less/bin
+
