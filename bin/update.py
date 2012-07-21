@@ -66,10 +66,10 @@ def parseCommandLine():
     
     return parser.parse_args()
 
-def rebuild_fastcompare(root, stamped):
-    virtualenv_activation = '. ' + os.path.join(root, 'bin/activate')
+def rebuild_fastcompare(stamped):
     python_cmd = 'python ' + os.path.join(stamped, 'platform/resolve/fastcompare_setup.py')
-    full_command = ' && '.join([virtualenv_activation, python_cmd + ' build', python_cmd + ' install'])
+    full_command = ' && '.join(['cd ' + stamped, python_cmd + ' build', python_cmd + ' install'])
+    log("Running command: " + full_command)
     ret = execute(full_command)
     if ret[1]:
         log("Failed to build new fastcompare module (%s). Command: %s" % (ret[0], full_command), error=True)
