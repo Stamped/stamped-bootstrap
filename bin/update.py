@@ -66,6 +66,14 @@ def parseCommandLine():
     
     return parser.parse_args()
 
+def rebuild_fastcompare(root, stamped):
+    virtualenv_activation = '. ' + os.path.join(root, 'bin/activate')
+    python_cmd = 'python ' + os.path.join(stamped, 'platform/resolve/fastcompare_setup.py')
+    full_command = ' && '.join([virtualenv_activation, python_cmd + ' build', python_cmd + ' install'])
+    ret = execute(full_command)
+    if ret[1]:
+        log("Failed to build new fastcompare module (%s). Command: %s" % (ret[0], full_command), error=True)
+
 def main():
     options, args   = parseCommandLine()
     bootstrap       = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -80,6 +88,8 @@ def main():
     for repo in repos:
         if os.path.exists(repo):
             sync_repo(repo, options.force)
+
+    rebuild_fastcompare(root, stamped)
     
     restart_upstart_daemon("gunicorn_api")
     restart_upstart_daemon("gunicorn_web")
