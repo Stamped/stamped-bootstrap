@@ -82,12 +82,12 @@ def main():
     root            = os.path.dirname(bootstrap)
     stamped         = os.path.join(root, "stamped")
 
-    repos = {
-        'bootstrap' : False,
-        'stamped'   : True,
-    }
+    repos = [
+        (bootstrap, False)
+        (stamped, True)
+    ]
 
-    for repo, passBranch in repos.iteritems():
+    for repo, passBranch in repos:
         if os.path.exists(repo):
             if passBranch:
                 sync_repo(repo, options.force, options.branch)
