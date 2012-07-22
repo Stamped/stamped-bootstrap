@@ -84,15 +84,17 @@ def main():
     root            = os.path.dirname(bootstrap)
     stamped         = os.path.join(root, "stamped")
     
-    repos = [
-        bootstrap, 
-        stamped, 
-    ]
+    repos = {
+        'bootstrap' : False,
+        'stamped'   : True,
+    }
 
-    print options.branch
-    for repo in repos:
+    for repo, passBranch in repos:
         if os.path.exists(repo):
-            sync_repo(repo, options.force, options.branch)
+            if passBranch:
+                sync_repo(repo, options.force, options.branch)
+            else:
+                sync_repo(repo, options.force)
 
     rebuild_fastcompare(root, stamped)
     
