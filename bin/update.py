@@ -52,6 +52,7 @@ def sync_repo(path, force=False, branch='master'):
     branch_cmd = "git checkout %s && " % branch
 
     cmd = "cd %s && %s%sgit pull" % (path, branch_cmd, clean_repo if force else "")
+    print ('### issuing cmd: %s' % cmd)
     ret = execute(cmd)
     
     if 0 != ret[1]:
