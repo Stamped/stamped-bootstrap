@@ -85,8 +85,8 @@ def main():
     stamped         = os.path.join(root, "stamped")
 
     repos = [
-        (bootstrap, False)
-        (stamped, True)
+        (bootstrap, False),
+        (stamped, True),
     ]
 
     for repo, passBranch in repos:
