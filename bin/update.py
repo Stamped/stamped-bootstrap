@@ -47,10 +47,13 @@ def restart_upstart_daemon(name):
     else:
         log("%s failed (%s)\n" % (name, ret[0]), error=True)
 
-def sync_repo(path, force=False):
+def sync_repo(path, force=False, branch=None):
     clean_repo = "git reset --hard HEAD && git clean -fd && "
-     
-    cmd = "cd %s && %sgit pull" % (path, clean_repo if force else "")
+    branch_cmd = ""
+    if branch is not None:
+        branch_cmd = "git checkout %s && " % branch
+
+    cmd = "cd %s && %s%sgit pull" % (path, branch_cmd, clean_repo if force else "")
     ret = execute(cmd)
     
     if 0 != ret[1]:
@@ -61,9 +64,10 @@ def parseCommandLine():
     version = "%prog " + __version__
     parser   = OptionParser(usage=usage, version=version)
     
-    parser.add_option("-f", "--force", action="store_true", default=False, 
+    parser.add_option("-f", "--force", action="store_true", default=False,
                       help="force cleaning / updating of underlying repositories")
-    
+    parser.add_option("-b", "--branch", action="store", default=None,
+                      help="git branch to checkout, if not master")
     return parser.parse_args()
 
 def rebuild_fastcompare(root, stamped):
@@ -84,10 +88,11 @@ def main():
         bootstrap, 
         stamped, 
     ]
-    
+
+    print options.branch
     for repo in repos:
         if os.path.exists(repo):
-            sync_repo(repo, options.force)
+            sync_repo(repo, options.force, options.branch)
 
     rebuild_fastcompare(root, stamped)
     
