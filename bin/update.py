@@ -49,8 +49,10 @@ def restart_upstart_daemon(name):
 
 def sync_repo(path, force=False, branch='master'):
     clean_repo = "git reset --hard HEAD && git clean -fd && "
+    branch_cmd = "git checkout %s && " % branch
 
-    cmd = "cd %s && %sgit pull" % (path, clean_repo if force else "")
+    cmd = "cd %s && %s%sgit pull" % (path, branch_cmd, clean_repo if force else "")
+    print ('### issuing cmd: %s' % cmd)
     ret = execute(cmd)
 
     if 0 != ret[1]:
