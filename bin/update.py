@@ -89,7 +89,7 @@ def main():
         'stamped'   : True,
     }
 
-    for repo, passBranch in repos:
+    for repo, passBranch in repos.iteritems():
         if os.path.exists(repo):
             if passBranch:
                 sync_repo(repo, options.force, options.branch)
