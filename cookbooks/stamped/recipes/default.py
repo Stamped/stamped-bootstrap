@@ -197,7 +197,7 @@ if 'bootstrap' in env.config.node.roles:
     tar -xvf graphite-web-0.9.9.tar.gz
     tar -xvf whisper-0.9.9.tar.gz
     tar -xvf carbon-0.9.9.tar.gz
-    tar -xvf node-v0.6.17
+    tar -xvf node-v0.6.17.tar.gz
     
     mv carbon-0.9.9  carbon
     mv whisper-0.9.9 whisper
