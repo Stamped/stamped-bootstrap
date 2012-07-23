@@ -95,6 +95,7 @@ def main():
     restart_upstart_daemon("gunicorn_web")
     restart_upstart_daemon("gunicorn_analytics")
     restart_upstart_daemon("celeryd")
+    restart_upstart_daemon("celerybeat")
     
     sys.exit(1 if __error else 0)
 
