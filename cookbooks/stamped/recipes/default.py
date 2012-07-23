@@ -197,7 +197,7 @@ if 'bootstrap' in env.config.node.roles:
     tar -xvf graphite-web-0.9.9.tar.gz
     tar -xvf whisper-0.9.9.tar.gz
     tar -xvf carbon-0.9.9.tar.gz
-    tar -xvf node-v0.6.17
+    tar -xvf node-v0.6.17.tar.gz
     
     mv carbon-0.9.9  carbon
     mv whisper-0.9.9 whisper
@@ -220,11 +220,11 @@ if 'bootstrap' in env.config.node.roles:
     
     # install NPM package manager and LESS
     # ------------------------------------
-    cmd = "curl http://npmjs.org/install.sh | sh"
-    Execute(r'. %s && %s' % (activate, cmd))
+    cmd = r"curl http://npmjs.org/install.sh | sh"
+    Execute(cmd)
     
-    cmd = "npm install less"
-    Execute(r'. %s && %s' % (activate, cmd))
+    cmd = r"npm install less"
+    Execute(cmd)
     
     # notify dependencies that we are done with bootstrap initialization
     # ------------------------------------------------------------------
@@ -485,3 +485,5 @@ else:
     if 'search' in env.config.node.roles:
         init_daemon("elasticsearch")
 
+    if 'ratelimiter' in env.config.node.roles:
+        init_daemon("ratelimiter")
