@@ -220,11 +220,11 @@ if 'bootstrap' in env.config.node.roles:
     
     # install NPM package manager and LESS
     # ------------------------------------
-    cmd = "curl http://npmjs.org/install.sh | sh"
-    Execute(r'. %s && %s' % (activate, cmd))
+    cmd = r"curl http://npmjs.org/install.sh | sh"
+    Execute(cmd)
     
-    cmd = "npm install less"
-    Execute(r'. %s && %s' % (activate, cmd))
+    cmd = r"npm install less"
+    Execute(cmd)
     
     # notify dependencies that we are done with bootstrap initialization
     # ------------------------------------------------------------------
