@@ -95,7 +95,7 @@ def main():
             else:
                 sync_repo(repo, options.force)
 
-    rebuild_fastcompare(root, stamped)
+    rebuild_fastcompare(stamped)
 
     restart_upstart_daemon("gunicorn_api")
     restart_upstart_daemon("gunicorn_web")
