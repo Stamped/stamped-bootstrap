@@ -485,3 +485,5 @@ else:
     if 'search' in env.config.node.roles:
         init_daemon("elasticsearch")
 
+    if 'ratelimiter' in env.config.node.roles:
+        init_daemon("ratelimiter")
