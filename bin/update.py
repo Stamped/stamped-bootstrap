@@ -47,11 +47,19 @@ def restart_upstart_daemon(name):
     else:
         log("%s failed (%s)\n" % (name, ret[0]), error=True)
 
-def sync_repo(path, force=False, branch='master'):
-    clean_repo = "git reset --hard HEAD && git clean -fd && "
-    branch_cmd = "git checkout %s && " % branch
+def sync_repo(path, force=False, branch=None):
+    if branch is None:
+        branch = 'master'
+        
+    cmds = []
+    cmds.append("cd %s" % path)
+    cmds.append("git checkout %s" % branch)
+    if force:
+        cmds.append("git reset --hard HEAD")
+        cmds.append("git clean -fd")
+    cmds.append("git pull")
 
-    cmd = "cd %s && %s%sgit pull" % (path, branch_cmd, clean_repo if force else "")
+    cmd = " && ".join(cmds)
     ret = execute(cmd)
 
     if 0 != ret[1]:
