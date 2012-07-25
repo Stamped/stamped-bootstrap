@@ -47,11 +47,19 @@ def restart_upstart_daemon(name):
     else:
         log("%s failed (%s)\n" % (name, ret[0]), error=True)
 
-def sync_repo(path, force=False, branch='master'):
-    clean_repo = "git reset --hard HEAD && git clean -fd && "
-    branch_cmd = "git checkout %s && " % branch
+def sync_repo(path, force=False, branch=None):
+    if branch is None:
+        branch = 'master'
+        
+    cmds = []
+    cmds.append("cd %s" % path)
+    cmds.append("git checkout %s" % branch)
+    if force:
+        cmds.append("git reset --hard HEAD")
+        cmds.append("git clean -fd")
+    cmds.append("git pull")
 
-    cmd = "cd %s && %s%sgit pull" % (path, branch_cmd, clean_repo if force else "")
+    cmd = " && ".join(cmds)
     ret = execute(cmd)
 
     if 0 != ret[1]:
@@ -69,10 +77,10 @@ def parseCommandLine():
                       help="git branch to checkout, if not master")
     return parser.parse_args()
 
-def rebuild_fastcompare(root, stamped):
-    virtualenv_activation = '. ' + os.path.join(root, 'bin/activate')
+def rebuild_fastcompare(stamped):
     python_cmd = 'python ' + os.path.join(stamped, 'platform/resolve/fastcompare_setup.py')
-    full_command = ' && '.join([virtualenv_activation, python_cmd + ' build', python_cmd + ' install'])
+    full_command = ' && '.join(['cd ' + stamped, python_cmd + ' build', python_cmd + ' install'])
+    log("Running command: " + full_command)
     ret = execute(full_command)
     if ret[1]:
         log("Failed to build new fastcompare module (%s). Command: %s" % (ret[0], full_command), error=True)
@@ -95,12 +103,14 @@ def main():
             else:
                 sync_repo(repo, options.force)
 
-    rebuild_fastcompare(root, stamped)
+    rebuild_fastcompare(stamped)
 
     restart_upstart_daemon("gunicorn_api")
     restart_upstart_daemon("gunicorn_web")
     restart_upstart_daemon("gunicorn_analytics")
     restart_upstart_daemon("celeryd")
+    restart_upstart_daemon("celerybeat")
+    restart_upstart_daemon("ratelimiter")
 
     sys.exit(1 if __error else 0)
 

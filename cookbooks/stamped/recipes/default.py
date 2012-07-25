@@ -221,7 +221,7 @@ if 'bootstrap' in env.config.node.roles:
     
     # install NPM package manager and LESS
     # ------------------------------------
-    cmd = r"curl http://npmjs.org/install.sh | sh"
+    cmd = r"wget http://npmjs.org/install.sh && clean=yes sh install.sh  > result.txt 2>&1  && rm install.sh"
     Execute(cmd)
     
     cmd = r"npm install less"
