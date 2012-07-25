@@ -388,6 +388,8 @@ else:
             else:
                 Script(name="git.clone.%s" % repo.url, 
                        code="git clone %s %s" % (repo.url, repo.path))
+            fastcompareSetup = os.path.join(repo.path, 'platform/resolve/fastcompare_setup.py')
+            Execute('. %s && python %s build && python %s install' % (activate, fastcompareSetup, fastcompareSetup))
     
     if 'db' in env.config.node.roles:
         env.includeRecipe('mongodb')
