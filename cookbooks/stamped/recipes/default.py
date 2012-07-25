@@ -28,7 +28,8 @@ def init_daemon(name, template=None):
     # analogous, arguably simpler upstart version in /etc/init
     if template is None:
         template = name
-    Execute("cp /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
+    
+    Execute("cp -f /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
             (template, name, name))
 
 def kill_mongo():
@@ -220,7 +221,7 @@ if 'bootstrap' in env.config.node.roles:
     
     # install NPM package manager and LESS
     # ------------------------------------
-    cmd = r"curl http://npmjs.org/install.sh | sh"
+    cmd = r"wget http://npmjs.org/install.sh && clean=yes sh install.sh  > result.txt 2>&1  && rm install.sh"
     Execute(cmd)
     
     cmd = r"npm install less"
