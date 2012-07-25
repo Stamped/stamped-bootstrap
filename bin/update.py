@@ -33,15 +33,17 @@ def execute(cmd, **kwargs):
 
 def restart_upstart_daemon(name):
     ret = execute("initctl status %s" % name, verbose=False, stderr=PIPE)
-
+    
     if 0 == ret[1]:
         ret = execute("initctl restart %s" % name)
+        return True
     elif os.path.exists("/etc/init/%s.conf" % name):
         log("%s not running; attempting to start\n" % name, error=True)
         ret = execute("initctl start %s" % name)
+        return True
     else:
-        return
-
+        return False
+    
     if 0 == ret[1]:
         log(ret[0])
     else:
@@ -90,28 +92,31 @@ def main():
     bootstrap       = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     root            = os.path.dirname(bootstrap)
     stamped         = os.path.join(root, "stamped")
-
+    
     repos = [
         (bootstrap, False),
         (stamped, True),
     ]
-
+    
     for repo, passBranch in repos:
         if os.path.exists(repo):
             if passBranch:
                 sync_repo(repo, options.force, options.branch)
             else:
                 sync_repo(repo, options.force)
-
+    
     rebuild_fastcompare(stamped)
-
+    
     restart_upstart_daemon("gunicorn_api")
-    restart_upstart_daemon("gunicorn_web")
+    is_web = restart_upstart_daemon("gunicorn_web")
     restart_upstart_daemon("gunicorn_analytics")
     restart_upstart_daemon("celeryd")
     restart_upstart_daemon("celerybeat")
     restart_upstart_daemon("ratelimiter")
-
+    
+    if is_web:
+        execute("/stamped/stamped/servers/web2/bin/restart.sh")
+    
     sys.exit(1 if __error else 0)
 
 if __name__ == '__main__':
