@@ -464,6 +464,8 @@ else:
         init_daemon("gunicorn_analytics")
     
     if 'webServer' in env.config.node.roles:
+        Execute("/stamped/bin/pip install pystache")
+        
         init_daemon("nginx_web")
         init_daemon("gunicorn_web")
     
@@ -485,6 +487,7 @@ else:
     
     if 'search' in env.config.node.roles:
         init_daemon("elasticsearch")
-
+    
     if 'ratelimiter' in env.config.node.roles:
         init_daemon("ratelimiter")
+
