@@ -28,7 +28,8 @@ def init_daemon(name, template=None):
     # analogous, arguably simpler upstart version in /etc/init
     if template is None:
         template = name
-    Execute("cp /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
+    
+    Execute("cp -f /stamped/bootstrap/config/templates/%s.upstart.conf /etc/init/%s.conf && start %s" % 
             (template, name, name))
 
 def kill_mongo():
