@@ -467,6 +467,8 @@ else:
     
     if 'webServer' in env.config.node.roles:
         Execute("/stamped/bin/pip install pystache")
+        Execute("mv -f /stamped/bootstrap/node_modules /stamped")
+        Execute(r'. %s && cd /stamped/stamped/platform/servers/web2 && make clean all' % (activate, ))
         
         init_daemon("nginx_web")
         init_daemon("gunicorn_web")

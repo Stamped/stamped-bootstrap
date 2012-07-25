@@ -94,16 +94,18 @@ def main():
     stamped         = os.path.join(root, "stamped")
     
     repos = [
-        (bootstrap, False),
-        (stamped, True),
+        (bootstrap, False, False),
+        (stamped, True, True),
     ]
     
-    for repo, passBranch in repos:
+    for repo, passBranch, enable_force in repos:
         if os.path.exists(repo):
+            force = options.force and enable_force
+            
             if passBranch:
-                sync_repo(repo, options.force, options.branch)
+                sync_repo(repo, force, options.branch)
             else:
-                sync_repo(repo, options.force)
+                sync_repo(repo, force)
     
     rebuild_fastcompare(stamped)
     
