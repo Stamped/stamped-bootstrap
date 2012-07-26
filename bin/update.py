@@ -116,9 +116,7 @@ def main():
     restart_upstart_daemon("celerybeat")
     restart_upstart_daemon("ratelimiter")
     
-    if is_web:
-        execute("/stamped/stamped/servers/web2/bin/restart.sh")
-    
+    execute("/stamped/stamped/servers/web2/bin/restart.sh")
     sys.exit(1 if __error else 0)
 
 if __name__ == '__main__':
