@@ -428,7 +428,7 @@ else:
                 (config.replSet, config.path, string.joinfields(options, ' ')))
         
         # initialize db-specific cron jobs (e.g., backup)
-        Execute("crontab /stamped/bootstrap/bin/cron.db.sh")
+        Execute("crontab /stamped/bootstrap/bin/cron.db.config")
     
     if 'monitor' in env.config.node.roles:
         cmd = """
@@ -459,11 +459,13 @@ else:
         init_daemon("celerybeat")
 
         # initialize mon-specific cron jobs (e.g., alerts)
-        Execute("crontab /stamped/bootstrap/bin/cron.mon.sh")
+        Execute("crontab /stamped/bootstrap/bin/cron.mon.config")
     
     if 'analytics' in env.config.node.roles:
         init_daemon("nginx_analytics")
         init_daemon("gunicorn_analytics")
+        
+        Execute("crontab /stamped/bootstrap/bin/cron.analytics.config")
     
     if 'webServer' in env.config.node.roles:
         Execute("/stamped/bin/pip install pystache")
@@ -472,19 +474,24 @@ else:
         
         init_daemon("nginx_web")
         init_daemon("gunicorn_web")
+        
+        Execute("crontab /stamped/bootstrap/bin/cron.web.config")
     
     if 'apiServer' in env.config.node.roles:
         init_daemon("nginx_api")
         init_daemon("gunicorn_api")
         
-        Execute("crontab /stamped/bootstrap/bin/cron.api.sh")
+        Execute("crontab /stamped/bootstrap/bin/cron.api.config")
     
     if 'work-api' in env.config.node.roles:
         init_daemon("celeryd", template="celeryd-api")
+        Execute("crontab /stamped/bootstrap/bin/cron.work.config")
     elif 'work-enrich' in env.config.node.roles:
         init_daemon("celeryd", template="celeryd-enrich")
+        Execute("crontab /stamped/bootstrap/bin/cron.work.config")
     elif 'work' in env.config.node.roles:
         init_daemon("celeryd")
+        Execute("crontab /stamped/bootstrap/bin/cron.work.config")
     
     if 'mem' in env.config.node.roles:
         init_daemon("memcached")
@@ -494,4 +501,5 @@ else:
     
     if 'ratelimiter' in env.config.node.roles:
         init_daemon("ratelimiter")
-
+        
+        Execute("crontab /stamped/bootstrap/bin/cron.ratelimiter.config")
