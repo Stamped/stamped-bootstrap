@@ -241,8 +241,8 @@ if 'bootstrap' in env.config.node.roles:
     apt-get update
 
     ldconfig
-    apt-get install libboost-program-options-dev uuid-dev libevent-dev
-    apt-get install gearman-job-server libgearman2 libgearman-dev gearman-tools
+    apt-get install libboost-program-options-dev uuid-dev libevent-dev -y
+    apt-get install gearman-job-server libgearman2 libgearman-dev gearman-tools -y
     """
     Execute(r'. %s && %s' % (activate, cmd))
 
