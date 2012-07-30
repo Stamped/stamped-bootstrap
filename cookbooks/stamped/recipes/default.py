@@ -226,6 +226,28 @@ if 'bootstrap' in env.config.node.roles:
     
     cmd = r"npm install less"
     Execute(cmd)
+
+    # Install Gearmand
+    # ----------------
+    cmd = """
+    echo "deb http://ppa.launchpad.net/drizzle-developers/ppa/ubuntu lucid main" >> /etc/apt/sources.list
+    echo "deb-src http://ppa.launchpad.net/drizzle-developers/ppa/ubuntu lucid main" >> /etc/apt/sources.list
+    echo "deb http://ppa.launchpad.net/gearman-developers/ppa/ubuntu lucid main" >> /etc/apt/sources.list
+    echo "deb-src http://ppa.launchpad.net/gearman-developers/ppa/ubuntu lucid main" >> /etc/apt/sources.list
+
+    add-apt-repository ppa:drizzle-developers/ppa
+    add-apt-repository ppa:gearman-developers/ppa
+    apt-get update
+    apt-get update
+
+    ldconfig
+    apt-get install libboost-program-options-dev uuid-dev libevent-dev
+    apt-get install gearman-job-server libgearman2 libgearman-dev gearman-tools
+    """
+    Execute(r'. %s && %s' % (activate, cmd))
+
+    # Kill process
+    Execute(r"ps -e | grep gearmand | grep -v grep | sed 's/^[ \t]*\([0-9]*\).*/\1/g' | xargs kill -9 || echo test")
     
     # notify dependencies that we are done with bootstrap initialization
     # ------------------------------------------------------------------
