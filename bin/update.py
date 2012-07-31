@@ -112,8 +112,8 @@ def main():
     restart_upstart_daemon("gunicorn_api")
     is_web = restart_upstart_daemon("gunicorn_web")
     restart_upstart_daemon("gunicorn_analytics")
-    restart_upstart_daemon("celeryd")
-    restart_upstart_daemon("celerybeat")
+    restart_upstart_daemon("work-api")
+    restart_upstart_daemon("work-enrich")
     restart_upstart_daemon("ratelimiter")
     
     execute("/stamped/stamped/servers/web2/bin/restart.sh")
