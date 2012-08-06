@@ -115,6 +115,7 @@ def main():
     restart_upstart_daemon("work-api")
     restart_upstart_daemon("work-enrich")
     restart_upstart_daemon("ratelimiter")
+    restart_upstart_daemon("periodictasks")
     
     execute("/stamped/stamped/servers/web2/bin/restart.sh")
     sys.exit(1 if __error else 0)
