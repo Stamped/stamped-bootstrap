@@ -466,6 +466,7 @@ else:
 
         # initialize mon-specific cron jobs (e.g., alerts)
         Execute("crontab /stamped/bootstrap/bin/cron.mon.config")
+        init_daemon('periodictasks')
     
     if 'analytics' in env.config.node.roles:
         init_daemon("nginx_analytics")
