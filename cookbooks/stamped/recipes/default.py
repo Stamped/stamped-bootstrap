@@ -492,12 +492,11 @@ else:
     
     if 'work-api' in env.config.node.roles:
         init_daemon("work-api")
+        Execute("crontab /stamped/bootstrap/bin/cron.work.config")
     elif 'work-enrich' in env.config.node.roles:
         init_daemon("work-enrich")
-        
-    if 'work' in env.config.node.roles:
         Execute("crontab /stamped/bootstrap/bin/cron.work.config")
-    
+        
     if 'mem' in env.config.node.roles:
         init_daemon("memcached")
     
