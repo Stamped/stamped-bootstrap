@@ -72,6 +72,7 @@ if 'bootstrap' in env.config.node.roles:
     Package("libxml2-dev")
     Package("libxslt1-dev")
     Package("python-lxml")
+    Package("libfreetype6-dev")
     Package("ntp")
     Package("mdadm")
     Package("lvm2")
