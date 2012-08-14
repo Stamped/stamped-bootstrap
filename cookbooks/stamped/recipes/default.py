@@ -80,18 +80,6 @@ if 'bootstrap' in env.config.node.roles:
     env.includeRecipe("pip")
     env.includeRecipe("libevent")
     
-    # install rabbitmq-server
-    # -----------------------
-    cmd = """
-    echo 'deb http://www.rabbitmq.com/debian/ testing main' >> /etc/apt/sources.list
-    wget http://www.rabbitmq.com/rabbitmq-signing-key-public.asc
-    apt-key add rabbitmq-signing-key-public.asc
-    apt-get -y update
-    """
-    Execute(cmd)
-    Package("rabbitmq-server")
-    Execute("/etc/init.d/rabbitmq-server stop; rm -f /etc/init.d/rabbitmq-server")
-    
     # install memcached and libmemcached
     # ----------------------------------
     Package("memcached")
@@ -242,7 +230,9 @@ if 'bootstrap' in env.config.node.roles:
     apt-get update
 
     ldconfig
+    
     apt-get install libboost-program-options-dev uuid-dev libevent-dev -y
+    
     apt-get install gearman-job-server libgearman2 libgearman-dev gearman-tools -y
     """
     Execute(r'. %s && %s' % (activate, cmd))
@@ -474,15 +464,10 @@ else:
         
         # start monitoring daemon
         # init_daemon("stampedmon")
-        
-        # start rabbit message queuing server
-        init_daemon("rabbitmq-server")
-        
-        # start rabbit message queuing server
-        init_daemon("celerybeat")
 
         # initialize mon-specific cron jobs (e.g., alerts)
         Execute("crontab /stamped/bootstrap/bin/cron.mon.config")
+        init_daemon('periodictasks')
     
     if 'analytics' in env.config.node.roles:
         init_daemon("nginx_analytics")
@@ -507,15 +492,12 @@ else:
         Execute("crontab /stamped/bootstrap/bin/cron.api.config")
     
     if 'work-api' in env.config.node.roles:
-        init_daemon("celeryd", template="celeryd-api")
+        init_daemon("work-api")
         Execute("crontab /stamped/bootstrap/bin/cron.work.config")
     elif 'work-enrich' in env.config.node.roles:
-        init_daemon("celeryd", template="celeryd-enrich")
+        init_daemon("work-enrich")
         Execute("crontab /stamped/bootstrap/bin/cron.work.config")
-    elif 'work' in env.config.node.roles:
-        init_daemon("celeryd")
-        Execute("crontab /stamped/bootstrap/bin/cron.work.config")
-    
+        
     if 'mem' in env.config.node.roles:
         init_daemon("memcached")
     
