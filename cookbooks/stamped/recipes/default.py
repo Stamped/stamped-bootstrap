@@ -182,17 +182,18 @@ if 'bootstrap' in env.config.node.roles:
     wget http://launchpad.net/graphite/0.9/0.9.9/+download/graphite-web-0.9.9.tar.gz
     wget http://launchpad.net/graphite/0.9/0.9.9/+download/carbon-0.9.9.tar.gz
     wget http://launchpad.net/graphite/0.9/0.9.9/+download/whisper-0.9.9.tar.gz
-    wget http://nodejs.org/dist/v0.6.17/node-v0.6.17.tar.gz
-    
+    wget http://nodejs.org/dist/v0.8.6/node-v0.8.6.tar.gz
+
+
     tar -xvf graphite-web-0.9.9.tar.gz
     tar -xvf whisper-0.9.9.tar.gz
     tar -xvf carbon-0.9.9.tar.gz
-    tar -xvf node-v0.6.17.tar.gz
+    tar -xvf node-v0.8.6.tar.gz
     
     mv carbon-0.9.9  carbon
     mv whisper-0.9.9 whisper
     mv graphite-web-0.9.9 graphite
-    mv node-v0.6.17 node
+    mv node-v0.8.6 node
     
     rm -f carbon-0.9.9.tar.gz whisper-0.9.9.tar.gz graphite-web-0.9.9.tar.gz node-v0.6.17
     
